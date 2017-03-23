@@ -307,7 +307,7 @@ public class Activity_Login extends AppCompatActivity {
             HttpURLConnection conn = null;
             String urlStr = "";
 
-            urlStr = "http://" + getString(R.string.ip_address)+ ":8080/ServerProject/addMemberInfo";
+            urlStr = "http://" + getString(R.string.ip_address)+ ":8080/SkhuGlocalitWebProject/addMemberInfo";
 
             try {
                 url = new URL(urlStr);
@@ -376,7 +376,7 @@ public class Activity_Login extends AppCompatActivity {
             HttpURLConnection conn = null;
             String urlStr = "";
 
-            urlStr = "http://" + getString(R.string.ip_address)+ ":8080/ServerProject/requestMemberID";
+            urlStr = "http://" + getString(R.string.ip_address)+ ":8080/SkhuGlocalitWebProject/requestMemberID";
 
             try {
                 url = new URL(urlStr);
@@ -438,7 +438,7 @@ public class Activity_Login extends AppCompatActivity {
             HttpURLConnection conn = null;
             String urlStr = "";
 
-            urlStr = "http://"+getString(R.string.ip_address)+":8080/ServerProject/requestLogin";
+            urlStr = "http://"+getString(R.string.ip_address)+":8080/SkhuGlocalitWebProject/requestLogin";
 
 
             try {
