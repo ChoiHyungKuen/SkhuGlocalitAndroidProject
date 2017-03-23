@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">SkhuGlocalitAndroidProject</string>
+    <string name="ip_address">192.168.123.112</string>
+    <string name="LS">Login_Success</string>
+    <string name="LF">Login_Fail</string>
+    <string name="JS">Join_Success</string>
+    <string name="JF">Join_Fail</string>
+    <string name="E">Error</string>
+    <string name="Check_Success">사용할 수 있는 학번입니다</string>
+    <string name="Check_Fail">입력된 학번은 사용중입니다. 확인 후 관리자에게 문의해주세요</string>
+
+
 </resources>
