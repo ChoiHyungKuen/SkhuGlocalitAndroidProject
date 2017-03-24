@@ -2,6 +2,7 @@
 package com.example.user_16.skhuglocalitandroidproject;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -15,6 +16,8 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.user_16.skhuglocalitandroidproject.BookDream.BookDreamMainActivity;
 
 import java.util.ArrayList;
 
@@ -33,7 +36,12 @@ public class NoticeBoardListFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
                 NoticeBoardListData data = (NoticeBoardListData)parent.getItemAtPosition(position);
-                Toast.makeText(getContext(), data.mTitle+"을 선택했습니다.", Toast.LENGTH_SHORT).show();
+                if(data.mTitle.equals("Book:Dream")) {
+                    Intent intent = new Intent(getContext(), BookDreamMainActivity.class);
+                    getActivity().startActivity(intent);
+                } else {
+                    Toast.makeText(getContext(), data.mTitle + "을 선택했습니다.", Toast.LENGTH_SHORT).show();
+                }
             }
         });
         listViewAdapter = new ListViewAdapter(getContext());
@@ -87,7 +95,7 @@ public class NoticeBoardListFragment extends Fragment {
             return position;
         }
 
-        // 사용자가 선택한 아이템 데이터를 layout_demand_board_item 형태에 맞춰 반환한다.
+        // 사용자가 선택한 아이템 데이터를 bookdream_request_item 형태에 맞춰 반환한다.
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             ViewHolder holder;

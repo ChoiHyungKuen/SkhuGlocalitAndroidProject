@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="title_sp_array">
+        <item>선    택</item>
+        <item>IT개론</item>
+        <item>컴퓨터문서작성</item>
+        <item>문제해결기초</item>
+        <item>C프로그래밍</item>
+        <item>이산수학</item>
+        <item>자료구조론</item>
+        <item>웹기초언어</item>
+        <item>객체지향프로그래밍</item>
+        <item>데이터베이스프로그래밍</item>
+        <item>데이터통신</item>
+        <item>운영체제론</item>
+        <item>기초프로젝트</item>
+        <item>실무프로젝트</item>
+        <item>컴퓨터구조</item>
+    </string-array>
+</resources>

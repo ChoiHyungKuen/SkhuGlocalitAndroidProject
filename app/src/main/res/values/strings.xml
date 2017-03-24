@@ -8,6 +8,34 @@
     <string name="E">Error</string>
     <string name="Check_Success">사용할 수 있는 학번입니다</string>
     <string name="Check_Fail">입력된 학번은 사용중입니다. 확인 후 관리자에게 문의해주세요</string>
+    <string name="title_activity_book_dream_main">BookDreamMainActivity</string>
+    <string name="action_settings">Settings</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+
+    <string name="enter_id">학번 입력</string>
+    <string name="enter_pw">비밀번호 입력</string>
+    <string name="iog_in">LOG IN</string>
+    <string name="joining">회원가입</string>
+    <string name="find_info">ID/PW찾기</string>
+    <string name="writing">글 쓰기</string>
+    <string name="refresh">새로고침</string>
+    <string name="title">과목</string>
+    <string name="type">타입</string>
+    <string name="user">글쓴이</string>
+    <string name="renting">DREAM</string>
+    <string name="giving">나눠주기</string>
+    <string name="state">책 상태</string>
+    <string name="uploading">갤러리</string>
+    <string name="content">글 내용</string>
+    <string name="photo">사진 찍기</string>
+    <string name="want_period">필요기간</string>
+    <string name="request">DREAM 신청하기</string>
+    <string name="ok">확인</string>
+    <string name="cancel">취소</string>
+    <string name="info_content">책 정보</string>
+    <string name="title_prompt">과목을 선택하세요.</string>
+    <string name="period_prompt">필요 기간을 선택하세요.</string>
+    <string name="demand_content">해당 과목 전공 서적에 대해 설명을 써주세요. (최대 50자)\n\n\n\n\n\n\n\n\n\n\n\n\n</string>
 
 
 </resources>
