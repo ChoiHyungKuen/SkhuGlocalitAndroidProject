@@ -4,6 +4,7 @@ package com.example.user_16.skhuglocalitandroidproject;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -15,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,9 +31,10 @@ import java.util.HashMap;
 
 public class Activity_Login extends AppCompatActivity {
 
-    private Button btn_login;
-    private TextView text_join;
     private EditText text_id, text_pw;
+    private CheckBox auto_login;
+    private SharedPreferences login_pref;
+    private SharedPreferences.Editor editor;
 
     private TextInputLayout TextInputLayout01, TextInputLayout02, TextInputLayout03, TextInputLayout04, TextInputLayout05;
     private EditText EditText_id, EditText_pw, EditText_pwTest, EditText_name, EditText_mail;
@@ -49,6 +52,14 @@ public class Activity_Login extends AppCompatActivity {
         {
             switch (msg.obj.toString()) {
                 case "Login_Success" :
+                    if(auto_login.isChecked()){
+                        Bundle loginInfo = msg.getData();
+                        login_pref = getSharedPreferences("login_Info",MODE_PRIVATE);
+                        editor = login_pref.edit();
+                        editor.putString("id", loginInfo.getString("id"));
+                        editor.putString("pw", loginInfo.getString("pw"));
+                        editor.commit();
+                    }
                     Toast.makeText(getApplicationContext(), "로그인 되었습니다.", Toast.LENGTH_SHORT).show();
                     break;
                 case "Login_Fail" :
@@ -72,8 +83,15 @@ public class Activity_Login extends AppCompatActivity {
         text_id = (EditText)findViewById(R.id.text_id);
         text_pw = (EditText)findViewById(R.id.text_pw);
 
-        btn_login = (Button) findViewById(R.id.btn_login);
-        text_join = (TextView) findViewById(R.id.text_join);
+        auto_login = (CheckBox)findViewById(R.id.check_autoLogin);
+
+        login_pref = getSharedPreferences("login_Info",MODE_PRIVATE);
+        if(!login_pref.getString("id","").equals("") && !login_pref.getString("pw","").equals("")){
+            Toast.makeText(getApplicationContext(), "자동로그인 되었습니다.", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            startActivity(intent);
+            finish();
+        }
 
     }
 
@@ -466,9 +484,6 @@ public class Activity_Login extends AppCompatActivity {
                     ois.close();
 
                     Bundle loginInfo = new Bundle();
-                    for(String pw:pwList) {
-                        Log.d("pwList",pw);
-                    }
 
                     int i = 0;
                     for (String id : idList) {
@@ -477,8 +492,9 @@ public class Activity_Login extends AppCompatActivity {
                             if (pwList.get(i).equals(args[1])) {
                                 loginInfo.putString("id", id);
                                 loginInfo.putString("pw", pwList.get(i));
-//                                final DBManager dbManager = new DBManager(getApplicationContext(), "App_Data.db", null, 1);
-//                                Log.d("비밀번호",pwList.get(i));
+                                final DBManager dbManager = new DBManager(getApplicationContext(), "app_data.db", null, 1);
+                                dbManager.insert(id, nameList.get(i), emailList.get(i));
+                                Log.d("비밀번호",pwList.get(i));
 
                                 Intent intent1 = new Intent(getApplicationContext(), MainActivity.class);
                                 startActivity(intent1);
