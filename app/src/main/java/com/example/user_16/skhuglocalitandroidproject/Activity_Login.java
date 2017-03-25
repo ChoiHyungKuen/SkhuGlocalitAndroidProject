@@ -68,6 +68,14 @@ public class Activity_Login extends AppCompatActivity {
                 case "Join_Success" :
                     Toast.makeText(getApplicationContext(), "회원가입 완료", Toast.LENGTH_SHORT).show();
                     break;
+                case "not exist":
+                    IDflag = true;
+                    Toast.makeText(getApplicationContext(),R.string.Check_Success,Toast.LENGTH_SHORT).show();
+                    break;
+                case "exist" :
+                    IDflag = false;
+                    Toast.makeText(getApplicationContext(),R.string.Check_Fail,Toast.LENGTH_SHORT).show();
+                    break;
                 case "Error" :
                     Toast.makeText(getApplicationContext(), "Error 발생", Toast.LENGTH_SHORT).show();
                     break;
@@ -146,7 +154,11 @@ public class Activity_Login extends AppCompatActivity {
         text_check.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
+
+                idCheckAsyncThread = new IDCheckAsyncThread();
+                idCheckAsyncThread.execute(EditText_id.getText().toString());
+                Log.d("아이디 서버로 보냄 테스트",EditText_id.getText().toString());
+              /*  try {*//*
                     String input_id = EditText_id.getText().toString();
                     if(CheckID(input_id)){
                         IDflag = true;
@@ -155,12 +167,12 @@ public class Activity_Login extends AppCompatActivity {
                     else {
                         IDflag = false;
                         Toast.makeText(getApplicationContext(),R.string.Check_Fail,Toast.LENGTH_SHORT).show();
-                    }
+                    }*//*
                 } catch (Exception e) {
                     IDflag = false;
                     Toast.makeText(getApplicationContext(), R.string.E, Toast.LENGTH_SHORT).show();
                     Log.e("ERR", "ID CHECK ERR : " + e.getMessage());
-                }
+                }*/
             }
         });
 
@@ -181,8 +193,6 @@ public class Activity_Login extends AppCompatActivity {
         dialog.setOnShowListener(new DialogInterface.OnShowListener() {
             @Override
             public void onShow(final DialogInterface d) {
-                idCheckAsyncThread = new IDCheckAsyncThread();
-                idCheckAsyncThread.execute();
 
                 Button positive = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
                 positive.setOnClickListener(new View.OnClickListener() {
@@ -278,7 +288,7 @@ public class Activity_Login extends AppCompatActivity {
         dialog.show();
 
     }
-
+/*
     public boolean CheckID(String id){
         boolean check = false;
         if(memberIdList.size() == 0) {
@@ -297,7 +307,7 @@ public class Activity_Login extends AppCompatActivity {
 
         return check;
     }
-
+*/
     /*
         사용자가 회원가입 시 잘못된 입력을 한 경우, 사용자에게 알려주기 위해 표시하는 메소드드
      */
@@ -325,7 +335,7 @@ public class Activity_Login extends AppCompatActivity {
             HttpURLConnection conn = null;
             String urlStr = "";
 
-            urlStr = "http://" + getString(R.string.ip_address)+ ":8080/SkhuGlocalitWebProject/addMemberInfo";
+            urlStr = "http://" + getString(R.string.ip_address)+ ":8080/SkhuGlocalitWebProject/member/addMemberInfo";
 
             try {
                 url = new URL(urlStr);
@@ -394,7 +404,7 @@ public class Activity_Login extends AppCompatActivity {
             HttpURLConnection conn = null;
             String urlStr = "";
 
-            urlStr = "http://" + getString(R.string.ip_address)+ ":8080/SkhuGlocalitWebProject/requestMemberID";
+            urlStr = "http://" + getString(R.string.ip_address)+ ":8080/SkhuGlocalitWebProject/member/compareId";
 
             try {
                 url = new URL(urlStr);
@@ -409,20 +419,28 @@ public class Activity_Login extends AppCompatActivity {
                 conn.setDoInput(true);
                 conn.setDoOutput(true);
 
+                ObjectOutputStream oos = new ObjectOutputStream(conn.getOutputStream());
+                ArrayList<String> idInfo = new ArrayList<>();
+                idInfo.add(args[0]);
+                oos.writeObject(idInfo);    // id를 서버로 보냅니다.
+                oos.flush();
                 Log.d("응답 메세지","실행중4----"+conn.getResponseCode());
                 if(conn.getResponseCode() == 200){
                     ObjectInputStream ois = new ObjectInputStream(conn.getInputStream());
-                    memberIdList = (ArrayList<String>) ois.readObject();
-                    Log.d("아이디 리스트",memberIdList.toString());
+                    ArrayList<String> resultInfo = (ArrayList<String>) ois.readObject();    // 서버로 부터 존재하는지 결과여부를 받습니다.
+                    Message msg = handler.obtainMessage();
+                    msg.obj = resultInfo.get(0);
+                    handler.sendMessage(msg);
                 }
 
+                oos.close();
                 conn.disconnect();
             }catch (Exception e){
                 Message msg = handler.obtainMessage();
                 msg.obj = getString(R.string.E);
                 Log.d("에러메세지",msg.obj.toString());
                 handler.sendMessage(msg);
-                Log.e("ERR", "AddMemberAsyncThread ERR : " + e);
+                Log.e("ERR", "IdCheckAsyncThread ERR : " + e);
 
             }
             return "";
@@ -456,11 +474,9 @@ public class Activity_Login extends AppCompatActivity {
             HttpURLConnection conn = null;
             String urlStr = "";
 
-            urlStr = "http://"+getString(R.string.ip_address)+":8080/SkhuGlocalitWebProject/requestLogin";
-
-
+            urlStr = "http://"+getString(R.string.ip_address)+":8080/SkhuGlocalitWebProject/member/login";
             try {
-                String message = getString(R.string.LF);
+                String message = getString(R.string.LF);        // 기본 메시지 스트링은 로그인 실패로 초기화
                 url = new URL(urlStr);
                 Log.d("URL","생성------"+urlStr);
                 conn = (HttpURLConnection) url.openConnection();
@@ -472,50 +488,40 @@ public class Activity_Login extends AppCompatActivity {
                 conn.setRequestProperty("Content-type", "application/x-www-form-urlencoded");
                 conn.setDoOutput(true);
                 conn.setDoOutput(true);
+                HashMap <String,String> memberInfoDataMap = new HashMap<>();
+                memberInfoDataMap.put("id",args[0]);
+                memberInfoDataMap.put("pw",args[1]);
 
+                ObjectOutputStream oos = new ObjectOutputStream(conn.getOutputStream());
+                oos.writeObject(memberInfoDataMap);
+                oos.flush();
+                oos.close();
                 Log.d("응답코드",conn.getResponseCode() +"");
                 if(conn.getResponseCode() == 200){
                     Log.d("응답코드","들어옴");
                     ObjectInputStream ois = new ObjectInputStream(conn.getInputStream());
-                    ArrayList<String> idList = (ArrayList<String>) ois.readObject();
-                    ArrayList<String> pwList = (ArrayList<String>) ois.readObject();
-                    ArrayList<String> nameList = (ArrayList<String>) ois.readObject();
-                    ArrayList<String> emailList = (ArrayList<String>) ois.readObject();
+                    // 서버로부터 로그인 결과를 받습니다.
+                    HashMap<String, String> member = (HashMap<String, String>)ois.readObject();
                     ois.close();
 
-                    Bundle loginInfo = new Bundle();
-
-                    int i = 0;
-                    for (String id : idList) {
-                        if(id.equals(args[0])) {
-                            Log.d("아이디",id +":"+ i);
-                            if (pwList.get(i).equals(args[1])) {
-                                loginInfo.putString("id", id);
-                                loginInfo.putString("pw", pwList.get(i));
-                                final DBManager dbManager = new DBManager(getApplicationContext(), "app_data.db", null, 1);
-                                dbManager.insert(id, nameList.get(i), emailList.get(i));
-                                Log.d("비밀번호",pwList.get(i));
-
-                                Intent intent1 = new Intent(getApplicationContext(), MainActivity.class);
-                                startActivity(intent1);
-                                message = getString(R.string.LS);
-                                finish();
-
-                            }
-                            break;
-                        }
-                        i++;
+                    if(member.size() >0 ){  // 회원의 정보가 들어가 있으면 로그인 성공
+                        /*
+                            그러면 스마트폰자체의 DB에 그값을 저장합니다.
+                         */
+                        final DBManager dbManager = new DBManager(getApplicationContext(), "app_data.db", null, 1);
+                        dbManager.insert(member.get("id"), member.get("name"), member.get("email"));
+                        // 그리고 MainActivity를 킵니다.
+                        Intent intent1 = new Intent(getApplicationContext(), MainActivity.class);
+                        startActivity(intent1);
+                        message = getString(R.string.LS);   // 성공메시지로 변경
+                        finish();
                     }
                     Message msg = handler.obtainMessage();
-                    if(loginInfo.size() > 0) {
-                        msg.setData(loginInfo);
-                    }
-                    msg.obj = message;
-                    handler.sendMessage(msg);
+                    msg.obj = message;  // 로그인 되면 로그인 성공 메시지, 실패하면 실패 메시지가 넣어집니다.
+                    handler.sendMessage(msg);   // Toast띄우기 위해 핸들러로 전송
                     Log.d("로그인메시지",message+"보냄");
 
                     conn.disconnect();
-
                 }
             } catch (Exception e) {
                 Message msg = handler.obtainMessage();
