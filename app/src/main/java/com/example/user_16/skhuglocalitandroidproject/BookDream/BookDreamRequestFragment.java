@@ -73,9 +73,16 @@ public class BookDreamRequestFragment extends Fragment {
                 } else {
                     Toast.makeText(getActivity(), "이미 처리 하신 상태입니다.", Toast.LENGTH_SHORT).show();
                 }
-            } else {
-                dAdapter.addItem(b.getString("no"), b.getString("title"), b.getString("date"), b.getString("user"), b.getString("period"), b.getString("content"));
-                dAdapter.dataChange();
+            }
+            else if(b.getString("status") !=null ) {
+                if (b.getString("status").equals("write_faile")) {
+                    Toast.makeText(getContext(), "파일을 추가하지 못 했습니다. 조금 이따 다시 시도해주세요!",Toast.LENGTH_SHORT).show();
+                }
+                else{
+                    dAdapter.addItem(Integer.parseInt(b.getString("no")), b.getString("title"),
+                            b.getString("date"), b.getString("user"), b.getString("period"), b.getString("content"));
+                    dAdapter.dataChange();
+                }
             }
         }
     };
@@ -112,7 +119,7 @@ public class BookDreamRequestFragment extends Fragment {
         demandListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
-                final DBManager dbManager = new DBManager(getContext(), "App_Data.db", null, 1);
+                final DBManager dbManager = new DBManager(getContext(), "app_data.db", null, 1);
                 final HashMap<String, String> dataMap = dbManager.getMemberInfo();
                 String userName = dataMap.get("id") +" " +dataMap.get("name");
                 BookDreamRequestListData dData = (BookDreamRequestListData) dAdapter.getItem(position);
@@ -178,7 +185,7 @@ public class BookDreamRequestFragment extends Fragment {
     public void getItemDialog(int position) {
         BookDreamRequestListData dData = dAdapter.mListData.get(position);
 
-        final String gNo = dData.mNo;
+        final int gNo = dData.mNo;
         final String gTitle = dData.mTitle;
         String gDate = dData.mDate;
         final String gUser = dData.mUser;
@@ -259,7 +266,7 @@ public class BookDreamRequestFragment extends Fragment {
                         String[] demandUserInfo = view_user.getText().toString().split(" ");
                         backgroundCompletePrecentConditionThread = new CompletePrecentCondionInfoAsyncThread();
                         backgroundCompletePrecentConditionThread.execute(
-                                gNo,gTitle,demandUserInfo[0], demandUserInfo[1],
+                                gNo+"",gTitle,demandUserInfo[0], demandUserInfo[1],
                                 date, time, edit_where.getText().toString(),
                                 edit_content.getText().toString(), edit_phone.getText().toString());
                     }
@@ -435,11 +442,9 @@ public class BookDreamRequestFragment extends Fragment {
                                 final HashMap<String, String> dataMap = dbManager.getMemberInfo();
                                 String userName = dataMap.get("id") +" " +dataMap.get("name");
                                 Calendar cal = Calendar.getInstance();
-                                String date = (cal.get(Calendar.YEAR) + "-" + (cal.get(Calendar.MONTH) + 1) + "-" + cal.get(Calendar.DATE));
+                                //String date = (cal.get(Calendar.YEAR) + "-" + (cal.get(Calendar.MONTH) + 1) + "-" + cal.get(Calendar.DATE));
                                 int n = dAdapter.getCount(); //현재리스트 숫자로 만드는 uniqueNum
-                                dAdapter.addItem(n+"", title, date, userName, period, content);
-                                dAdapter.dataChange();
-                                insertDatabase(n, title, date, userName, period, content);
+                                insertDatabase(n, title, userName, period, content);
                                 dialog.dismiss();
                             }
                         }
@@ -519,18 +524,17 @@ public class BookDreamRequestFragment extends Fragment {
 
             BookDreamRequestListData mData = mListData.get(position); // DListData로부터 해당 아이템의 데이터를 받아온다.
 
-            holder.mNo.setText(mData.mNo);
+            holder.mNo.setText(mData.mNo+"");
             holder.mTitle.setText(mData.mTitle);
             holder.mUser.setText(mData.mUser);
             holder.mSemester.setText(mData.mSemester);
-
             return convertView;
         }
 
         /*
             리스트에 아이템을 추가하는 메소드
         */
-        public void addItem(String mNo, String mTitle, String mDate, String mUser, String mSemester, String mContent) {
+        public void addItem(int mNo, String mTitle, String mDate, String mUser, String mSemester, String mContent) {
             BookDreamRequestListData addInfo = null;
             addInfo = new BookDreamRequestListData();
             addInfo.mNo = mNo;
@@ -569,9 +573,9 @@ public class BookDreamRequestFragment extends Fragment {
     /*
         DB에 새로운 데이터를 추가하는 메소드
      */
-    private void insertDatabase(int uniqueNum, String title, String date, String userName, String period, String content) {
+    private void insertDatabase(int uniqueNum, String title, String userName, String period, String content) {
         backgroundWriteThread = new WriteAsyncThread();
-        backgroundWriteThread.execute(uniqueNum+"", title, date, userName, period, content);
+        backgroundWriteThread.execute(uniqueNum+"", title,  userName, period, content);
     }
 
     public class WriteAsyncThread extends AsyncTask<String, String, String> {
@@ -589,7 +593,7 @@ public class BookDreamRequestFragment extends Fragment {
                 HttpURLConnection conn = null;
                 String urlStr = "";
 
-                urlStr = "http://"+getString(R.string.ip_address)+":8080/SkhuGlocalitWebProject/addDemandBulletinBoardInfo";
+                urlStr = "http://"+getString(R.string.ip_address)+":8080/SkhuGlocalitWebProject/bookdream/addRequestInfo";
                 url = new URL(urlStr);
                 Log.d("test", urlStr);
                 OutputStream os = null;
@@ -604,26 +608,46 @@ public class BookDreamRequestFragment extends Fragment {
                 conn.setRequestProperty("Content-type", "application/x-www-form-urlencoded");
                 conn.setDoInput(true);
                 conn.setDoOutput(true);
-                HashMap<String, String> params = new HashMap<>();
-                params.put("no", args[0]);
-                params.put("title", args[1]);
-                params.put("date", args[2]);
-                params.put("user", args[3]);
-                params.put("period", args[4]);
-                params.put("content", args[5]);
                 ObjectOutputStream oos = new ObjectOutputStream(conn.getOutputStream());
-                oos.writeObject(params);
+                HashMap<String, String> requestDataMap = new HashMap<>();
+                requestDataMap.put("no", args[0]);
+                requestDataMap.put("title", args[1]);
+                requestDataMap.put("user", args[2]);
+                requestDataMap.put("period", args[3]);
+                requestDataMap.put("content", args[4]);
+                oos.writeObject(requestDataMap);
                 oos.flush();
                 oos.close();
                 Log.d("test", "write");
-                if (conn.getResponseMessage().equals("OK")) { // 서버가 받았다면
-                    Log.d("Test","DD");
+                if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) { // 서버가 받았다면
+                    Log.d("get","서버데이터 받음");
+                    ObjectInputStream ois = new ObjectInputStream(conn.getInputStream());
+                    HashMap<String,String> responseDataMap = (HashMap<String,String>)ois.readObject();
+                    ois.close();
+
+                    Log.d("get","서버데이터 추가함");
+                    Bundle b = new Bundle();
+                    if(responseDataMap.size() ==0 ) {
+                        b.putString("status", "write_fail");
+                    }
+                    else {
+                        b.putString("status", "write");
+                        b.putString("no", responseDataMap.get("no"));
+                        b.putString("title", responseDataMap.get("title"));
+                        b.putString("date", responseDataMap.get("date"));
+                        b.putString("user", responseDataMap.get("user"));
+                        b.putString("period", responseDataMap.get("period"));
+                        b.putString("content", responseDataMap.get("content"));
+                        Message msg = handler.obtainMessage();
+                        msg.setData(b);
+                        handler.sendMessage(msg);
+                    }
                 }
                 conn.disconnect();
                 return "OK";
             } catch (Exception e) {
-                Toast.makeText(getActivity(), "Error 발생", Toast.LENGTH_SHORT).show();
-                Log.e("ERR", "WriteAsyncThread ERR : " + e.getMessage());
+                //Toast.makeText(getActivity(), "Error 발생", Toast.LENGTH_SHORT).show();
+                Log.e("ERR", "WriteAsyncThread ERR : " + e);
             }
             return "";
         }
@@ -655,7 +679,7 @@ public class BookDreamRequestFragment extends Fragment {
             HttpURLConnection conn = null;
             String urlStr = "";
 
-            urlStr = "http://"+getString(R.string.ip_address)+":8080/SkhuGlocalitWebProject/requestDemandBulletinBoardInitInfo";
+            urlStr = "http://"+getString(R.string.ip_address)+":8080/SkhuGlocalitWebProject/bookdream/initRequestInfo";
 
             try {
                 url = new URL(urlStr);
@@ -671,33 +695,31 @@ public class BookDreamRequestFragment extends Fragment {
                 conn.setDoInput(true);
                 conn.setDoOutput(true);
                 int responseCode = conn.getResponseCode();
-                Log.d("D", responseCode+"");
-                if (responseCode == HttpURLConnection.HTTP_OK) {    // 송수신이 잘되면 - 데이터를 받은 것
-                    Log.d("coded", "들어옴");
-                    ObjectInputStream ois = new ObjectInputStream(conn.getInputStream());
-                    HashMap<String, HashMap<String, String>> dataMap = (HashMap<String, HashMap<String, String>>)ois.readObject();
-                    ois.close();
+                Log.d("D", responseCode+"");/*
+                if (responseCode== HttpURLConnection.HTTP_OK) {    // 송수신이 잘되면 - 데이터를 받은 것
+                    Log.d("coded", "들어옴");*/
+                ObjectInputStream ois = new ObjectInputStream(conn.getInputStream());
+                HashMap<String, HashMap<String, String>> dataMap = (HashMap<String, HashMap<String, String>>)ois.readObject();
+                ois.close();
 
-                    for(int i=0; i<dataMap.size(); i++) {
-                        HashMap<String, String> stringDataMap = dataMap.get(i+"");
-                        Message msg = handler.obtainMessage();
-                        Bundle b = new Bundle();
-                        b.putString("no", i+"");
-                        b.putString("title" , stringDataMap.get("title"));
-                        Log.d("DD", stringDataMap.get("title"));
-                        b.putString("date" , stringDataMap.get("date"));
-                        b.putString("user", stringDataMap.get("user"));
-                        b.putString("period", stringDataMap.get("period"));
-                        b.putString("content", stringDataMap.get("content"));
-                        msg.setData(b);
-                        handler.sendMessage(msg);
-                    }
-
-                    conn.disconnect();
+                for(int i=0; i<dataMap.size(); i++) {
+                    HashMap<String, String> stringDataMap = dataMap.get(i+"");
+                    Message msg = handler.obtainMessage();
+                    Bundle b = new Bundle();
+                    b.putString("status","init");
+                    b.putString("no", stringDataMap.get("no"));
+                    b.putString("title" , stringDataMap.get("title"));
+                    b.putString("date" , stringDataMap.get("date"));
+                    b.putString("user", stringDataMap.get("user"));
+                    b.putString("period", stringDataMap.get("period"));
+                    b.putString("content", stringDataMap.get("content"));
+                    msg.setData(b);
+                    handler.sendMessage(msg);
                 }
+                conn.disconnect();
             } catch (Exception e) {
-                Toast.makeText(getActivity(), "Error 발생", Toast.LENGTH_SHORT).show();
-                Log.e("ERR", "InitAsyncThread ERR : " + e.getMessage());
+                //Toast.makeText(getActivity(), "Error 발생", Toast.LENGTH_SHORT).show();
+                Log.e("ERR", "InitAsyncThread ERR : " + e);
             }
 
             return "";
@@ -733,7 +755,7 @@ public class BookDreamRequestFragment extends Fragment {
                 HttpURLConnection conn = null;
                 String urlStr = "";
 
-                urlStr = "http://"+getString(R.string.ip_address)+":8080/SkhuGlocalitWebProject/removeDemandBulletinBoardInfo";
+                urlStr = "http://"+getString(R.string.ip_address)+":8080/SkhuGlocalitWebProject/bookdream/removeRequestInfo";
                 url = new URL(urlStr);
                 Log.d("test", urlStr);
 
@@ -753,19 +775,19 @@ public class BookDreamRequestFragment extends Fragment {
                 oos.flush();
                 oos.close();
                 Log.d("test", "remove_write");
-                if (conn.getResponseMessage().equals("OK")) { // 서버가 받았다면
+                if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) { // 서버가 받았다면
                     Log.d("coded", "들어옴");
                     ObjectInputStream ois = new ObjectInputStream(conn.getInputStream());
                     HashMap<String, HashMap<String, String>> dataMap = (HashMap<String, HashMap<String, String>>)ois.readObject();
                     ois.close();
 
-                    for(int i = 0; i < dataMap.size(); i++) {
+                    for(int i=0; i<dataMap.size(); i++) {
                         HashMap<String, String> stringDataMap = dataMap.get(i+"");
                         Message msg = handler.obtainMessage();
                         Bundle b = new Bundle();
-                        b.putString("no", i+"");
+                        b.putString("status","init");
+                        b.putString("no", stringDataMap.get("no"));
                         b.putString("title" , stringDataMap.get("title"));
-                        Log.d("DD", stringDataMap.get("title"));
                         b.putString("date" , stringDataMap.get("date"));
                         b.putString("user", stringDataMap.get("user"));
                         b.putString("period", stringDataMap.get("period"));
@@ -773,13 +795,11 @@ public class BookDreamRequestFragment extends Fragment {
                         msg.setData(b);
                         handler.sendMessage(msg);
                     }
-
-                    Log.d("Test","DD");
                 }
                 conn.disconnect();
                 return "OK";
             }  catch (Exception e) {
-                Toast.makeText(getActivity(), "Error 발생", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getActivity(), "Error 발생", Toast.LENGTH_SHORT).show();
                 Log.e("ERR", "RemoveAsyncThread ERR : " + e.getMessage());
             }
             return "";
@@ -846,7 +866,7 @@ public class BookDreamRequestFragment extends Fragment {
                 oos.writeObject(dataMap);
                 oos.flush();
                 oos.close();
-                if (conn.getResponseMessage().equals("OK")) { // 서버가 받았다면
+                if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) { // 서버가 받았다면
                     ObjectInputStream ois = new ObjectInputStream(conn.getInputStream());
                     HashMap<String, String> stringDataMap = (HashMap<String, String>)ois.readObject();
                     ois.close();
