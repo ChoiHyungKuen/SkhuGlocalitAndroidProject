@@ -7,7 +7,7 @@ package com.example.user_16.skhuglocalitandroidproject.BookDream;
  *
  * 요청 프래그먼트에서 사용되는 데이터를 관리한다.
  **/
-public class BookDreamRequestListData {
+public class RequestListData {
     public int mNo;          // 유니크넘버
     public String mTitle;       // 제목
     public String mDate;        // 날짜

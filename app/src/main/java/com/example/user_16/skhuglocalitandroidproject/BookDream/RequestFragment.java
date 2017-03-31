@@ -41,7 +41,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 
-public class BookDreamRequestFragment extends Fragment {
+public class RequestFragment extends Fragment {
     private ListView demandListView = null;
     private ListViewAdapter dAdapter = null;
     private SwipeRefreshLayout mSwipeRefreshLayout = null;
@@ -122,7 +122,7 @@ public class BookDreamRequestFragment extends Fragment {
                 final DBManager dbManager = new DBManager(getContext(), "app_data.db", null, 1);
                 final HashMap<String, String> dataMap = dbManager.getMemberInfo();
                 String userName = dataMap.get("id") +" " +dataMap.get("name");
-                BookDreamRequestListData dData = (BookDreamRequestListData) dAdapter.getItem(position);
+                RequestListData dData = (RequestListData) dAdapter.getItem(position);
                 if (!dData.mUser.equals(userName)) {    // 해당 글 작성자가 아닌 경우 실패 메세지를 띄우고 삭제 취소
                     Log.d("user", dData.mUser);
                     Log.d("userInfo", userName);
@@ -183,7 +183,7 @@ public class BookDreamRequestFragment extends Fragment {
         DListData에서 해당 정보를 찾아 다이얼로그에 정보를 띄운다.
     */
     public void getItemDialog(int position) {
-        BookDreamRequestListData dData = dAdapter.mListData.get(position);
+        RequestListData dData = dAdapter.mListData.get(position);
 
         final int gNo = dData.mNo;
         final String gTitle = dData.mTitle;
@@ -232,7 +232,7 @@ public class BookDreamRequestFragment extends Fragment {
                 }
 
                 LayoutInflater inflater = LayoutInflater.from(getContext());
-                final View dialogView= inflater.inflate(R.layout.layout_supply_precent_condition_dialog,null);
+                final View dialogView= inflater.inflate(R.layout.bookdream_give_presentcondition_dialog,null);
 
                 final DatePicker datePicker = (DatePicker)  dialogView.findViewById(R.id.datePicker);
                 final TimePicker timePicker = (TimePicker)  dialogView.findViewById(R.id.timePicker);
@@ -477,7 +477,7 @@ public class BookDreamRequestFragment extends Fragment {
      */
     private class ListViewAdapter extends BaseAdapter {
         private Context mContext = null;
-        private ArrayList<BookDreamRequestListData> mListData = new ArrayList<>();
+        private ArrayList<RequestListData> mListData = new ArrayList<>();
 
         public ListViewAdapter(Context mContext) {
             super();
@@ -505,9 +505,9 @@ public class BookDreamRequestFragment extends Fragment {
         // 사용자가 선택한 아이템 데이터를 bookdream_request_item 형태에 맞춰 반환한다.
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            BookDreamRequestFragment.ViewHolder holder;
+            RequestFragment.ViewHolder holder;
             if (convertView == null) {
-                holder = new BookDreamRequestFragment.ViewHolder();
+                holder = new RequestFragment.ViewHolder();
 
                 LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 convertView = inflater.inflate(R.layout.bookdream_request_item, null);
@@ -519,10 +519,10 @@ public class BookDreamRequestFragment extends Fragment {
 
                 convertView.setTag(holder);
             } else {
-                holder = (BookDreamRequestFragment.ViewHolder) convertView.getTag();
+                holder = (RequestFragment.ViewHolder) convertView.getTag();
             }
 
-            BookDreamRequestListData mData = mListData.get(position); // DListData로부터 해당 아이템의 데이터를 받아온다.
+            RequestListData mData = mListData.get(position); // DListData로부터 해당 아이템의 데이터를 받아온다.
 
             holder.mNo.setText(mData.mNo+"");
             holder.mTitle.setText(mData.mTitle);
@@ -535,8 +535,8 @@ public class BookDreamRequestFragment extends Fragment {
             리스트에 아이템을 추가하는 메소드
         */
         public void addItem(int mNo, String mTitle, String mDate, String mUser, String mSemester, String mContent) {
-            BookDreamRequestListData addInfo = null;
-            addInfo = new BookDreamRequestListData();
+            RequestListData addInfo = null;
+            addInfo = new RequestListData();
             addInfo.mNo = mNo;
             addInfo.mTitle = mTitle;
             addInfo.mDate = mDate;
@@ -695,26 +695,27 @@ public class BookDreamRequestFragment extends Fragment {
                 conn.setDoInput(true);
                 conn.setDoOutput(true);
                 int responseCode = conn.getResponseCode();
-                Log.d("D", responseCode+"");/*
+                Log.d("D", responseCode+"");
                 if (responseCode== HttpURLConnection.HTTP_OK) {    // 송수신이 잘되면 - 데이터를 받은 것
-                    Log.d("coded", "들어옴");*/
-                ObjectInputStream ois = new ObjectInputStream(conn.getInputStream());
-                HashMap<String, HashMap<String, String>> dataMap = (HashMap<String, HashMap<String, String>>)ois.readObject();
-                ois.close();
+                    Log.d("coded", "들어옴");
+                    ObjectInputStream ois = new ObjectInputStream(conn.getInputStream());
+                    HashMap<String, HashMap<String, String>> dataMap = (HashMap<String, HashMap<String, String>>) ois.readObject();
+                    ois.close();
 
-                for(int i=0; i<dataMap.size(); i++) {
-                    HashMap<String, String> stringDataMap = dataMap.get(i+"");
-                    Message msg = handler.obtainMessage();
-                    Bundle b = new Bundle();
-                    b.putString("status","init");
-                    b.putString("no", stringDataMap.get("no"));
-                    b.putString("title" , stringDataMap.get("title"));
-                    b.putString("date" , stringDataMap.get("date"));
-                    b.putString("user", stringDataMap.get("user"));
-                    b.putString("period", stringDataMap.get("period"));
-                    b.putString("content", stringDataMap.get("content"));
-                    msg.setData(b);
-                    handler.sendMessage(msg);
+                    for (int i = 0; i < dataMap.size(); i++) {
+                        HashMap<String, String> stringDataMap = dataMap.get(i + "");
+                        Message msg = handler.obtainMessage();
+                        Bundle b = new Bundle();
+                        b.putString("status", "init");
+                        b.putString("no", stringDataMap.get("no"));
+                        b.putString("title", stringDataMap.get("title"));
+                        b.putString("date", stringDataMap.get("date"));
+                        b.putString("user", stringDataMap.get("user"));
+                        b.putString("period", stringDataMap.get("period"));
+                        b.putString("content", stringDataMap.get("content"));
+                        msg.setData(b);
+                        handler.sendMessage(msg);
+                    }
                 }
                 conn.disconnect();
             } catch (Exception e) {

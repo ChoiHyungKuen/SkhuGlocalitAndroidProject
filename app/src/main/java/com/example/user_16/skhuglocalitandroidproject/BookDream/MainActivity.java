@@ -11,14 +11,14 @@ import android.widget.Toast;
 
 import com.example.user_16.skhuglocalitandroidproject.R;
 
-public class BookDreamMainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity {
 
         private final long	FINSH_INTERVAL_TIME = 2000; // 2초안에 Back 버튼을 2번 누르면 앱 종료 -> 2초
         private long backPressedTime = 0;
 
         private int[] imageResId = {
                 R.drawable.request,
-                R.drawable.dream,
+                R.drawable.give,
                 R.drawable.info,
                 R.drawable.settings
         };
@@ -39,7 +39,7 @@ public class BookDreamMainActivity extends AppCompatActivity {
 
             // 5개의 탭에 맞게 프래그먼트 구성
             final ViewPager viewPager = (ViewPager) findViewById(R.id.bookdream_pager);
-            final BookDreamTabPagerAdapter adapter = new BookDreamTabPagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount());
+            final TabPagerAdapter adapter = new TabPagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount());
             viewPager.setAdapter(adapter);
             viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
             tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {

@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".BookDream.BookDreamMainActivity">
+    tools:context=".BookDream.MainActivity">
 
     <android.support.design.widget.TabLayout
         android:id="@+id/bookdream_tab_layout"

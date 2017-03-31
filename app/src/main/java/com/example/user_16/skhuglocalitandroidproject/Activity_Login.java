@@ -205,12 +205,7 @@ public class Activity_Login extends AppCompatActivity {
                                 dbEmail = EditText_mail.getText().toString();
                         try {
                             if(flag) {
-                                if(IDflag){
-                                    flag = true;
-                                }
-                                else {
-                                    flag = false;
-                                }
+                                flag = IDflag;
                             }
 
                             if(flag) {
