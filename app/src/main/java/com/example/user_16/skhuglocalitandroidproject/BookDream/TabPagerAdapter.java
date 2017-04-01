@@ -32,14 +32,11 @@ public class TabPagerAdapter extends FragmentStatePagerAdapter {
                 GiveFragment bookDreamGiveFragment = new GiveFragment();
                 return bookDreamGiveFragment;
             case 2:
-                TabFragment03 tabFragment03 = new TabFragment03();
-                return tabFragment03;
+                InformationFragment informationFragment = new InformationFragment();
+                return informationFragment;
             case 3:
                 TabFragment04 tabFragment04 = new TabFragment04();
                 return tabFragment04;
-            case 4:
-                TabFragment04 tabFragment01 = new TabFragment04();
-                return tabFragment01;
             default:
                 return null;
         }
