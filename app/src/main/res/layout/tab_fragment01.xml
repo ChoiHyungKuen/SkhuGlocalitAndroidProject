@@ -12,4 +12,12 @@
         android:textAlignment="center"
         android:textAppearance="?android:attr/textAppearanceLarge"/>
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_logout"
+        android:text="로그아웃"
+        android:textAlignment="center"
+        android:layout_gravity="center"/>
+
 </LinearLayout>

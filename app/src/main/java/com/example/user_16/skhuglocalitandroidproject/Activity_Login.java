@@ -53,11 +53,14 @@ public class Activity_Login extends AppCompatActivity {
             switch (msg.obj.toString()) {
                 case "Login_Success" :
                     if(auto_login.isChecked()){
+                        Log.d("자동로그인 들어왔어","!!!!!!!!!!!!!!!!!!!!!1");
                         Bundle loginInfo = msg.getData();
                         login_pref = getSharedPreferences("login_Info",MODE_PRIVATE);
                         editor = login_pref.edit();
                         editor.putString("id", loginInfo.getString("id"));
+                        Log.d("저장한 아이디",login_pref.getString("id",""));
                         editor.putString("pw", loginInfo.getString("pw"));
+                        Log.d("저장한 비번",login_pref.getString("pw",""));
                         editor.commit();
                     }
                     Toast.makeText(getApplicationContext(), "로그인 되었습니다.", Toast.LENGTH_SHORT).show();
@@ -498,7 +501,7 @@ public class Activity_Login extends AppCompatActivity {
                     // 서버로부터 로그인 결과를 받습니다.
                     HashMap<String, String> member = (HashMap<String, String>)ois.readObject();
                     ois.close();
-
+                    Bundle loginInfo = new Bundle();
                     if(member.size() >0 ){  // 회원의 정보가 들어가 있으면 로그인 성공
                         /*
                             그러면 스마트폰자체의 DB에 그값을 저장합니다.
@@ -508,11 +511,17 @@ public class Activity_Login extends AppCompatActivity {
                         // 그리고 MainActivity를 킵니다.
                         Intent intent1 = new Intent(getApplicationContext(), MainActivity.class);
                         startActivity(intent1);
+
+                        loginInfo.putString("id",member.get("id"));
+                        Log.d("로그인 아이디 담기",loginInfo.getString("id"));
+                        loginInfo.putString("pw",args[1]);
+                        Log.d("로그인 비번 담기",loginInfo.getString("pw"));
                         message = getString(R.string.LS);   // 성공메시지로 변경
                         finish();
                     }
                     Message msg = handler.obtainMessage();
                     msg.obj = message;  // 로그인 되면 로그인 성공 메시지, 실패하면 실패 메시지가 넣어집니다.
+                    msg.setData(loginInfo);
                     handler.sendMessage(msg);   // Toast띄우기 위해 핸들러로 전송
                     Log.d("로그인메시지",message+"보냄");
 
