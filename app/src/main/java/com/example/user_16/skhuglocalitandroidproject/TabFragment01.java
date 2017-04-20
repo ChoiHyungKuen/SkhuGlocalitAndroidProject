@@ -12,6 +12,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.messaging.FirebaseMessaging;
+
 import static android.content.Context.MODE_PRIVATE;
 
 
@@ -29,7 +32,8 @@ public class TabFragment01 extends Fragment {
             @Override
             public void onClick(View v) { //DB헬퍼에 있는 정보와 login_Info 삭제
                 SharedPreferences login_pref = getContext().getSharedPreferences("login_Info", MODE_PRIVATE);
-                dbManager.delete(login_pref.getString("id",""));
+                dbManager.deleteAll();
+                //dbManager.delete(login_pref.getString("id",""));
                 Log.d("test", login_pref.getString("id",""));
                 SharedPreferences.Editor editor = login_pref.edit();
                 editor.clear();

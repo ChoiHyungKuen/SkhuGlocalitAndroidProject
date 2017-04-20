@@ -21,6 +21,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.user_16.skhuglocalitandroidproject.BookDream.FirebaseInstanceIDService;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.messaging.FirebaseMessaging;
+
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.HttpURLConnection;
@@ -33,7 +37,7 @@ public class Activity_Login extends AppCompatActivity {
 
     private EditText text_id, text_pw;
     private CheckBox auto_login;
-    private SharedPreferences login_pref;
+    private SharedPreferences login_pref, init_pref;
     private SharedPreferences.Editor editor;
 
     private TextInputLayout TextInputLayout01, TextInputLayout02, TextInputLayout03, TextInputLayout04, TextInputLayout05;
@@ -52,6 +56,7 @@ public class Activity_Login extends AppCompatActivity {
         {
             switch (msg.obj.toString()) {
                 case "Login_Success" :
+                    String token = FirebaseInstanceId.getInstance().getToken();
                     if(auto_login.isChecked()){
                         Log.d("자동로그인 들어왔어","!!!!!!!!!!!!!!!!!!!!!1");
                         Bundle loginInfo = msg.getData();
@@ -63,7 +68,6 @@ public class Activity_Login extends AppCompatActivity {
                         Log.d("저장한 비번",login_pref.getString("pw",""));
                         editor.commit();
                     }
-                    Toast.makeText(getApplicationContext(), "로그인 되었습니다.", Toast.LENGTH_SHORT).show();
                     break;
                 case "Login_Fail" :
                     Toast.makeText(getApplicationContext(), "학번이나 비밀번호를 잘못입력하셨습니다.", Toast.LENGTH_SHORT).show();
@@ -90,6 +94,7 @@ public class Activity_Login extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        initProgram();
 
         text_id = (EditText)findViewById(R.id.text_id);
         text_pw = (EditText)findViewById(R.id.text_pw);
@@ -132,8 +137,12 @@ public class Activity_Login extends AppCompatActivity {
         String pw = text_pw.getText().toString();
 
         if(id.length() == 9 && pw.length() > 0){
+
+            init_pref = getSharedPreferences("init_Info",MODE_PRIVATE);
             loginAsyncThread = new LoginAsyncThread();
             loginAsyncThread.execute(id, pw);
+        } else {
+            Toast.makeText(getApplicationContext(), "아이디나 비밀번호를 제대로 입력해 주세요.", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -306,6 +315,22 @@ public class Activity_Login extends AppCompatActivity {
         return check;
     }
 */
+    public  void initProgram() {
+            Log.d("init","초기화 작업!");
+            init_pref = getSharedPreferences("init_Info",MODE_PRIVATE);
+            if(init_pref.getString("init","").equals("")) {         // 처음 프로그램 깔면 실행해야 될 것들을 여기서 처리
+                final DBManager dbManager = new DBManager(getApplicationContext(), "app_data.db", null, 1);
+                HashMap<String, String> data = dbManager.getMemberInfo();
+                if(data.size()!=0)
+                    dbManager.deleteAll();
+                String token = FirebaseInstanceId.getInstance().getToken();
+                Log.d("init", "");
+                editor = init_pref.edit();
+                editor.putString("init", "init");
+                Log.d("init", init_pref.getString("init", ""));
+                editor.commit();
+            }
+    }
     /*
         사용자가 회원가입 시 잘못된 입력을 한 경우, 사용자에게 알려주기 위해 표시하는 메소드드
      */
@@ -471,7 +496,7 @@ public class Activity_Login extends AppCompatActivity {
             URL url;
             HttpURLConnection conn = null;
             String urlStr = "";
-
+            final DBManager dbManager = new DBManager(getApplicationContext(), "app_data.db", null, 1);
             urlStr = "http://"+getString(R.string.ip_address)+":8080/SkhuGlocalitWebProject/member/login";
             try {
                 String message = getString(R.string.LF);        // 기본 메시지 스트링은 로그인 실패로 초기화
@@ -489,7 +514,10 @@ public class Activity_Login extends AppCompatActivity {
                 HashMap <String,String> memberInfoDataMap = new HashMap<>();
                 memberInfoDataMap.put("id",args[0]);
                 memberInfoDataMap.put("pw",args[1]);
-
+                /* 로그인 할 때 마다 로그인 된 정보가 서버에 가고 기존에 설치된 어플리케이션의 토큰에서
+                   정보가 로그인된 정보로 계속 수정된다. */
+                String token = FirebaseInstanceId.getInstance().getToken();
+                memberInfoDataMap.put("token", token);
                 ObjectOutputStream oos = new ObjectOutputStream(conn.getOutputStream());
                 oos.writeObject(memberInfoDataMap);
                 oos.flush();
@@ -506,8 +534,9 @@ public class Activity_Login extends AppCompatActivity {
                         /*
                             그러면 스마트폰자체의 DB에 그값을 저장합니다.
                          */
-                        final DBManager dbManager = new DBManager(getApplicationContext(), "app_data.db", null, 1);
-                        dbManager.insert(member.get("id"), member.get("name"), member.get("email"));
+                        HashMap<String, String> data = dbManager.getMemberInfo();
+                        if(data.size()==0)
+                            dbManager.insert(member.get("id"), member.get("name"), member.get("email"));
                         // 그리고 MainActivity를 킵니다.
                         Intent intent1 = new Intent(getApplicationContext(), MainActivity.class);
                         startActivity(intent1);
@@ -529,7 +558,7 @@ public class Activity_Login extends AppCompatActivity {
                 }
             } catch (Exception e) {
                 Message msg = handler.obtainMessage();
-                msg.obj = getString(R.string.E);
+                msg.obj = getString(R.string.E)+e;
                 Log.d("에러메세지",msg.obj.toString());
                 handler.sendMessage(msg);
                 Log.e("ERR", "LoginAsyncThread ERR : " + e.getMessage());

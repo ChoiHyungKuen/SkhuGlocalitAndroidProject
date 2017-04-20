@@ -31,6 +31,7 @@ import com.example.user_16.skhuglocalitandroidproject.DBManager;
 import com.example.user_16.skhuglocalitandroidproject.R;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -40,6 +41,11 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+
+import okhttp3.FormBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
 
 public class RequestFragment extends Fragment {
     private ListView demandListView = null;
@@ -225,8 +231,8 @@ public class RequestFragment extends Fragment {
             public void onClick(View v) { // 선배 : 후배가 올린 드림 글의 요청에 응한 경우 (선배가 후배에게 책을 주고싶은 경우)
                 final DBManager dbManager = new DBManager(getContext(), "app_data.db", null, 1);
                 final HashMap<String, String> dataMap = dbManager.getMemberInfo();
-                String userName = dataMap.get("id") +" " +dataMap.get("name");
-                if(gUser.equals(userName)) { // 자기 자신의 드림 요청에 응하는것 방지
+                String user = dataMap.get("id") +" " +dataMap.get("name");
+                if(gUser.equals(user)) { // 자기 자신의 드림 요청에 응하는것 방지
                     Toast.makeText(getContext(), "자신한테 DREAM을 할 수 없습니다.", Toast.LENGTH_LONG).show();
                     return ;
                 }
@@ -263,12 +269,42 @@ public class RequestFragment extends Fragment {
                         }
 
                         // 선배의 정보와 드림 메세지(선배 이름, 연락처, 약속 장소 등)을 보냄
+
+                        /*
                         String[] demandUserInfo = view_user.getText().toString().split(" ");
                         backgroundCompletePrecentConditionThread = new CompletePrecentCondionInfoAsyncThread();
                         backgroundCompletePrecentConditionThread.execute(
                                 gNo+"",gTitle,demandUserInfo[0], demandUserInfo[1],
                                 date, time, edit_where.getText().toString(),
-                                edit_content.getText().toString(), edit_phone.getText().toString());
+                                edit_content.getText().toString(), edit_phone.getText().toString());*/
+                        final DBManager dbManager = new DBManager(getContext(), "app_data.db", null, 1);
+                        final HashMap<String, String> dataMap = dbManager.getMemberInfo();
+                        String user = dataMap.get("id") +" " +dataMap.get("name");
+                        OkHttpClient client = new OkHttpClient();
+                        RequestBody body = new FormBody.Builder()
+                                .add("title",gTitle)
+                                .add("giveUser", user)
+                                .add("requestUser", view_user.getText().toString())
+                                .add("date", date)
+                                .add("time", time)
+                                .add("where", edit_where.getText().toString())
+                                .add("content", edit_content.getText().toString())
+                                .add("phone", edit_phone.getText().toString())
+                                .build();
+
+                        //request
+                        Log.d("TAG", "접속 ");
+                        Request request = new Request.Builder()
+                                .url("http://"+getString(R.string.ip_address)+":8080/SkhuGlocalitWebProject/bookdream/giveMatch")
+                                .post(body)
+                                .build();
+                        try {
+                            client.newCall(request).execute();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+
                     }
                 });
 

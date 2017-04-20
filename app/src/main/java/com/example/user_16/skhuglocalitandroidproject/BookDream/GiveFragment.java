@@ -811,7 +811,7 @@ public class GiveFragment extends Fragment {
                 Log.d("D", responseCode+"");
                 if (responseCode == HttpURLConnection.HTTP_OK) {    // 송수신이 잘되면 - 데이터를 받은 것입니다.
                     Log.d("coded", "들어옴");
-                                     ObjectInputStream ois = new ObjectInputStream(conn.getInputStream());
+                    ObjectInputStream ois = new ObjectInputStream(conn.getInputStream());
                     HashMap<String, HashMap<String,String>> dataMap = (HashMap<String, HashMap<String,String>>)ois.readObject();
                     HashMap<String, byte[]> imgByteMap = (HashMap<String, byte[]>)ois.readObject();
                     ois.close();

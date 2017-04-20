@@ -31,18 +31,13 @@ public class FirebaseInstanceIDService extends FirebaseInstanceIdService {
 
     private void sendRegistrationToServer(String token) {
         // Add custom implementation, as needed.
-
-        final DBManager dbManager = new DBManager(getApplicationContext(), "app_data.db", null, 1);
-        final HashMap<String, String> dataMap = dbManager.getMemberInfo();
-        String user = dataMap.get("id") +" " +dataMap.get("name");
         OkHttpClient client = new OkHttpClient();
         RequestBody body = new FormBody.Builder()
                 .add("token", token)
-                .add("user", user)
+                .add("user", "")
                 .build();
 
         //request
-        Log.d(TAG, "접속 ");
         Request request = new Request.Builder()
                 .url("http://"+getString(R.string.ip_address)+":8080/SkhuGlocalitWebProject/fcm/registerToken")
                 .post(body)

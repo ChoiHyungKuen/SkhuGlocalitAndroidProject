@@ -30,7 +30,6 @@ public class DBManager extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
     }
 
     public void insert(String id, String name, String email){
@@ -38,15 +37,18 @@ public class DBManager extends SQLiteOpenHelper {
         query = "insert into app_data values (null, '" + id + "', '" + name + "', '" + email + "');";
         Log.d("쿼리",query);
         db.execSQL(query);
-        Log.d("회원정보","추가");
+        Log.d("회원정보","insrt추가");
     }
-
     public void delete(String id) {
         db = getWritableDatabase();
-        query =  "delete from app_data where id = '" + id + "';";
+        query =  "delete from app_data where id ='"+id +"';";
         Log.d("쿼리",query);
         db.execSQL(query);
         Log.d("회원정보","삭제");
+    }
+    public void deleteAll(){
+        this.db.delete("app_data",null,null);
+        Log.d("회원정보","전부삭제");
     }
 
     public HashMap<String, String> getMemberInfo() {
@@ -56,12 +58,15 @@ public class DBManager extends SQLiteOpenHelper {
         Log.d("쿼리",query);
         Cursor cursor = db.rawQuery(query, null);
         Log.d("테이블","읽기");
+        int cnt=0;
         while (cursor.moveToNext()) {
             memberInfo.put("id",cursor.getString(1));
             memberInfo.put("name",cursor.getString(2));
             memberInfo.put("email",cursor.getString(3));
+            cnt++;
+            Log.d("회원정보",memberInfo.toString()+"");
         }
-        Log.d("회원정보",memberInfo.toString());
+        Log.d("회원정보",cnt+"개");
         return memberInfo;
     }
 
