@@ -12,9 +12,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.firebase.iid.FirebaseInstanceId;
-import com.google.firebase.messaging.FirebaseMessaging;
-
 import static android.content.Context.MODE_PRIVATE;
 
 
@@ -39,7 +36,7 @@ public class TabFragment01 extends Fragment {
                 editor.clear();
                 editor.commit();
 
-                Toast.makeText(getContext(), "로그아웃 되었습니다. 다시 로그인 해주세요.", Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), "로그아웃 되었습니다. 다시 로그인 해주세요.", Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(getContext(), Activity_Login.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 getActivity().startActivity(intent);

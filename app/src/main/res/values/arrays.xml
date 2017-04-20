@@ -87,4 +87,20 @@
         <item>만든이 정보</item>
         <item>문의메일 보내기</item>
     </string-array>
+
+    <string-array name="category_sp_array">
+        <item>한  식</item>
+        <item>양  식</item>
+        <item>중  식</item>
+        <item>일  식</item>
+        <item>분  식</item>
+        <item>카  페</item>
+        <item>주  점</item>
+        <item>빵  집</item>
+        <item>레스토랑</item>
+        <item>무한리필</item>
+        <item>패스트푸드</item>
+        <item>기  타</item>
+    </string-array>
+
 </resources>

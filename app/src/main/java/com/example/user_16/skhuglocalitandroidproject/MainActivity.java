@@ -4,17 +4,16 @@ package com.example.user_16.skhuglocalitandroidproject;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
-
 
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.HashMap;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends FragmentActivity {
     private final long	FINSH_INTERVAL_TIME = 2000; // 2초안에 Back 버튼을 2번 누르면 앱 종료 -> 2초
     private long backPressedTime = 0;
 
@@ -37,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.addTab(tabLayout.newTab().setText("홈").setIcon(imageResId[0]));
         tabLayout.addTab(tabLayout.newTab().setText("게시판"));
         tabLayout.addTab(tabLayout.newTab().setText("북드림"));
-        tabLayout.addTab(tabLayout.newTab().setText("주변맛집"));
+        tabLayout.addTab(tabLayout.newTab().setText("추천맛집"));
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
         // Initializing ViewPager
@@ -85,8 +84,7 @@ public class MainActivity extends AppCompatActivity {
             dbManager.deleteAll();
         } else {
             backPressedTime = tempTime;
-            Toast.makeText(getApplicationContext(), "\'뒤로\'버튼을 한번 더 누르시면 종료됩니다.", Toast.LENGTH_SHORT).show();
-
+            Toast.makeText(MainActivity.this, "\'뒤로\'버튼을 한번 더 누르시면 종료됩니다.", Toast.LENGTH_SHORT).show();
         }
     }
 }

@@ -1,8 +1,6 @@
-
 package com.example.user_16.skhuglocalitandroidproject;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -16,43 +14,46 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import com.example.user_16.skhuglocalitandroidproject.BookDream.MainActivity;
 
 import java.util.ArrayList;
 
-/*
-    게시판을 한 곳에 묶어 사용하려 합니다.
- */
-public class NoticeBoardListFragment extends Fragment {
 
-    private ListView noticeBoardListView = null;
-    private ListViewAdapter listViewAdapter = null;
+public class RecommendListFragment extends Fragment {
+
+    private ListView recommendListView = null;
+    private RecommendListFragment.ListViewAdapter listViewAdapter = null;
     @Override
-    public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.noticeboard_list_fragment, container, false);
-        noticeBoardListView = (ListView) rootView.findViewById(R.id.noticeboard_listview);
-        noticeBoardListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+    public View onCreateView(final LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
+        final View rootView = inflater.inflate(R.layout.recommend_list_fragment, container, false);
+        Log.d("리스트뷰 프래그먼트","들어옴");
+
+        recommendListView = (ListView) rootView.findViewById(R.id.recommend_listview);
+        recommendListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-                NoticeBoardListData data = (NoticeBoardListData)parent.getItemAtPosition(position);
-                if(data.mTitle.equals("Book:Dream")) {
-                    Intent intent = new Intent(getContext(), MainActivity.class);
-                    Log.d("인텐트!!",intent.toString());
-                    getActivity().startActivity(intent);
-                } else {
-                    Toast.makeText(getContext(), data.mTitle + "을 선택했습니다.", Toast.LENGTH_SHORT).show();
+                RecommendListData data = (RecommendListData) parent.getItemAtPosition(position);
+                switch (data.mTitle) {
+                    case "지도 보기":
+                        ((RecommendFragmentActivity)getActivity()).changeMapFragment();
+                        break;
+                    case "추천 등록":
+                        ((RecommendFragmentActivity)getActivity()).changeAddFragment();
+                        break;
+                    case "추천 음식점 검색":
+                        ((RecommendFragmentActivity)getActivity()).changeSearchFragment();
+                        break;
                 }
             }
         });
-        listViewAdapter = new ListViewAdapter(getContext());
-        noticeBoardListView.setAdapter(listViewAdapter);
-        listViewAdapter.addItem(ContextCompat.getDrawable(getContext(), R.mipmap.ic_launcher) , "Book:Dream", "선,후배 간에 책을 주고 받을 수 있습니다.");
-        listViewAdapter.addItem(ContextCompat.getDrawable(getContext(), R.mipmap.ic_launcher), "자유게시판", "자유롭게 소통하세요!");
-        listViewAdapter.addItem(ContextCompat.getDrawable(getContext(), R.mipmap.ic_launcher), "정보게시판", "정보를 주고 받을 수 있습니다.");
+        listViewAdapter = new RecommendListFragment.ListViewAdapter(getContext());
+        recommendListView.setAdapter(listViewAdapter);
+        listViewAdapter.addItem(ContextCompat.getDrawable(getContext(), R.drawable.icon), getString(R.string.map_show));
+        listViewAdapter.addItem(ContextCompat.getDrawable(getContext(), R.drawable.icon), getString(R.string.add_recommend));
+        listViewAdapter.addItem(ContextCompat.getDrawable(getContext(), R.drawable.icon), getString(R.string.recommend_search));
         listViewAdapter.dataChange();
+        Log.d("리스트뷰 프래그먼트","완료");
         return rootView;
+
     }
 
 
@@ -64,7 +65,6 @@ public class NoticeBoardListFragment extends Fragment {
     private class ViewHolder {
         public ImageView mIcon;
         public TextView mTitle;
-        public TextView mDescription;
     }
 
     /*
@@ -72,7 +72,7 @@ public class NoticeBoardListFragment extends Fragment {
      */
     private class ListViewAdapter extends BaseAdapter {
         private Context mContext = null;
-        private ArrayList<NoticeBoardListData> mListData = new ArrayList<>();
+        private ArrayList<RecommendListData> mListData = new ArrayList<>();
 
         public ListViewAdapter(Context mContext) {
             super();
@@ -100,22 +100,21 @@ public class NoticeBoardListFragment extends Fragment {
         // 사용자가 선택한 아이템 데이터를 bookdream_request_item 형태에 맞춰 반환한다.
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            ViewHolder holder;
+            RecommendListFragment.ViewHolder holder;
             if (convertView == null) {
-                holder = new ViewHolder();
+                holder = new RecommendListFragment.ViewHolder();
 
                 LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                convertView = inflater.inflate(R.layout.noticeboard_list_item, null);
+                convertView = inflater.inflate(R.layout.recommend_list_item, null);
 
-                holder.mIcon = (ImageView) convertView.findViewById(R.id.list_icon);
-                holder.mTitle = (TextView) convertView.findViewById(R.id.list_title);
-                holder.mDescription = (TextView) convertView.findViewById(R.id.list_description);
+                holder.mIcon = (ImageView) convertView.findViewById(R.id.recommend_list_icon);
+                holder.mTitle = (TextView) convertView.findViewById(R.id.recommend_list_title);
                 convertView.setTag(holder);
             } else {
-                holder = (ViewHolder) convertView.getTag();
+                holder = (RecommendListFragment.ViewHolder) convertView.getTag();
             }
 
-            NoticeBoardListData mData = mListData.get(position); // DListData로부터 해당 아이템의 데이터를 받아온다.
+            RecommendListData mData = mListData.get(position); // DListData로부터 해당 아이템의 데이터를 받아온다.
 
             if (mData.mIcon != null) {
                 holder.mIcon.setVisibility(View.VISIBLE);
@@ -124,24 +123,22 @@ public class NoticeBoardListFragment extends Fragment {
                 holder.mIcon.setVisibility(View.GONE);
             }
             holder.mTitle.setText(mData.mTitle);
-            holder.mDescription.setText(mData.mDescription);
             return convertView;
         }
 
         /*
             리스트에 아이템을 추가하는 메소드
         */
-        public void addItem(Drawable mIcon, String mTitle, String mDescription) {
-            NoticeBoardListData addInfo = null;
-            addInfo = new NoticeBoardListData();
+        public void addItem(Drawable mIcon, String mTitle) {
+            RecommendListData addInfo = null;
+            addInfo = new RecommendListData();
             addInfo.mIcon = mIcon;
             addInfo.mTitle = mTitle;
-            addInfo.mDescription = mDescription;
             mListData.add(addInfo);
         }
 
         // 리스트를 새로고침 하는 메소드
-        public void clear(){
+        public void clear() {
             mListData.clear();
         }
 
@@ -150,5 +147,4 @@ public class NoticeBoardListFragment extends Fragment {
             listViewAdapter.notifyDataSetChanged();
         }
     }
-
 }

@@ -6,8 +6,19 @@
     <string name="JS">Join_Success</string>
     <string name="JF">Join_Fail</string>
     <string name="E">Error</string>
+    <string name="Login_Success">로그인 되었습니다</string>
+    <string name="Login_Fail">학번이나 비밀번호를 잘못입력하셨습니다</string>
+    <string name="Join_Success">회원가입 완료</string>
+    <string name="Auto_Login">자동로그인 되었습니다</string>
     <string name="Check_Success">사용할 수 있는 학번입니다</string>
     <string name="Check_Fail">입력된 학번은 사용중입니다. 확인 후 관리자에게 문의해주세요</string>
+    <string name="Check_Error">중복확인을 해주세요</string>
+    <string name="ID_Error">학번 9자리를 입력해주세요</string>
+    <string name="Pw_Error">비밀번호를 입력해주세요</string>
+    <string name="Pw_Check_Error">비밀번호가 일치하지 않습니다</string>
+    <string name="Name_Error">이름을 입력해주세요</string>
+    <string name="Email_Error">정확한 E-mail주소를 입력해주세요</string>
+    <string name="Join_ing">회원가입 중\n완료가 될 때 까지 대기해주세요</string>
     <string name="title_activity_book_dream_main">BookDreamMainActivity</string>
     <string name="action_settings">Settings</string>
     <string name="section_format">Hello World from section: %1$d</string>
@@ -38,5 +49,24 @@
     <string name="demand_content">해당 과목 전공 서적에 대해 설명을 써주세요. (최대 50자)\n\n\n\n\n\n\n\n\n\n\n\n\n</string>
     <string name="message">완료 버튼을 누르면 더 이상 알람은 오지 않습니다. \n 이 점 유의하시고 내용 확인해주세요.</string>
 
+    <string name="CLIENT_ID">MJH2cXLtz_lvhesMICpC</string>
+    <string name="str_done">완료</string>
+    <string name="map_show">지도 보기</string>
+    <string name="add_recommend">추천 등록</string>
+    <string name="recommend_search">추천 음식점 검색</string>
+    <string name="category">카테고리</string>
+    <string name="category_prompt">음식 카테고리를 선택하세요</string>
+    <string name="name">이 름</string>
+    <string name="name_hint">음식점 이름 입력</string>
+    <string name="call">전화번호</string>
+    <string name="call_hint">전화번호 입력</string>
+    <string name="delivery">배달 가능</string>
+    <string name="review">추천 리뷰</string>
+    <string name="review_hint">추천 리뷰★  (선택)</string>
+    <string name="addLocation">위치 추가</string>
+    <string name="add">등록</string>
+    <string name="add_condition">+ 조건추가</string>
+    <string name="condition_reset">초기화</string>
+    <string name="search">검색</string>
 
 </resources>

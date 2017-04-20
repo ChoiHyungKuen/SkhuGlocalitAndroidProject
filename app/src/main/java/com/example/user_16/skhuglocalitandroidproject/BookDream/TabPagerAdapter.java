@@ -5,9 +5,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
-import com.example.user_16.skhuglocalitandroidproject.NoticeBoardListFragment;
-import com.example.user_16.skhuglocalitandroidproject.TabFragment03;
-import com.example.user_16.skhuglocalitandroidproject.TabFragment04;
+import com.example.user_16.skhuglocalitandroidproject.RecommendListFragment;
 
 
 public class TabPagerAdapter extends FragmentStatePagerAdapter {
@@ -35,7 +33,7 @@ public class TabPagerAdapter extends FragmentStatePagerAdapter {
                 InformationFragment informationFragment = new InformationFragment();
                 return informationFragment;
             case 3:
-                TabFragment04 tabFragment04 = new TabFragment04();
+                RecommendListFragment tabFragment04 = new RecommendListFragment();
                 return tabFragment04;
             default:
                 return null;

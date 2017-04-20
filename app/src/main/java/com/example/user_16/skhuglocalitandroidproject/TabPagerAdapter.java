@@ -31,8 +31,8 @@ public class TabPagerAdapter extends FragmentStatePagerAdapter {
                 TabFragment03 tabFragment03 = new TabFragment03();
                 return tabFragment03;
             case 3:
-                TabFragment04 tabFragment04 = new TabFragment04();
-                return tabFragment04;
+                RecommendFragment recommendFragment = new RecommendFragment();
+                return recommendFragment;
             default:
                 return null;
         }
