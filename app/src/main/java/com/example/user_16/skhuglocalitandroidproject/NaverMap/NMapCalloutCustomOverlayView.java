@@ -37,7 +37,7 @@ public class NMapCalloutCustomOverlayView extends NMapCalloutOverlayView {
 
 		String infService = Context.LAYOUT_INFLATER_SERVICE;
 		LayoutInflater li = (LayoutInflater)getContext().getSystemService(infService);
-		li.inflate(R.layout.Naver_callout_overlay_view, this, true);
+		li.inflate(R.layout.naver_callout_overlay_view, this, true);
 
 		mCalloutView = findViewById(R.id.callout_overlay);
 		mCalloutText = (TextView)mCalloutView.findViewById(R.id.callout_text);

@@ -79,7 +79,8 @@ public class MainActivity extends FragmentActivity {
         if ( 0 <= intervalTime && FINSH_INTERVAL_TIME >= intervalTime ) {
             super.onBackPressed();
             final DBManager dbManager = new DBManager(getApplicationContext(), "app_data.db", null, 1);
-            HashMap<String, String> data = dbManager.getMemberInfo();        login_pref = getSharedPreferences("login_Info",MODE_PRIVATE);
+            HashMap<String, String> data = dbManager.getMemberInfo();
+            login_pref = getSharedPreferences("login_Info",MODE_PRIVATE);
             if(login_pref.getString("id","").equals("") && login_pref.getString("pw","").equals("") && data.size()!=0)
             dbManager.deleteAll();
         } else {

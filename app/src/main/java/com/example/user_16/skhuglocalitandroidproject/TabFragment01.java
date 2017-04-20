@@ -29,6 +29,7 @@ public class TabFragment01 extends Fragment {
             @Override
             public void onClick(View v) { //DB헬퍼에 있는 정보와 login_Info 삭제
                 SharedPreferences login_pref = getContext().getSharedPreferences("login_Info", MODE_PRIVATE);
+                Log.d("회원테이블",dbManager.getMemberInfo().toString());   //지우면 에러
                 dbManager.deleteAll();
                 //dbManager.delete(login_pref.getString("id",""));
                 Log.d("test", login_pref.getString("id",""));
@@ -36,7 +37,7 @@ public class TabFragment01 extends Fragment {
                 editor.clear();
                 editor.commit();
 
-                Toast.makeText(getActivity(), "로그아웃 되었습니다. 다시 로그인 해주세요.", Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), "로그아웃 되었습니다.\n 다시 로그인 해주세요.", Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(getContext(), Activity_Login.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 getActivity().startActivity(intent);
