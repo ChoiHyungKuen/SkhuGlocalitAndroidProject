@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
+    android:orientation="vertical"
+    android:weightSum="20">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="3dp"
+        android:layout_marginTop="3dp"
+        android:layout_weight="1"
+        android:weightSum="10">
+
+        <TextView
+            android:id="@+id/backBtn"
+            android:layout_width="0dp"
+            android:textStyle="bold"
+            android:textColor="@color/BLUEGREEN"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:text="←"
+            android:textSize="25dp"
+            android:clickable="true"
+            android:textAlignment="center" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:textStyle="bold"
+            android:textColor="@color/BLACK"
+            android:layout_height="wrap_content"
+            android:layout_weight="4"
+            android:textSize="20dp"
+            android:text="★자유게시판★"
+            android:textAlignment="center" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:textStyle="bold"
+            android:textColor="@color/BLACK"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:text=""
+            android:textSize="20dp"
+            android:textAlignment="center" />
+
+        <TextView
+            android:id="@+id/freeboard_writeBtn"
+            android:text="@string/writing"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:layout_weight="1"
+            android:textColor="@color/WHITE"
+            android:background="@drawable/round_btn"
+            android:clickable="true"
+            android:textAlignment="center"/>
+    </LinearLayout>
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:id="@+id/swipe_layout"
+        android:layout_weight="18">
+
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:id="@+id/freeboard_listView" />
+
+    </android.support.v4.widget.SwipeRefreshLayout>
+
+
+</LinearLayout>

@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:weightSum="14"
+    android:background="@color/colorPrimary">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="horizontal"
+        android:layout_marginBottom="3dp"
+        android:layout_marginTop="3dp"
+        android:layout_weight="1"
+        android:weightSum="10">
+
+        <TextView
+            android:id="@+id/backBtn"
+            android:layout_width="0dp"
+            android:textStyle="bold"
+            android:textColor="@color/BLUEGREEN"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:text="←"
+            android:textSize="25dp"
+            android:clickable="true"
+            android:textAlignment="center" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:textStyle="bold"
+            android:textColor="@color/BLACK"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:textSize="20dp"
+            android:text="글 쓰 기"
+            android:textAlignment="center" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:textStyle="bold"
+            android:textColor="@color/BLACK"
+            android:layout_height="wrap_content"
+            android:layout_weight="4"
+            android:text=""
+            android:textSize="20dp"
+            android:textAlignment="center" />
+
+        <TextView
+            android:id="@+id/freeboard_writeClearBtn"
+            android:text="완료"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:layout_weight="1"
+            android:textColor="@color/WHITE"
+            android:background="@drawable/round_btn"
+            android:clickable="true"
+            android:textAlignment="center"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:layout_marginTop="1dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:orientation="horizontal"
+        android:layout_weight="6">
+
+        <EditText
+            android:id="@+id/freeboard_edit_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/freeboard_round"
+            android:gravity="top"
+            android:inputType="textMultiLine"
+            android:ems="50"
+            android:hint="@string/freeboard_content"
+            android:textSize="15dp"
+            android:paddingLeft="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="3dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="horizontal"
+        android:layout_marginTop="1dp"
+        android:layout_marginBottom="1dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_weight="1">
+
+        <TextView
+            android:id="@+id/photoBtn"
+            android:text="사진찍기"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:layout_margin="5dp"
+            android:layout_weight="1"
+            android:textColor="@color/WHITE"
+            android:background="@drawable/round_btn"
+            android:clickable="true"
+            android:textAlignment="center"/>
+
+        <TextView
+            android:id="@+id/gallaryBtn"
+            android:text="갤러리"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:layout_margin="5dp"
+            android:layout_weight="1"
+            android:textColor="@color/WHITE"
+            android:background="@drawable/round_btn"
+            android:clickable="true"
+            android:textAlignment="center"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:orientation="horizontal"
+        android:layout_weight="6"
+        android:weightSum="1">
+        <ImageView
+            android:id="@+id/image_input"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"/>
+    </LinearLayout>
+
+</LinearLayout>

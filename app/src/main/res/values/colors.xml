@@ -9,4 +9,6 @@
     <color name="WHITE">#FFFFFF</color>
     <color name="GREEN">#2DB400</color>
     <color name="customErrorColor">#FF0000</color>
+    <color name="BLUEGREEN">#46aea7</color>
+
 </resources>

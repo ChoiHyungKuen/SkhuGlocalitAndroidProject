@@ -68,5 +68,6 @@
     <string name="add_condition">+ 조건추가</string>
     <string name="condition_reset">초기화</string>
     <string name="search">검색</string>
+    <string name="freeboard_content">글을 작성해 주세요.\n\n\n\n\n\n\n\n\n\n\n\n\n</string>
 
 </resources>
