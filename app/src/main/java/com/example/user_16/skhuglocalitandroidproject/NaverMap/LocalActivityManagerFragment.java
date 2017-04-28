@@ -28,7 +28,6 @@ public class LocalActivityManagerFragment extends Fragment {
 
     private static final String TAG = LocalActivityManagerFragment.class.getSimpleName();
     private static final String KEY_STATE_BUNDLE = "localActivityManagerState";
-    
     private LocalActivityManager mLocalActivityManager;
     
     
@@ -39,12 +38,12 @@ public class LocalActivityManagerFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         Log.d(TAG, "onCreate(): " + getClass().getSimpleName());
 
         Bundle state = null;
         if(savedInstanceState != null) {
             state = savedInstanceState.getBundle(KEY_STATE_BUNDLE);
-            Log.d("스테이트!!",state.toString());
         }
         
         mLocalActivityManager = new LocalActivityManager(getActivity(), true);
@@ -84,4 +83,6 @@ public class LocalActivityManagerFragment extends Fragment {
         Log.d(TAG, "onDestroy(): " + getClass().getSimpleName());
         mLocalActivityManager.dispatchDestroy(getActivity().isFinishing());
     }
+
+
 }

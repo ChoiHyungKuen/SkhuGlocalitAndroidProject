@@ -17,7 +17,8 @@ public class MainActivity extends FragmentActivity {
     private final long	FINSH_INTERVAL_TIME = 2000; // 2초안에 Back 버튼을 2번 누르면 앱 종료 -> 2초
     private long backPressedTime = 0;
 
-    private SharedPreferences login_pref;
+    private SharedPreferences login_pref, map_pref;
+    private SharedPreferences.Editor editor;
     private TabLayout tabLayout;
     private ViewPager viewPager;
 
@@ -83,6 +84,11 @@ public class MainActivity extends FragmentActivity {
             login_pref = getSharedPreferences("login_Info",MODE_PRIVATE);
             if(login_pref.getString("id","").equals("") && login_pref.getString("pw","").equals("") && data.size()!=0)
             dbManager.deleteAll();
+            map_pref = getSharedPreferences("map_center",MODE_PRIVATE);
+            editor = map_pref.edit();
+            editor.clear();
+            editor.commit();
+
         } else {
             backPressedTime = tempTime;
             Toast.makeText(MainActivity.this, "\'뒤로\'버튼을 한번 더 누르시면 종료됩니다.", Toast.LENGTH_SHORT).show();

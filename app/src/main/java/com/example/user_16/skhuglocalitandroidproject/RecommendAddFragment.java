@@ -3,6 +3,7 @@ package com.example.user_16.skhuglocalitandroidproject;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,11 +47,14 @@ public class RecommendAddFragment extends Fragment {
         public void onClick(View v) {
             switch (v.getId()){
                 case R.id.addLocation_btn:
-                    MapViewer.MakePoint = true;
+                    RecommendFragmentActivity.setMakable(true);
                     ((RecommendFragmentActivity)getActivity()).changeMapFragment();
+                    ((RecommendFragmentActivity)getActivity()).markCheck();
+                    Toast.makeText(getActivity(),"길게 눌러 위치를 추가하세요\n추가한 후에 위치를 클릭해주세요",Toast.LENGTH_LONG).show();
                     break;
                 case R.id.addRecommend_btn:
                     Toast.makeText(getActivity(),"추천 등록",Toast.LENGTH_SHORT).show();
+                    Log.d("액티비티",getActivity().toString());
                     break;
 
             }

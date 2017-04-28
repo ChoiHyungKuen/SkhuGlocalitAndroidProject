@@ -17,7 +17,9 @@ import static android.content.Context.MODE_PRIVATE;
 
 public class TabFragment01 extends Fragment {
 
-    TextView btn_logout;
+    private TextView btn_logout;
+    private SharedPreferences login_pref, map_pref;
+    SharedPreferences.Editor editor;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.tab_fragment01, container, false);
@@ -28,12 +30,16 @@ public class TabFragment01 extends Fragment {
         btn_logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) { //DB헬퍼에 있는 정보와 login_Info 삭제
-                SharedPreferences login_pref = getContext().getSharedPreferences("login_Info", MODE_PRIVATE);
+                login_pref = getContext().getSharedPreferences("login_Info", MODE_PRIVATE);
                 Log.d("회원테이블",dbManager.getMemberInfo().toString());   //지우면 에러
                 dbManager.deleteAll();
                 //dbManager.delete(login_pref.getString("id",""));
                 Log.d("test", login_pref.getString("id",""));
-                SharedPreferences.Editor editor = login_pref.edit();
+                editor = login_pref.edit();
+                editor.clear();
+                editor.commit();
+                map_pref = getContext().getSharedPreferences("map_center",MODE_PRIVATE);
+                editor = map_pref.edit();
                 editor.clear();
                 editor.commit();
 
