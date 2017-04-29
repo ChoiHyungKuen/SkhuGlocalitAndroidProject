@@ -38,6 +38,9 @@
         <activity android:name=".MapViewer" />
 
         <activity
+            android:name=".BookDream.MatchActivity"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".BookDream.MainActivity"
             android:label="@string/title_activity_book_dream_main"
 

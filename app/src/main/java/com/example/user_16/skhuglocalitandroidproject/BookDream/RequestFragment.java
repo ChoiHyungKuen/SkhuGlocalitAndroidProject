@@ -62,7 +62,7 @@ public class RequestFragment extends Fragment {
     private WriteAsyncThread backgroundWriteThread;
     private InitAsyncThread backgroundInitThread;
     private RemoveAsyncThread backgroundRemoveThread;
-    private  CompletePrecentCondionInfoAsyncThread  backgroundCompletePrecentConditionThread;
+    private MatchAsyncThread  backgroundMatchThread;
 
     /*
         후배가 요청 게시판에 글을 올린 경우, DB와 상호작용 하는 핸들러
@@ -77,7 +77,7 @@ public class RequestFragment extends Fragment {
                 if (b.getString("result").equals("success")) {
                     Toast.makeText(getActivity(), "BOOK:DREAM을 완료했습니다.", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(getActivity(), "이미 처리 하신 상태입니다.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "이미 처리 하셨거나 에러가 발생했습니다. 잠시 후 다시 시도해주세요", Toast.LENGTH_SHORT).show();
                 }
             }
             else if(b.getString("status") !=null ) {
@@ -179,8 +179,8 @@ public class RequestFragment extends Fragment {
                 backgroundRemoveThread.cancel(true);
             }
 
-            if (backgroundCompletePrecentConditionThread.getStatus() == AsyncTask.Status.RUNNING) {
-                backgroundCompletePrecentConditionThread.cancel(true);
+            if (backgroundMatchThread.getStatus() == AsyncTask.Status.RUNNING) {
+                backgroundMatchThread.cancel(true);
             }
         } catch (Exception e) {}
     }
@@ -268,6 +268,7 @@ public class RequestFragment extends Fragment {
                             time = String.format("%d 시 %d 분", timePicker.getCurrentHour(), timePicker.getCurrentMinute());
                         }
 
+                        Log.d("접속", "접속dd ");
                         // 선배의 정보와 드림 메세지(선배 이름, 연락처, 약속 장소 등)을 보냄
 
                         /*
@@ -280,7 +281,12 @@ public class RequestFragment extends Fragment {
                         final DBManager dbManager = new DBManager(getContext(), "app_data.db", null, 1);
                         final HashMap<String, String> dataMap = dbManager.getMemberInfo();
                         String user = dataMap.get("id") +" " +dataMap.get("name");
-                        OkHttpClient client = new OkHttpClient();
+                        backgroundMatchThread = new MatchAsyncThread();
+                        backgroundMatchThread.execute(
+                                gTitle, user, view_user.getText().toString(),
+                                date, time, edit_where.getText().toString(),
+                                edit_content.getText().toString(), edit_phone.getText().toString());
+     /*                   OkHttpClient client = new OkHttpClient();
                         RequestBody body = new FormBody.Builder()
                                 .add("title",gTitle)
                                 .add("giveUser", user)
@@ -293,16 +299,16 @@ public class RequestFragment extends Fragment {
                                 .build();
 
                         //request
-                        Log.d("TAG", "접속 ");
+                        Log.d("접속", "접속dd ");
                         Request request = new Request.Builder()
                                 .url("http://"+getString(R.string.ip_address)+":8080/SkhuGlocalitWebProject/bookdream/giveMatch")
                                 .post(body)
                                 .build();
                         try {
                             client.newCall(request).execute();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
+                        } catch (Exception e) {
+                            Log.d("에러","이거였으"+e);
+                        }*/
 
 
                     }
@@ -857,7 +863,7 @@ public class RequestFragment extends Fragment {
         }
     }
 
-    public class CompletePrecentCondionInfoAsyncThread extends AsyncTask<String, String, String> {
+    public class MatchAsyncThread extends AsyncTask<String, String, String> {
         // Thread를 시작하기 전에 호출되는 함수
         protected void onPreExecute() {
             super.onPreExecute();
@@ -869,23 +875,19 @@ public class RequestFragment extends Fragment {
             URL url = null;
             HttpURLConnection conn = null;
             String urlStr = "";
-            final DBManager dbManager = new DBManager(getContext(), "app_data.db", null, 1);
-            final HashMap<String, String> appDataMap = dbManager.getMemberInfo();
-            HashMap<String, String> dataMap = new HashMap<>();
-            dataMap.put("type", "demand");
-            dataMap.put("no", args[0]);
-            dataMap.put("title", args[1]);
-            dataMap.put("supply_id", appDataMap.get("id"));
-            dataMap.put("supply_name", appDataMap.get("name"));
-            dataMap.put("demand_id",args[2]);
-            dataMap.put("demand_name", args[3]);
-            dataMap.put("date", args[4]);
-            dataMap.put("time", args[5]);
-            dataMap.put("where", args[6]);
-            dataMap.put("content", args[7]);
-            dataMap.put("phone", args[8]);
 
-            urlStr = "http://"+getString(R.string.ip_address)+":8080/BookDreamServerProject/completePresentConditionInfo";
+            HashMap<String, String> dataMap = new HashMap<>();
+
+            dataMap.put("title", args[0]);
+            dataMap.put("giveUser", args[1]);
+            dataMap.put("requestUser", args[2]);
+            dataMap.put("date", args[3]);
+            dataMap.put("time", args[4]);
+            dataMap.put("where",args[5]);
+            dataMap.put("content", args[6]);
+            dataMap.put("phone", args[7]);
+
+            urlStr = "http://"+getString(R.string.ip_address)+":8080/SkhuGlocalitWebProject/bookdream/giveMatch";
             try {
                 url = new URL(urlStr);
                 Log.d("test", urlStr);
@@ -902,14 +904,12 @@ public class RequestFragment extends Fragment {
                 ObjectOutputStream oos =new ObjectOutputStream(conn.getOutputStream());
                 oos.writeObject(dataMap);
                 oos.flush();
-                oos.close();
                 if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) { // 서버가 받았다면
                     ObjectInputStream ois = new ObjectInputStream(conn.getInputStream());
                     HashMap<String, String> stringDataMap = (HashMap<String, String>)ois.readObject();
                     ois.close();
                     Message msg = handler.obtainMessage();
                     Bundle b = new Bundle();
-                    b.putString("present_condition", "data");
                     Log.d("test_cnt",stringDataMap.size()+"");
                     if(stringDataMap .size() == 0){
                         b.putString("result", "fail");
@@ -919,10 +919,10 @@ public class RequestFragment extends Fragment {
                     msg.setData(b);
                     handler.sendMessage(msg);
                 }
+                oos.close();
                 conn.disconnect();
             } catch (Exception e) {
-                Toast.makeText(getActivity(), "Error 발생", Toast.LENGTH_SHORT).show();
-                Log.e("ERR", "CompletePrecentCondionInfoAsyncThread ERR : " + e.getMessage());
+                Log.e("ERR", "CompletePrecentCondionInfoAsyncThread ERR : " + e);
             }
 
             return "";
