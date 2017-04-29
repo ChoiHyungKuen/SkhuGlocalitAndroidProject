@@ -18,10 +18,12 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 
-public class RecommendListFragment extends Fragment {
+public class RecommendListFragment extends Fragment{
+
 
     private ListView recommendListView = null;
     private RecommendListFragment.ListViewAdapter listViewAdapter = null;
+
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.recommend_list_fragment, container, false);
@@ -37,6 +39,9 @@ public class RecommendListFragment extends Fragment {
                         ((RecommendFragmentActivity)getActivity()).changeMapFragment();
                         break;
                     case "추천 등록":
+//                        Toast.makeText(getActivity(),"길게 눌러서 위치 설정",Toast.LENGTH_SHORT).show();
+//                        RecommendFragmentActivity.setMakable(true);
+//                        ((RecommendFragmentActivity)getActivity()).markCheck();
                         ((RecommendFragmentActivity)getActivity()).changeAddFragment();
                         break;
                     case "추천 음식점 검색":
@@ -56,12 +61,6 @@ public class RecommendListFragment extends Fragment {
 
     }
 
-
-    /*
-       ViewHolder란, 이름 그대로 뷰들을 홀더에 꼽아놓듯이 보관하는 객체를 말한다.
-       각각의 Row를 그려낼 때 그 안의 위젯들의 속성을 변경하기 위해 findViewById를 호출하는데,
-       이것의 비용이 큰것을 줄이기 위해 사용한다. 여기서 게시판의 정보들을 ViewHolder를 이용해 삽입한다.
-     */
     private class ViewHolder {
         public ImageView mIcon;
         public TextView mTitle;
@@ -148,3 +147,4 @@ public class RecommendListFragment extends Fragment {
         }
     }
 }
+
