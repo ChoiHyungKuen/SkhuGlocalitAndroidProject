@@ -62,7 +62,7 @@ public class RequestFragment extends Fragment {
     private WriteAsyncThread backgroundWriteThread;
     private InitAsyncThread backgroundInitThread;
     private RemoveAsyncThread backgroundRemoveThread;
-    private MatchAsyncThread  backgroundMatchThread;
+    private GiveMatchAsyncThread  backgroundMatchThread;
 
     /*
         후배가 요청 게시판에 글을 올린 경우, DB와 상호작용 하는 핸들러
@@ -73,7 +73,7 @@ public class RequestFragment extends Fragment {
         {
             Bundle b = msg.getData();
 
-            if (b.getString("present_condition") != null) {
+            if (b.getString("result") != null) {
                 if (b.getString("result").equals("success")) {
                     Toast.makeText(getActivity(), "BOOK:DREAM을 완료했습니다.", Toast.LENGTH_SHORT).show();
                 } else {
@@ -257,7 +257,6 @@ public class RequestFragment extends Fragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         // TextView에 추가작업을 완료 하였기에 '완료'했다는 메세지를 Toast로 출력
-                        Toast.makeText(getContext(), datePicker.toString(), Toast.LENGTH_SHORT).show();
                         // 선배가 설정한 약속 날짜를 datePicker로부터 저장
                         String date = String.format("%d - %d - %d", datePicker.getYear(), datePicker.getMonth(), datePicker.getDayOfMonth());
                         // 선배가 설정한 약속 시간을 timePicker로부터 저장
@@ -281,7 +280,7 @@ public class RequestFragment extends Fragment {
                         final DBManager dbManager = new DBManager(getContext(), "app_data.db", null, 1);
                         final HashMap<String, String> dataMap = dbManager.getMemberInfo();
                         String user = dataMap.get("id") +" " +dataMap.get("name");
-                        backgroundMatchThread = new MatchAsyncThread();
+                        backgroundMatchThread = new GiveMatchAsyncThread();
                         backgroundMatchThread.execute(
                                 gTitle, user, view_user.getText().toString(),
                                 date, time, edit_where.getText().toString(),
@@ -863,7 +862,7 @@ public class RequestFragment extends Fragment {
         }
     }
 
-    public class MatchAsyncThread extends AsyncTask<String, String, String> {
+    public class GiveMatchAsyncThread extends AsyncTask<String, String, String> {
         // Thread를 시작하기 전에 호출되는 함수
         protected void onPreExecute() {
             super.onPreExecute();

@@ -39,11 +39,15 @@
 
         <activity
             android:name=".BookDream.MatchActivity"
+            android:theme="@style/AppTheme"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".BookDream.GiveMatchMessageActivity"
+            android:theme="@style/AppTheme"
             android:screenOrientation="portrait" />
         <activity
             android:name=".BookDream.MainActivity"
             android:label="@string/title_activity_book_dream_main"
-
             android:theme="@style/AppTheme">
         </activity>
 

@@ -31,10 +31,10 @@
         android:layout_weight="3.5">
 
         <Button
-            android:text="보류"
+            android:text="취소"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/cancel_btn"
+            android:id="@+id/deny_btn"
             android:layout_weight="1" />
 
         <Button

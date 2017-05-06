@@ -33,8 +33,8 @@ public class TabPagerAdapter extends FragmentStatePagerAdapter {
                 InformationFragment informationFragment = new InformationFragment();
                 return informationFragment;
             case 3:
-                RecommendListFragment tabFragment04 = new RecommendListFragment();
-                return tabFragment04;
+                SettingFragment settingFragment = new SettingFragment();
+                return settingFragment;
             default:
                 return null;
         }
