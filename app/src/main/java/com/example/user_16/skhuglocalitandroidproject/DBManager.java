@@ -44,13 +44,7 @@ public class DBManager extends SQLiteOpenHelper {
         db.execSQL(query);
         Log.d("회원정보","insrt추가");
     }
-    public void delete(String id) {
-        db = getWritableDatabase();
-        query =  "delete from app_data where id ='"+id +"';";
-        Log.d("쿼리",query);
-        db.execSQL(query);
-        Log.d("회원정보","삭제");
-    }
+
     public void deleteAll(){
         this.db.delete("app_data",null,null);
         Log.d("회원정보","전부삭제");
