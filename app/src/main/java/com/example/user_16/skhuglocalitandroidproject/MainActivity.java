@@ -36,7 +36,7 @@ public class MainActivity extends FragmentActivity {
         tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         tabLayout.addTab(tabLayout.newTab().setText("홈").setIcon(imageResId[0]));
         tabLayout.addTab(tabLayout.newTab().setText("게시판"));
-        tabLayout.addTab(tabLayout.newTab().setText("북드림"));
+        tabLayout.addTab(tabLayout.newTab().setText("시간표"));
         tabLayout.addTab(tabLayout.newTab().setText("추천맛집"));
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
