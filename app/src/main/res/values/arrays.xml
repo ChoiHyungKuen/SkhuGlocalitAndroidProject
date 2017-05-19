@@ -84,6 +84,7 @@
     </string-array>
 
     <string-array name="setting_list">
+        <item>알림음 설정</item>
         <item>만든이 정보</item>
         <item>문의메일 보내기</item>
     </string-array>

@@ -28,7 +28,7 @@ public class TabPagerAdapter extends FragmentStatePagerAdapter {
                 NoticeBoardListFragment noticeBoardListFragment = new NoticeBoardListFragment();
                 return noticeBoardListFragment;
             case 2:
-                TabFragment03 tabFragment03 = new TabFragment03();
+                TimeTableFragment tabFragment03 = new TimeTableFragment();
                 return tabFragment03;
             case 3:
                 RecommendFragment recommendFragment = new RecommendFragment();

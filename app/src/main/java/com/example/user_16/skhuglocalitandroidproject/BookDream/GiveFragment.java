@@ -79,7 +79,7 @@ public class GiveFragment extends Fragment {
     private WriteAsyncThread backgroundWriteThread;
     private InitAsyncThread backgroundInitThread;
     private RemoveAsyncThread backgroundRemoveThread;
-    private AddSupplyPrecentConditionAsyncThread backgroundAddPrecentConditionThread;
+    private RequestMatchAsyncThread backgroundRequestMatchThread;
 
     /*
         선배가 드림 게시판에 글을 올린 경우, DB와 상호 작용하는 리스너
@@ -89,7 +89,7 @@ public class GiveFragment extends Fragment {
         public void handleMessage(Message msg)
         {
             Bundle b = msg.getData();
-            if (b.getString("present_condition") !=null) {
+            if (b.getString("result") !=null) {
                 if (b.getString("result").equals("success")){
                     Toast.makeText(getActivity(), "DREAM을 신청했습니다.", Toast.LENGTH_SHORT).show();
                 } else {
@@ -196,8 +196,8 @@ public class GiveFragment extends Fragment {
                 backgroundRemoveThread.cancel(true);
             }
 
-            if (backgroundAddPrecentConditionThread.getStatus() == AsyncTask.Status.RUNNING) {
-                backgroundAddPrecentConditionThread.cancel(true);
+            if (backgroundRequestMatchThread.getStatus() == AsyncTask.Status.RUNNING) {
+                backgroundRequestMatchThread.cancel(true);
             }
         } catch (Exception e) {}
     }
@@ -209,7 +209,7 @@ public class GiveFragment extends Fragment {
         GiveListData mData = mAdapter.mListData.get(position);
 
         Drawable vIcon = mData.mIcon;
-        String vTitle = mData.mTitle;
+        final String vTitle = mData.mTitle;
         String vDate = mData.mDate;
         String vType = mData.mType;
         String vGrade = mData.mGrade;
@@ -250,8 +250,40 @@ public class GiveFragment extends Fragment {
                     Toast.makeText(getContext(), "자신한테 DREAM을 신청할 수 없습니다.", Toast.LENGTH_LONG).show();
                     return ;
                 }
-                backgroundAddPrecentConditionThread = new AddSupplyPrecentConditionAsyncThread();
-                backgroundAddPrecentConditionThread.execute(position+"", dataMap.get("id"), dataMap.get("name"));
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getContext());
+
+                // 제목셋팅
+                alertDialogBuilder.setTitle("확인창");
+
+                // AlertDialog 셋팅
+                alertDialogBuilder
+                        .setMessage("정말로 DREAM 요청 하십니까?")
+                        .setCancelable(false)
+                        .setPositiveButton("확인",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(
+                                            DialogInterface dialog, int id) {
+                                        // 확인 후 매칭 요청 메시지를 상대방에게 보낸다.
+
+                                        backgroundRequestMatchThread = new RequestMatchAsyncThread();
+                                        backgroundRequestMatchThread.execute(dataMap.get("id")+ " " +dataMap.get("name"), vInfo, vTitle);
+                                    }
+                                })
+                        .setNegativeButton("취소",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(
+                                            DialogInterface dialog, int id) {
+                                        // 다이얼로그를 취소한다
+                                        dialog.cancel();
+                                    }
+                                });
+
+                // 다이얼로그 생성
+                AlertDialog alertDialog = alertDialogBuilder.create();
+
+                // 다이얼로그 보여주기
+                alertDialog.show();
+
             }
         });
 
@@ -938,7 +970,7 @@ public class GiveFragment extends Fragment {
         }
     }
 
-    public class AddSupplyPrecentConditionAsyncThread extends AsyncTask<String, String, String> {
+    public class RequestMatchAsyncThread extends AsyncTask<String, String, String> {
         // Thread를 시작하기 전에 호출되는 함수
         protected void onPreExecute() {
             super.onPreExecute();
@@ -950,8 +982,14 @@ public class GiveFragment extends Fragment {
             URL url = null;
             HttpURLConnection conn = null;
             String urlStr = "";
-            urlStr = "http://"+getString(R.string.ip_address)+":8080/BookDreamServerProject/addSupplyPresentConditionInfo";
 
+            HashMap<String, String> dataMap = new HashMap<>();
+
+            dataMap.put("requestUser", args[0]);
+            dataMap.put("giveUser", args[1]);
+            dataMap.put("title", args[2]);
+
+            urlStr = "http://"+getString(R.string.ip_address)+":8080/SkhuGlocalitWebProject/bookdream/requestMatch";
             try {
                 url = new URL(urlStr);
                 Log.d("test", urlStr);
@@ -964,27 +1002,18 @@ public class GiveFragment extends Fragment {
                 conn.setRequestProperty("Content-type", "application/x-www-form-urlencoded");
                 conn.setDoInput(true);
                 conn.setDoOutput(true);
-                HashMap<String, String> stringDataMap = new HashMap<String, String>();
-                stringDataMap.put("no", args[0]);
-                stringDataMap.put("demand_id",args[1]);
-                stringDataMap.put("demand_name", args[2]);
 
                 ObjectOutputStream oos =new ObjectOutputStream(conn.getOutputStream());
-                oos.writeObject(stringDataMap);
+                oos.writeObject(dataMap);
                 oos.flush();
-                oos.close();
-
-                if (conn.getResponseMessage().equals("OK")) { // 서버가 받았다면
-                    Log.d("test", "gogo");
-
+                if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) { // 서버가 받았다면
                     ObjectInputStream ois = new ObjectInputStream(conn.getInputStream());
-                    HashMap<String, String> dataMap = (HashMap<String, String>)ois.readObject();
+                    HashMap<String, String> stringDataMap = (HashMap<String, String>)ois.readObject();
                     ois.close();
                     Message msg = handler.obtainMessage();
                     Bundle b = new Bundle();
-                    b.putString("present_condition", "data");
-                    Log.d("test_cnt",dataMap.size()+"");
-                    if(dataMap.size()==0){
+                    Log.d("test_cnt",stringDataMap.size()+"");
+                    if(stringDataMap .size() == 0){
                         b.putString("result", "fail");
                     } else {
                         b.putString("result", "success");
@@ -992,10 +1021,10 @@ public class GiveFragment extends Fragment {
                     msg.setData(b);
                     handler.sendMessage(msg);
                 }
+                oos.close();
                 conn.disconnect();
-
             } catch (Exception e) {
-                Log.e("ERR", "AddSupplyPrecentConditionAsyncThread ERR : " + e.getMessage());
+                Log.e("ERR", "CompletePrecentCondionInfoAsyncThread ERR : " + e);
             }
 
             return "";

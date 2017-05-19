@@ -68,24 +68,23 @@ public class Activity_Login extends AppCompatActivity {
                         Log.d("저장한 비번",login_pref.getString("pw",""));
                         editor.commit();
                     }
-                    Toast.makeText(Activity_Login.this, R.string.Login_Success, Toast.LENGTH_SHORT).show();
                     break;
                 case "Login_Fail" :
-                    Toast.makeText(Activity_Login.this, R.string.Login_Fail, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "학번이나 비밀번호를 잘못입력하셨습니다.", Toast.LENGTH_SHORT).show();
                     break;
                 case "Join_Success" :
-                    Toast.makeText(Activity_Login.this, R.string.Join_Success, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "회원가입 완료", Toast.LENGTH_SHORT).show();
                     break;
                 case "not exist":
                     IDflag = true;
-                    Toast.makeText(Activity_Login.this,R.string.Check_Success,Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(),R.string.Check_Success,Toast.LENGTH_SHORT).show();
                     break;
                 case "exist" :
                     IDflag = false;
-                    Toast.makeText(Activity_Login.this,R.string.Check_Fail,Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(),R.string.Check_Fail,Toast.LENGTH_SHORT).show();
                     break;
                 case "Error" :
-                    Toast.makeText(Activity_Login.this, "Error 발생", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Error 발생", Toast.LENGTH_SHORT).show();
                     break;
             }
 
@@ -104,7 +103,7 @@ public class Activity_Login extends AppCompatActivity {
 
         login_pref = getSharedPreferences("login_Info",MODE_PRIVATE);
         if(!login_pref.getString("id","").equals("") && !login_pref.getString("pw","").equals("")){
-            Toast.makeText(Activity_Login.this, R.string.Auto_Login, Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "자동로그인 되었습니다.", Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
             startActivity(intent);
             finish();
@@ -227,7 +226,7 @@ public class Activity_Login extends AppCompatActivity {
                                 }
                                 else {
                                     flag = false;
-                                    TextInputLayout01.setError(getString(R.string.ID_Error));
+                                    TextInputLayout01.setError("학번 9자리를 입력해주세요");
                                     requestFocus(EditText_id);
                                 }
                             }
@@ -238,7 +237,7 @@ public class Activity_Login extends AppCompatActivity {
                                 }
                                 else {
                                     flag = false;
-                                    TextInputLayout02.setError(getString(R.string.Pw_Error));
+                                    TextInputLayout02.setError("비밀번호를 입력해주세요");
                                     requestFocus(EditText_pw);
                                 }
                             }
@@ -249,7 +248,7 @@ public class Activity_Login extends AppCompatActivity {
                                 }
                                 else {
                                     flag = false;
-                                    TextInputLayout03.setError(getString(R.string.Pw_Check_Error));
+                                    TextInputLayout03.setError("비밀번호가 일치하지 않습니다");
                                     requestFocus(EditText_pwTest);
                                 }
                             }
@@ -260,7 +259,7 @@ public class Activity_Login extends AppCompatActivity {
                                 }
                                 else {
                                     flag = false;
-                                    TextInputLayout04.setError(getString(R.string.Name_Error));
+                                    TextInputLayout04.setError("이름을 입력해주세요");
                                     requestFocus(EditText_name);
                                 }
                             }
@@ -271,18 +270,18 @@ public class Activity_Login extends AppCompatActivity {
                                 }
                                 else {
                                     flag = false;
-                                    TextInputLayout05.setError(getString(R.string.Email_Error));
+                                    TextInputLayout05.setError("정확한 E-mail주소를 입력해주세요");
                                     requestFocus(EditText_mail);
                                 }
                             }
 
                             if(flag) {
                                 AddMemberDB(dbId, dbPw, dbName, dbEmail);
-                                Toast.makeText(Activity_Login.this, R.string.Join_ing, Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getApplicationContext(), "회원가입 중 \n 완료가 될 때 까지 대기해주세요", Toast.LENGTH_SHORT).show();
                                 dialog.dismiss();
                             }
                         } catch (Exception e) {
-                            Toast.makeText(Activity_Login.this, R.string.Check_Error, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(), R.string.E, Toast.LENGTH_SHORT).show();
                             Log.e("ERR", "JOIN ERR : " + e.getMessage());
                         }
                     }
@@ -385,13 +384,13 @@ public class Activity_Login extends AppCompatActivity {
                 Log.d("응답메세지","실행중5---"+conn.getResponseCode());
                 if (conn.getResponseCode() == 200) { // 서버가 받았다면
                     Message msg = handler.obtainMessage();
-                    msg.obj = R.string.JS;
+                    msg.obj = getString(R.string.JS);
                     handler.sendMessage(msg);
                 }
                 conn.disconnect();
             }catch (Exception e){
                 Message msg = handler.obtainMessage();
-                msg.obj = R.string.E;
+                msg.obj = getString(R.string.E);
                 Log.d("에러메세지",msg.obj.toString());
                 handler.sendMessage(msg);
                 Log.e("ERR", "AddMemberAsyncThread ERR : " + e);
@@ -554,6 +553,7 @@ public class Activity_Login extends AppCompatActivity {
                     msg.setData(loginInfo);
                     handler.sendMessage(msg);   // Toast띄우기 위해 핸들러로 전송
                     Log.d("로그인메시지",message+"보냄");
+
                     conn.disconnect();
                 }
             } catch (Exception e) {
@@ -561,7 +561,7 @@ public class Activity_Login extends AppCompatActivity {
                 msg.obj = getString(R.string.E)+e;
                 Log.d("에러메세지",msg.obj.toString());
                 handler.sendMessage(msg);
-                Log.e("ERR", "LoginAsyncThread ERR : " + e.toString());
+                Log.e("ERR", "LoginAsyncThread ERR : " + e.getMessage());
             }
             return "";
         }
