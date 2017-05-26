@@ -156,7 +156,8 @@ public class TimeTableFragment extends Fragment {
                         tx.setTextSize(9.5f);
                         tx.setHeight(230*subjectCnt);
                         tx.setTextColor(Color.WHITE);
-                        tx.setOnLongClickListener(new View.OnLongClickListener() {
+                        if(!s.equals(" ")) {
+                            tx.setOnLongClickListener(new View.OnLongClickListener() {
                             @Override
                             public boolean onLongClick(final View view) {
                                 ColorPickerDialogBuilder
@@ -186,8 +187,9 @@ public class TimeTableFragment extends Fragment {
                                         .build()
                                         .show();
                                 return true;
-                            }
+                                }
                         });
+                        }
                     }
                     tx.setTypeface(Typeface.DEFAULT_BOLD);
                     if(j!=0 && !s.equals(" ")) {
