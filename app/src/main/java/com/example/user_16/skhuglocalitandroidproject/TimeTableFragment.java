@@ -4,7 +4,11 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.RectShape;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -29,6 +33,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.user_16.skhuglocalitandroidproject.BookDream.GiveFragment;
+import com.flask.colorpicker.ColorPickerView;
+import com.flask.colorpicker.OnColorSelectedListener;
+import com.flask.colorpicker.builder.ColorPickerClickListener;
+import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.io.ObjectInputStream;
@@ -40,13 +48,14 @@ import java.util.Random;
 import java.util.StringTokenizer;
 
 import static android.content.Context.MODE_PRIVATE;
+import static com.example.user_16.skhuglocalitandroidproject.R.id.textView;
 
 
 public class TimeTableFragment extends Fragment {
     private TextView authTx;
     private EditText authId, authPw;
     private Button authBtn;
-    private SharedPreferences auth_pref;
+    private SharedPreferences auth_pref, color_pref;
     private SharedPreferences.Editor editor;
     private View rootView;
     private GetTimeTableInfoAsyncThread backgroundGetTimeTableInfoThread;
@@ -55,188 +64,240 @@ public class TimeTableFragment extends Fragment {
         public void handleMessage(Message msg)
         {
             Bundle b = msg.getData();
-            if(b.get("state") != null && b.get("state").equals("fail")) {
-                String message = (String) b.get("message");
-                AlertDialog.Builder alert = new AlertDialog.Builder(getActivity());
-                alert.setTitle("경고!");
-                alert.setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-                alert.setIcon(R.drawable.alert);
 
-                alert.setMessage(message);
-                alert.show();
+            String[][] timetableInfo = (String[][]) msg.obj;
 
-                //Toast.makeText(getContext(), "아이디나 비밀번호가 틀렸습니다. 잠시 후 시도해주세요.", Toast.LENGTH_LONG).show();
-            } else {
-                String[][] timetableInfo = (String[][]) msg.obj;
+            final TableLayout table = new TableLayout(getActivity());
+            table.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.MATCH_PARENT));
 
-                succeedAuthStudent();
-                final TableLayout table = new TableLayout(getActivity());
-                table.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.MATCH_PARENT));
-                table.setStretchAllColumns(true);
-                table.setShrinkAllColumns(true);
-                TableRow rowTitle = new TableRow(getActivity());
-                rowTitle.setGravity(Gravity.CENTER_HORIZONTAL);
-                TableRow row = new TableRow(getActivity());
-                TableRow rowDayLabels = new TableRow(getActivity());
-                TableRow rowHighs = new TableRow(getActivity());
-                TableRow rowLows = new TableRow(getActivity());
-                TableRow rowConditions = new TableRow(getActivity());
-                rowConditions.setGravity(Gravity.CENTER);
+            TableRow rowTitle = new TableRow(getActivity());
+            rowTitle.setGravity(Gravity.CENTER_HORIZONTAL);
+            TableRow row = new TableRow(getActivity());
 
-                TextView empty = new TextView(getActivity());
+            // title column/row
+            TextView title = new TextView(getActivity());
+            title.setText(b.get("title") +" 시간표");
 
-                // title column/row
-                TextView title = new TextView(getActivity());
-                title.setText(b.get("title") +" 시간표");
+            title.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 22);
+            title.setGravity(Gravity.CENTER);
+            title.setTypeface(Typeface.SERIF, Typeface.BOLD);
 
-                title.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 22);
-                title.setGravity(Gravity.CENTER);
-                title.setTypeface(Typeface.SERIF, Typeface.BOLD);
+            TableRow.LayoutParams params = new TableRow.LayoutParams();
+            params.span = 6;
 
-                TableRow.LayoutParams params = new TableRow.LayoutParams();
-                params.span = 6;
+            rowTitle.addView(title, params);
+            table.addView(rowTitle);
+            String [] dayName = {" " , "월", "화","수","목","금"};
+            row=new TableRow(getActivity());
+            row.setLayoutParams( new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT));
+            //row.setBackgroundResource(R.drawable.row_border);
+            for(int i=0; i<6; i++) {
 
-                rowTitle.addView(title, params);
-                table.addView(rowTitle);
-                String [] dayName = {" " , "월", "화","수","목","금"};
+                TextView tx = new TextView(getActivity());
+                tx.setText(dayName[i]);
+                tx.setTypeface(Typeface.DEFAULT_BOLD);
+                tx.setGravity(Gravity.CENTER_HORIZONTAL);
+                tx.setBackgroundResource(R.drawable.row_border);
+                if(i==0)
+                    tx.setWidth(155);
+                else
+                    tx.setWidth(260);
+                row.addView(tx);
+            }
+            table.addView(row);
+            int[] colors = new int[5];
+            for(int i=0; i<5; i++) {
+                Random rnd = new Random();
+                int color = Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256));
+                colors[i] = color;
+            }
+            for(int i=0; i<13; i++) {
                 row=new TableRow(getActivity());
-                row.setLayoutParams( new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT));
-                for(int i=0; i<6; i++) {
-                    TextView tx = new TextView(getActivity());
-                    tx.setText(dayName[i]);
-                    tx.setTypeface(Typeface.DEFAULT_BOLD);
-                    tx.setGravity(Gravity.CENTER_HORIZONTAL);
-                    row.addView(tx);
-                }
-                table.addView(row);
-                for(int i=0; i<13; i++) {
-                    row=new TableRow(getActivity());
-                    //row.setWeightSum(12f);
-                    //row.setLayoutParams( new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT));
+                //row.setWeightSum(12f);
+                //row.setLayoutParams( new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT));
+                int subjectCnt =1;  // 75분 수업인경우 한셀에 두개과목이 들어감
+                for(int j=0; j<6; j++) {
 
-                    for(int j=0; j<6; j++) {
-                        String s = "";
-                        if(!timetableInfo[i][j].equals(" ")) {
-                            StringTokenizer stz = new StringTokenizer(timetableInfo[i][j], "#");
-                            if (stz.countTokens() >= 2) {
-                                while (stz.hasMoreTokens()) {
-                                    StringTokenizer stzz = new StringTokenizer(stz.nextToken(), "&");
-                                    while (stzz.hasMoreTokens()) {
-                                        s += stzz.nextToken() + "\n";
-                                    }
+                    String s = "";
+                    if(!timetableInfo[i][j].equals(" ")) {
+                        StringTokenizer stz = new StringTokenizer(timetableInfo[i][j], "#");
+                        if (stz.countTokens() >= 2) {
+                            subjectCnt=2;
+                            while (stz.hasMoreTokens()) {
+                                StringTokenizer stzz = new StringTokenizer(stz.nextToken(), "&");
+                                while (stzz.hasMoreTokens()) {
+                                    s += stzz.nextToken() + "\n";
                                 }
-                            } else {
-                                while (stz.hasMoreTokens()) {
-                                    StringTokenizer stzz = new StringTokenizer(stz.nextToken(), "&");
-                                    while (stzz.hasMoreTokens()) {
-                                        s += stzz.nextToken() + "\n";
-                                    }
-                                }
+                                s+="\n";
                             }
                         } else {
-                            s= " ";
+                            subjectCnt=1;
+                            while (stz.hasMoreTokens()) {
+                                StringTokenizer stzz = new StringTokenizer(stz.nextToken(), "&");
+                                while (stzz.hasMoreTokens()) {
+                                    s += stzz.nextToken() + "\n";
+                                }
+                            }
                         }
-                        TextView tx = new TextView(getActivity());
-                        if(j==0)
-                            tx.setPadding(10, 0, 0, 0);
-                        tx.setText(s);
-                        tx.setTextSize(10f);
-                        tx.setTypeface(Typeface.DEFAULT_BOLD);
-                        if(j!=0 && !s.equals(" ")) {
-                            Random rnd = new Random();
-                            int color = Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256));
-                            tx.setBackgroundColor(color);
-                        }
-                        row.addView(tx);
+                    } else {
+                        s= " ";
                     }
+                    final TextView tx = new TextView(getActivity());
+                    tx.setText(s);
+                    if(j==0) {
+                        tx.setPadding(10, 0, 0, 0);
+                        tx.setTextSize(12f);
+                        tx.setWidth(155);
+                        tx.setTextColor(Color.BLACK);
 
-                    table.addView(row);
+                    } else {
+                        tx.setPadding(3, 0, 5, 0);
+                        tx.setWidth(260);
+                        tx.setTextSize(9.5f);
+                        tx.setHeight(230*subjectCnt);
+                        tx.setTextColor(Color.WHITE);
+                        tx.setOnLongClickListener(new View.OnLongClickListener() {
+                            @Override
+                            public boolean onLongClick(final View view) {
+                                ColorPickerDialogBuilder
+                                        .with(getContext())
+                                        .setTitle("Choose color")
+                                        .initialColor(Color.RED)
+                                        .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
+                                        .density(12)
+                                        .setOnColorSelectedListener(new OnColorSelectedListener() {
+                                            @Override
+                                            public void onColorSelected(int selectedColor) {
+                                                Toast.makeText(getContext(), "onColorSelected: 0x" + Integer.toHexString(selectedColor), Toast.LENGTH_LONG).show();
+                                            }
+                                        })
+                                        .setPositiveButton("ok", new ColorPickerClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int selectedColor, Integer[] allColors) {
+                                                view.setBackgroundColor(selectedColor);
+                                                setBackgroundColor((String) ((TextView)view).getHint(), selectedColor);
+                                            }
+                                        })
+                                        .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                            }
+                                        })
+                                        .build()
+                                        .show();
+                                return true;
+                            }
+                        });
+                    }
+                    tx.setTypeface(Typeface.DEFAULT_BOLD);
+                    if(j!=0 && !s.equals(" ")) {
+                        tx.setHint(i+"%"+j);
+                        if(getBackgroundColor(i+"%"+j) == 0) {
+                            tx.setBackgroundColor(colors[j-1]);
+                            setBackgroundColor(i+"%"+j, colors[j-1]);
+                        } else {
+                            tx.setBackgroundColor(getBackgroundColor(i+"%"+j));
+                        }
+                    }
+                    row.addView(tx);
                 }
 
-                table.setBackgroundResource(R.drawable.row_border);
-/*                table.addView(rowTitle);
-                table.addView(rowDayLabels);
-                table.addView(rowHighs);
-                table.addView(rowLows);*/
-                ScrollView sv = new ScrollView(getActivity());
-                sv.addView(table);
-                LinearLayout layout = new LinearLayout(getActivity());
-
-                layout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
-                layout.setOrientation(LinearLayout.VERTICAL);
-                layout.addView(sv);
-                ViewGroup viewGroup =(ViewGroup) getView();
-                viewGroup.removeAllViews();
-                viewGroup.addView(layout);
+                table.addView(row);
             }
 
+            table.setBackgroundResource(R.drawable.row_border);
+            ScrollView sv = new ScrollView(getActivity());
+            sv.addView(table);
+            LinearLayout layout = new LinearLayout(getActivity());
+
+            layout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+            layout.setOrientation(LinearLayout.VERTICAL);
+            layout.addView(sv);
+            ViewGroup viewGroup =(ViewGroup) getView();
+            viewGroup.removeAllViews();
+            viewGroup.addView(layout);
         }
+
     };
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.timetable_fragment, container, false);
-        authTx = (TextView) rootView.findViewById(R.id.auth_timetable_tx);
-        authId = (EditText) rootView.findViewById(R.id.auth_timetable_id_edit);
-        authPw  = (EditText) rootView.findViewById(R.id.auth_timetable_pw_edit);
-        authBtn = (Button) rootView.findViewById(R.id.auth_timetable_btn);
-        authTx.setText("forest 사이트로부터 시간표를 받아옵니다. \n"
-                    +"학사 시스템 forest 홈페이지의 아이디와 비밀번호를 입력하여 \n"
-                    +"아래의 인증버튼을 누르세요.");
-        authBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                final DBManager dbManager = new DBManager(getContext(), "app_data.db", null, 1);
-                final HashMap <String, String> dataMap = dbManager.getMemberInfo();
-                backgroundGetTimeTableInfoThread = new GetTimeTableInfoAsyncThread();
-                backgroundGetTimeTableInfoThread.execute("auth", authId.getText().toString(),
-                        authPw.getText().toString(), dataMap.get("id"));
-            }
-        });
+        final DBManager dbManager = new DBManager(getContext(), "app_data.db", null, 1);
+        final HashMap <String, String> dataMap = dbManager.getMemberInfo();
+        if(isFirstAccess()) {
+            initTimeTable();
+        }
         if(isAuthStudent()) {
-
-            final DBManager dbManager = new DBManager(getContext(), "app_data.db", null, 1);
-            final HashMap <String, String> dataMap = dbManager.getMemberInfo();
             backgroundGetTimeTableInfoThread = new GetTimeTableInfoAsyncThread();
             backgroundGetTimeTableInfoThread.execute(dataMap.get("id"));
-
         }
         return rootView;
     }
     public  boolean isAuthStudent() {
         auth_pref = getActivity().getSharedPreferences("auth_Info", MODE_PRIVATE);
         if (!auth_pref.getString("auth", "").equals("")) {
-
+/*
             editor = auth_pref.edit();
             editor.putString("auth", "");
-            editor.commit();
+            editor.commit();*/
             return true;
         } else {
             return false;
         }
     }
-    public  void succeedAuthStudent() {
+    public  boolean isFirstAccess() {
+        auth_pref = getActivity().getSharedPreferences("auth_Info", MODE_PRIVATE);
+        if (auth_pref.getString("access", "").equals("")) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    public void initTimeTable() {
+        auth_pref = getActivity().getSharedPreferences("auth_Info", MODE_PRIVATE);
+        editor = auth_pref.edit();
+        editor.putString("access", "OK");
+        editor.commit();
+        saveAllBackgroundColors();
+    }
+    public void saveAllBackgroundColors() {
         Log.d("auth","초기화 작업!");
-            auth_pref = getActivity().getSharedPreferences("auth_Info",MODE_PRIVATE);
-            editor = auth_pref.edit();
-            editor.putString("auth", "success");
-            editor.commit();
+        color_pref = getActivity().getSharedPreferences("color_Info",MODE_PRIVATE);
+        editor = color_pref.edit();
+        for(int i=0; i<13; i++) {
+            for(int j=0; j<5; j++) {
+                editor.putString("color_"+i+"_"+j, 0+"");
+                editor.commit();
+            }
+        }
+    }
+    public int getBackgroundColor(String key) {
+        Log.d("auth","초기화 작업!");
+        color_pref = getActivity().getSharedPreferences("color_Info",MODE_PRIVATE);
+
+        StringTokenizer stz = new StringTokenizer(key, "%");
+        String i=stz.nextToken(), j =stz.nextToken();
+        String colorCode = color_pref.getString("color_"+i+"_"+j , "");
+        if(colorCode.equals(""))
+            return 0;
+
+        return Integer.parseInt(colorCode);
+    }
+    public void setBackgroundColor(String key, int color) {
+        Log.d("auth","초기화 작업!");
+        color_pref = getActivity().getSharedPreferences("color_Info",MODE_PRIVATE);
+        StringTokenizer stz = new StringTokenizer(key, "%");
+        String i=stz.nextToken(), j =stz.nextToken();
+        editor = color_pref.edit();
+        editor.putString("color_"+i+"_"+j, color+"");
+        editor.commit();
     }
     public class GetTimeTableInfoAsyncThread extends AsyncTask<String, String, String> {
 
-        ProgressDialog pd=new ProgressDialog(getActivity());
         // Thread를 시작하기 전에 호출되는 함수
         protected void onPreExecute() {
             super.onPreExecute();
 
-            pd.setTitle("정보 받아오는 중...");
-            pd.setMessage("잠시만 기다려주세요. \n 시간표 데이터를 받아오고 있습니다.");
-            pd.setCancelable(false);
-            pd.show();
         }
 
         // Thread의 주요 작업을 처리 하는 함수
@@ -247,14 +308,8 @@ public class TimeTableFragment extends Fragment {
             String urlStr = "";
             HashMap<String, String> dataMap = new HashMap<>();
 
-            if(args.length==1) {
-                dataMap.put("user", args[0]);
-            } else {
-                dataMap.put("auth", args[0]);
-                dataMap.put("id",args[1]);
-                dataMap.put("pw", args[2]);
-                dataMap.put("user", args[3]);
-            }
+            dataMap.put("user", args[0]);
+
             urlStr = "http://"+getString(R.string.ip_address)+":8080/ForestWebProject/parse/timetable";
             try {
                 url = new URL(urlStr);
@@ -277,15 +332,10 @@ public class TimeTableFragment extends Fragment {
                     Bundle b = new Bundle();
                     ObjectInputStream ois = new ObjectInputStream(conn.getInputStream());
                     HashMap<String, String> stateDataMap = (HashMap<String, String>)ois.readObject();
-                    if(stateDataMap.get("fail")!=null) {    // 빈데이터면 아이디 비번 틀림
-                        b.putString("state","fail");
-                        b.putString("message",stateDataMap.get("fail"));
-                    } else {
-                        b.putString("state","success");
-                        b.putString("title", stateDataMap.get("title"));
-                        String[][] timetableInfo = (String[][]) ois.readObject();
-                        msg.obj = timetableInfo;
-                    }
+                    b.putString("title", stateDataMap.get("title"));
+                    String[][] timetableInfo = (String[][]) ois.readObject();
+                    msg.obj = timetableInfo;
+
                     ois.close();
                     msg.setData(b);
                     handler.sendMessage(msg);
@@ -308,7 +358,6 @@ public class TimeTableFragment extends Fragment {
         // doInBackground(~)의 리턴값을 인자로 받습니다.
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
-            if(pd.isShowing()) pd.dismiss();
         }
 
         // AsyncTask.cancel(true) 호출시 실행되어 thread를 취소 합니다.

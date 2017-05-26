@@ -22,7 +22,7 @@ public class TabPagerAdapter extends FragmentStatePagerAdapter {
         // Returning the current tabs
         switch (position) {
             case 0:
-                TabFragment01 tabFragment01 = new TabFragment01();
+                HomeFragment tabFragment01 = new HomeFragment();
                 return tabFragment01;
             case 1:
                 NoticeBoardListFragment noticeBoardListFragment = new NoticeBoardListFragment();

@@ -53,6 +53,10 @@ public class NoticeBoardListFragment extends Fragment {
                 else {
                     Toast.makeText(getContext(), data.mTitle + "을 선택했습니다.", Toast.LENGTH_SHORT).show();
                 }
+                if(data.mTitle.equals("학과게시판")) { //북드림을 눌렀을 경우
+                    Intent intent = new Intent(getContext(), DepartmentNoticeboardActivity.class);
+                    getActivity().startActivity(intent);
+                }
             }
         });
         listViewAdapter = new ListViewAdapter(getContext());
@@ -60,6 +64,8 @@ public class NoticeBoardListFragment extends Fragment {
         listViewAdapter.addItem(ContextCompat.getDrawable(getContext(), R.mipmap.ic_launcher) ,"Book:Dream", "선,후배 간에 책을 주고 받을 수 있습니다.");
         listViewAdapter.addItem(ContextCompat.getDrawable(getContext(), R.mipmap.ic_launcher), "자유게시판", "자유롭게 소통하세요!");
         listViewAdapter.addItem(ContextCompat.getDrawable(getContext(), R.mipmap.ic_launcher), "정보게시판", "정보를 주고 받을 수 있습니다.");
+        listViewAdapter.addItem(ContextCompat.getDrawable(getContext(), R.mipmap.ic_launcher), "학과게시판", "학과의 소식을 알 수 있습니다.");
+
         listViewAdapter.dataChange();
         return rootView;
     }
