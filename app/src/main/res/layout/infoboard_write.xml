@@ -16,7 +16,7 @@
         android:weightSum="10">
 
         <TextView
-            android:id="@+id/backBtn"
+            android:id="@+id/infoboard_backBtn"
             android:layout_width="0dp"
             android:textStyle="bold"
             android:textColor="@color/BLUEGREEN"
@@ -48,7 +48,7 @@
             android:textAlignment="center" />
 
         <TextView
-            android:id="@+id/freeboard_writeClearBtn"
+            android:id="@+id/infoboard_writeClearBtn"
             android:text="완료"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -82,12 +82,13 @@
             android:textColor="#151359"/>
 
         <EditText
-            android:id="@+id/freeboard_edit_title"
+            android:id="@+id/infoboard_edit_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/freeboard_round"
             android:textSize="15dp"
             android:hint="제목을 입력해주세요"
+            android:maxLength="20"
             android:paddingLeft="10dp"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"/>
@@ -107,14 +108,14 @@
         android:layout_weight="6">
 
         <EditText
-            android:id="@+id/freeboard_edit_content"
+            android:id="@+id/infoboard_edit_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/freeboard_round"
             android:gravity="top"
             android:inputType="textMultiLine"
             android:ems="50"
-            android:maxLength="1000"
+            android:maxLength="200"
             android:hint="@string/freeboard_content"
             android:textSize="15dp"
             android:paddingLeft="10dp"
@@ -135,8 +136,8 @@
         android:layout_weight="1">
 
         <TextView
-            android:id="@+id/photoBtn"
-            android:text="사진찍기"
+            android:id="@+id/infoboard_photoBtn"
+            android:text="카메라"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingTop="5dp"
@@ -151,7 +152,7 @@
             android:textAlignment="center"/>
 
         <TextView
-            android:id="@+id/gallaryBtn"
+            android:id="@+id/infoboard_gallaryBtn"
             android:text="갤러리"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -178,7 +179,7 @@
         android:layout_weight="6"
         android:weightSum="1">
         <ImageView
-            android:id="@+id/image_input"
+            android:id="@+id/infoboard_image_input"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"/>

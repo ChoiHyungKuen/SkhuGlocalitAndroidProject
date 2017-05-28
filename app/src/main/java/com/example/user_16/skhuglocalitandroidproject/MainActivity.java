@@ -5,8 +5,6 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -16,17 +14,9 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
-import android.util.TypedValue;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.ScrollView;
-import android.widget.TableLayout;
-import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,8 +28,6 @@ import java.io.ObjectOutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
-import java.util.Random;
-import java.util.StringTokenizer;
 
 public class MainActivity extends FragmentActivity {
     private final long	FINSH_INTERVAL_TIME = 2000; // 2초안에 Back 버튼을 2번 누르면 앱 종료 -> 2초
@@ -52,7 +40,7 @@ public class MainActivity extends FragmentActivity {
     private ViewPager viewPager;
     private GetInfoFromForestAsyncThread backgroundGetInfoFromForestThread;
     private int[] imageResId = {
-            R.drawable.home
+            R.drawable.image_home, R.drawable.image_board, R.drawable.image_table, R.drawable.image_food
     };
     final Handler handler = new Handler()
     {
@@ -93,9 +81,9 @@ public class MainActivity extends FragmentActivity {
         FirebaseInstanceId.getInstance().getToken();
         tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         tabLayout.addTab(tabLayout.newTab().setText("홈").setIcon(imageResId[0]));
-        tabLayout.addTab(tabLayout.newTab().setText("게시판"));
-        tabLayout.addTab(tabLayout.newTab().setText("시간표"));
-        tabLayout.addTab(tabLayout.newTab().setText("추천맛집"));
+        tabLayout.addTab(tabLayout.newTab().setText("게시판").setIcon(imageResId[1]));
+        tabLayout.addTab(tabLayout.newTab().setText("시간표").setIcon(imageResId[2]));
+        tabLayout.addTab(tabLayout.newTab().setText("추천맛집").setIcon(imageResId[3]));
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
         // Initializing ViewPager

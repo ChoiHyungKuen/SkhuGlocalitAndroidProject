@@ -19,7 +19,7 @@
             android:weightSum="10"
             android:orientation="vertical">
             <TextView
-                android:id="@+id/list_title"
+                android:id="@+id/infoboard_list_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="10"
@@ -47,7 +47,7 @@
                     android:orientation="horizontal"/>
 
                 <TextView
-                    android:id="@+id/list_date"
+                    android:id="@+id/infoboard_list_date"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="3dp"
@@ -59,7 +59,7 @@
                     android:textColor="#3c3c3d"/>
 
                 <TextView
-                    android:id="@+id/list_user"
+                    android:id="@+id/infoboard_list_user"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="3dp"
@@ -74,7 +74,7 @@
         </LinearLayout>
 
         <ImageView
-            android:id="@+id/freeboard_list_image"
+            android:id="@+id/infoboard_list_image"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_marginTop="5dp"
@@ -96,7 +96,7 @@
         android:layout_marginRight="10dp">
 
         <TextView
-            android:id="@+id/list_content"
+            android:id="@+id/infoboard_list_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="8dp"

@@ -7,6 +7,7 @@
     android:minHeight="700dp"
     android:background="@color/colorPrimary">
 
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -16,7 +17,7 @@
         android:weightSum="10">
 
         <TextView
-            android:id="@+id/view_backBtn"
+            android:id="@+id/infoboard_view_backBtn"
             android:layout_width="0dp"
             android:textColor="@color/BLUEGREEN"
             android:layout_height="wrap_content"
@@ -33,7 +34,7 @@
             android:layout_weight="7"/>
 
         <TextView
-            android:id="@+id/view_editBtn"
+            android:id="@+id/infoboard_view_editBtn"
             android:text="글 수정"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -56,7 +57,7 @@
         android:layout_marginTop="3dp">
 
         <TextView
-            android:id="@+id/view_title"
+            android:id="@+id/infoboard_view_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="7dp"
@@ -83,7 +84,7 @@
             android:layout_weight="13"/>
 
         <TextView
-            android:id="@+id/view_user"
+            android:id="@+id/infoboard_view_user"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="30dp"
@@ -95,7 +96,7 @@
             android:textColor="#3c3c3d"/>
 
         <TextView
-            android:id="@+id/view_date"
+            android:id="@+id/infoboard_view_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="1dp"
@@ -122,7 +123,7 @@
         android:weightSum="5"
         android:gravity="center_vertical">
         <TextView
-            android:id="@+id/view_content"
+            android:id="@+id/infoboard_view_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="9dp"
@@ -150,7 +151,8 @@
             android:layout_marginRight="15dp"
             android:layout_marginTop="8dp"
             android:gravity="center_vertical"
-            android:id="@+id/view_image" />
+            android:id="@+id/infoboard_view_image"
+            android:clickable="true"/>
     </LinearLayout>
 
     <LinearLayout

@@ -18,6 +18,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <activity android:name=".Activity_Login">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -67,7 +68,36 @@
         <activity
             android:name=".FreeNoticeBoard.FreeNoticeBoard_View"
             android:label="@string/title_activity_book_dream_main"
-            android:theme="@style/AppTheme"></activity>
+            android:theme="@style/AppTheme">
+
+            android:theme="@style/AppTheme">
+
+        </activity>
+
+        <activity
+            android:name=".InfoNoticeBoard.InfoNoticeBoard_Main"
+            android:label="@string/title_activity_book_dream_main"
+
+            android:theme="@style/AppTheme">
+
+        </activity>
+
+        <activity
+            android:name=".InfoNoticeBoard.InfoNoticeBoard_Write"
+            android:label="@string/title_activity_book_dream_main"
+
+            android:theme="@style/AppTheme">
+
+        </activity>
+
+        <activity
+            android:name=".InfoNoticeBoard.InfoNoticeBoard_View"
+            android:label="@string/title_activity_book_dream_main"
+
+            android:theme="@style/AppTheme">
+
+        </activity>
+
         // 추가된 서비스
         <service android:name=".BookDream.FirebaseMessagingService">
             <intent-filter>
