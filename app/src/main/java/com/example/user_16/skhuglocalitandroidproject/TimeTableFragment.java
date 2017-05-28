@@ -162,7 +162,7 @@ public class TimeTableFragment extends Fragment {
                             public boolean onLongClick(final View view) {
                                 ColorPickerDialogBuilder
                                         .with(getContext())
-                                        .setTitle("Choose color")
+                                        .setTitle("변경할 색을 골라주세요.")
                                         .initialColor(Color.RED)
                                         .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
                                         .density(12)
