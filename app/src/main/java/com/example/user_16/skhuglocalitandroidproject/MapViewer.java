@@ -47,12 +47,12 @@ public class MapViewer extends NMapActivity {
     private NMapOverlayManager mMapOverlayManager;
     private MapContainerView mMapContainerView;
     private int markerCount;
-
-    private LoadRecommendAsyncThread loadRecommendAsyncThread;
+    private InitRecommendAsyncThread initRecommendAsyncThread;
 
     @Override
     protected void onCreate(Bundle bundle) {
         super.onCreate(bundle);
+
 
         mMapView = new NMapView(this);
 
@@ -61,8 +61,8 @@ public class MapViewer extends NMapActivity {
 
         // set the activity content to the parent view
         setContentView(mMapContainerView);
-
-        mMapView.setClientId(getString(R.string.CLIENT_ID));
+        String clientID = getString(R.string.CLIENT_ID);
+        mMapView.setClientId(clientID);
         mMapView.setClickable(true);
         mMapView.setEnabled(true);
         mMapView.setFocusable(true);
@@ -75,11 +75,11 @@ public class MapViewer extends NMapActivity {
         mMapViewerResourceProvider = new NMapViewerResourceProvider(this);
         mMapOverlayManager = new NMapOverlayManager(this, mMapView, mMapViewerResourceProvider);
 
-        loadRecommendAsyncThread = new LoadRecommendAsyncThread();
-        loadRecommendAsyncThread.execute();
+
+        handler.sendEmptyMessage(100);
     }
 
-    public class LoadRecommendAsyncThread extends AsyncTask<String, String, String> {
+    public class InitRecommendAsyncThread extends AsyncTask<String, String, String> {
 
         @Override
         protected void onPreExecute() {
@@ -89,12 +89,9 @@ public class MapViewer extends NMapActivity {
         @Override
         protected String doInBackground(String... args) {
             URL url;
-            HttpURLConnection conn = null;
-            String urlStr = "";
-            //final DBManager dbManager = new DBManager(getApplicationContext(), "app_data.db", null, 1);
-            urlStr = "http://192.168.123.199:8080/ServerProject/Recommend/LoadRecommendList"; //집
-//            urlStr = "http://172.30.41.141:8080/ServerProject/Recommend/LoadRecommendList";  // 학교
-//            urlStr = "http://192.168.35.59:8080/ServerProject/Recommend/LoadRecommendList";     //더안
+            HttpURLConnection conn;
+            String urlStr;
+            urlStr = "http://"+getString(R.string.ip_address)+":8080/SkhuGlocalitWebProject/recommend/InitRecommendList";
 
             try {
                 url = new URL(urlStr);
@@ -115,20 +112,17 @@ public class MapViewer extends NMapActivity {
                     HashMap<Integer, HashMap<String, String>> recommendListMap = new HashMap<>();
                     int index = 0;
                     boolean flag = ois.readBoolean();
-                    Log.d("플래그", flag + "");
                     while (flag) {
                         HashMap<String, String> locationData = (HashMap<String, String>) ois.readObject();
-//                        dbManager.loadLocation(index,locationData.get("title"),
-//                                locationData.get("longitude"), locationData.get("latitude"));
                         recommendListMap.put(index++, locationData);
                         flag = ois.readBoolean();
                     }
-                    Log.d("추천리스트", flag + recommendListMap.toString());
+                    ois.close();
                     Message msg = handler.obtainMessage();
                     msg.what = 0;
                     msg.obj = recommendListMap;
                     handler.sendMessage(msg);
-                    ois.close();
+
                 }
 
                 conn.disconnect();
@@ -159,6 +153,10 @@ public class MapViewer extends NMapActivity {
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             switch (msg.what) {
+                case 100:
+                    initRecommendAsyncThread = new InitRecommendAsyncThread();
+                    initRecommendAsyncThread.execute();
+                    break;
                 case 0:
                     HashMap<Integer, HashMap<String, String>> recommendListMap = (HashMap<Integer, HashMap<String, String>>) msg.obj;
                     String title, longitude, latitude;
@@ -167,19 +165,15 @@ public class MapViewer extends NMapActivity {
                         title = locationData.get("title");
                         longitude = locationData.get("longitude");
                         latitude = locationData.get("latitude");
-//                        Log.d("타이틀 - 롱기 - 래티", title + " - " + longitude + " - " + latitude);
-                        loadRecommendPoint(title, Integer.parseInt(longitude), Integer.parseInt(latitude));
+                        initRecommendPoint(title, Integer.parseInt(longitude), Integer.parseInt(latitude));
                     }
                     map_pref = getSharedPreferences("map_center", MODE_PRIVATE);
                     if (map_pref.getInt("longitude", 0) != 0 && map_pref.getInt("latitude", 0) != 0 && map_pref.getInt("zoomlevel", 0) != 0) {
                         mMapController.setMapCenter(new NGeoPoint(map_pref.getInt("longitude", 0), map_pref.getInt("latitude", 0)), map_pref.getInt("zoomlevel", 0));
-//                        Log.d("로딩 되어야 할 위치", map_pref.getAll().toString());
                     } else {
                         mMapController.setMapCenter(new NGeoPoint(126.82575, 37.487444), 11);
                     }
                     break;
-
-
             }
         }
     };
@@ -189,13 +183,23 @@ public class MapViewer extends NMapActivity {
         return locationData;
     }
 
+
     private final NMapPOIdataOverlay.OnStateChangeListener onPOIdataStateChangeListener = new NMapPOIdataOverlay.OnStateChangeListener() {
         public void onCalloutClick(NMapPOIdataOverlay poiDataOverlay, NMapPOIitem item) {
-            if(RecommendFragmentActivity.getMakable()){
-                RecommendFragmentActivity.setMakable(false);
-                RecommendFragmentActivity.setMaking(true);
-//                Log.d("마킹",RecommendFragmentActivity.getMaking()+"");
-                saveCenterInfo();
+            if(((RecommendFragmentActivity)getParent()).getMakable()){
+                ((RecommendFragmentActivity)getParent()).setMakable(false);
+                ((RecommendFragmentActivity)getParent()).setMaking(true);
+                ((RecommendFragmentActivity)getParent()).changeAddFragment();
+            }
+            else {
+                final DBManager dbManager = new DBManager(getApplicationContext(), "app_data.db", null, 1);
+                HashMap<String, String> data = dbManager.getMemberInfo();
+                String title = item.getTitle();
+                int longitude = item.getPoint().getLongitudeE6();
+                int latitude = item.getPoint().getLatitudeE6();
+                ((RecommendFragmentActivity) getParent()).selectRecommend(title, Integer.toString(longitude), Integer.toString(latitude), data.get("id"));
+//                selectRecommendAsyncThread = new SelectRecommendAsyncThread();
+//                selectRecommendAsyncThread.execute(title, Integer.toString(longitude), Integer.toString(latitude), data.get("id"));
             }
         }
 
@@ -240,6 +244,13 @@ public class MapViewer extends NMapActivity {
          */
         @Override
         public void onMapCenterChange(NMapView nMapView, NGeoPoint nGeoPoint) {
+            map_pref = getSharedPreferences("map_center", MODE_PRIVATE);
+            editor = map_pref.edit();
+            editor.putInt("longitude", nGeoPoint.getLongitudeE6());
+            Log.d("센터longitude", map_pref.getInt("longitude", 0) + "");
+            editor.putInt("latitude", nGeoPoint.getLatitudeE6());
+            Log.d("센터latitude", map_pref.getInt("latitude", 0) + "");
+            editor.commit();
         }
 
         /**
@@ -247,6 +258,11 @@ public class MapViewer extends NMapActivity {
          */
         @Override
         public void onZoomLevelChange(NMapView nMapView, int i) {
+            map_pref = getSharedPreferences("map_center", MODE_PRIVATE);
+            editor = map_pref.edit();
+            editor.putInt("zoomlevel", i);
+            Log.d("줌레벨", map_pref.getInt("zoomlevel", 0) + "");
+            editor.commit();
         }
 
         /**
@@ -263,48 +279,28 @@ public class MapViewer extends NMapActivity {
 
         }
     };
-
-    void saveCenterInfo() {
-        NGeoPoint center = mMapController.getMapCenter();
-        int zoomLevel = mMapController.getZoomLevel();
-
-        map_pref = getSharedPreferences("map_center", MODE_PRIVATE);
-        editor = map_pref.edit();
-        editor.putInt("longitude", center.getLongitudeE6());
-        Log.d("센터longitude", map_pref.getInt("longitude", 0) + "");
-        editor.putInt("latitude", center.getLatitudeE6());
-        Log.d("센터latitude", map_pref.getInt("latitude", 0) + "");
-        editor.putInt("zoomlevel", zoomLevel);
-        Log.d("줌레벨", map_pref.getInt("zoomlevel", 0) + "");
-        editor.commit();
-    }
-
-    void loadRecommendPoint(String title, int x, int y) {
-
+    
+    void initRecommendPoint(String title, int x, int y) {
         NGeoPoint selectPoint = new NGeoPoint(x, y);
         Log.d("지오포인트", selectPoint + "");
         int markerID = NMapPOIflagType.PIN;
-        Log.d("마커아이디 - 개수", markerID + " - " + markerCount);
         NMapPOIdata poiData = new NMapPOIdata(++markerCount, mMapViewerResourceProvider);
         poiData.beginPOIdata(1);
         poiData.addPOIitem(selectPoint, title, markerID, markerCount);
         poiData.endPOIdata();
         NMapPOIdataOverlay poiDataOverlay = mMapOverlayManager.createPOIdataOverlay(poiData, null);
-        poiDataOverlay.showAllPOIdata(0);
         poiDataOverlay.setOnStateChangeListener(onPOIdataStateChangeListener);
 
     }
 
     void addPoint(NMapView mapView, int x, int y) {
-        markerCount = 0;
         NMapProjection mMapProjection = mapView.getMapProjection();
         NGeoPoint selectPoint = mMapProjection.fromPixels(x, y);
-        Log.d("지오포인트", selectPoint + "");
         int markerID = NMapPOIflagType.PIN;
-        Log.d("마커아이디", markerID + "");
         NMapPOIdata poiData = new NMapPOIdata(++markerCount, mMapViewerResourceProvider);
+        markerCount = poiData.count();
         poiData.beginPOIdata(1);
-        poiData.addPOIitem(selectPoint, RecommendAddFragment.title + " : " + markerID + " : " + markerCount, markerID, markerCount);
+        poiData.addPOIitem(selectPoint, RecommendAddFragment.title +" 위치 추가 완료", markerID, markerCount);
         poiData.endPOIdata();
         add_pref = getSharedPreferences("recommend_Info", MODE_PRIVATE);
         editor = add_pref.edit();
@@ -312,7 +308,6 @@ public class MapViewer extends NMapActivity {
         editor.putString("latitude", Integer.toString(selectPoint.getLatitudeE6()));
         editor.commit();
         NMapPOIdataOverlay poiDataOverlay = mMapOverlayManager.createPOIdataOverlay(poiData, null);
-        poiDataOverlay.showAllPOIdata(0);
         poiDataOverlay.setOnStateChangeListener(onPOIdataStateChangeListener);
 
     }
@@ -323,7 +318,7 @@ public class MapViewer extends NMapActivity {
         @Override
         public void onLongPress(NMapView mapView, MotionEvent ev) {
             // TODO Auto-generated method stub
-            if (RecommendFragmentActivity.getMakable()) {
+            if (((RecommendFragmentActivity)getParent()).getMakable()) {
                 int touch_x = (int) ev.getX();
                 int touch_y = (int) ev.getY();
                 addPoint(mapView, touch_x, touch_y);
@@ -439,10 +434,8 @@ public class MapViewer extends NMapActivity {
     protected void onDestroy() {
         super.onDestroy();
         try {
-            saveCenterInfo();
-
-            if (loadRecommendAsyncThread.getStatus() == AsyncTask.Status.RUNNING) {
-                loadRecommendAsyncThread.cancel(true);
+            if (initRecommendAsyncThread.getStatus() == AsyncTask.Status.RUNNING) {
+                initRecommendAsyncThread.cancel(true);
             }
         } catch (Exception e) {
 

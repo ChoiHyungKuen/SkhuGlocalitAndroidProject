@@ -58,26 +58,21 @@ public class RecommendAddFragment extends Fragment {
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.addLocation_btn:
-                    RecommendFragmentActivity.setMakable(true);
+                    ((RecommendFragmentActivity)getActivity()).setMakable(true);
                     title = " 위치 설정 완료";
                     if (!name_edittext.getText().equals("")) {
                         title = name_edittext.getText().toString() + title;
                     }
                     ((RecommendFragmentActivity) getActivity()).changeMapFragment();
-                    ((RecommendFragmentActivity) getActivity()).markCheck();
                     Toast.makeText(getActivity(), "길게 눌러 위치를 추가하세요\n추가한 후에 위치를 클릭해주세요", Toast.LENGTH_LONG).show();
                     break;
                 case R.id.addRecommend_btn:
-                    String category,
-                            name = "",
-                            callNumber,
-                            delivery,
-                            review;
+                    String category, name = "", callNumber, delivery, review;
                     boolean test = true;
                     if (delivery_check.isChecked()) {
-                        delivery = "can";
+                        delivery = "true";
                     } else {
-                        delivery = "cant";
+                        delivery = "false";
                     }
                     category = category_sp.getSelectedItem().toString();
                     if (test) {
@@ -92,7 +87,7 @@ public class RecommendAddFragment extends Fragment {
                         }
                     }
                     if (test) {
-                        if (!RecommendFragmentActivity.getMaking()) {
+                        if (!((RecommendFragmentActivity)getActivity()).getMaking()) {
 //                            Log.d("마킹 - 테스트",RecommendFragmentActivity.getMaking() + " - "+test);
                             test = false;
 //                            Log.d("마킹 - 테스트",RecommendFragmentActivity.getMaking() + " - "+test);
@@ -126,7 +121,7 @@ public class RecommendAddFragment extends Fragment {
                         call_edittext.setText("");
                         delivery_check.setChecked(false);
                         review_edittext.setText("");
-                        RecommendFragmentActivity.setMaking(false);
+                        ((RecommendFragmentActivity)getActivity()).setMaking(false);
                     }
                     break;
             }

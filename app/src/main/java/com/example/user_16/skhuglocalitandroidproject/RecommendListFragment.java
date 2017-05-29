@@ -66,9 +66,6 @@ public class RecommendListFragment extends Fragment{
         public TextView mTitle;
     }
 
-    /*
-        요청 프래그먼트의 리스트뷰를 관리하는 메소드
-     */
     private class ListViewAdapter extends BaseAdapter {
         private Context mContext = null;
         private ArrayList<RecommendListData> mListData = new ArrayList<>();
@@ -96,12 +93,11 @@ public class RecommendListFragment extends Fragment{
             return position;
         }
 
-        // 사용자가 선택한 아이템 데이터를 bookdream_request_item 형태에 맞춰 반환한다.
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             RecommendListFragment.ViewHolder holder;
             if (convertView == null) {
-                holder = new RecommendListFragment.ViewHolder();
+                holder = new ViewHolder();
 
                 LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 convertView = inflater.inflate(R.layout.recommend_list_item, null);
@@ -110,7 +106,7 @@ public class RecommendListFragment extends Fragment{
                 holder.mTitle = (TextView) convertView.findViewById(R.id.recommend_list_title);
                 convertView.setTag(holder);
             } else {
-                holder = (RecommendListFragment.ViewHolder) convertView.getTag();
+                holder = (ViewHolder) convertView.getTag();
             }
 
             RecommendListData mData = mListData.get(position); // DListData로부터 해당 아이템의 데이터를 받아온다.

@@ -55,6 +55,7 @@
     <string name="department_notice">현재 네트워크가 불안정하거나 삭제된 게시판입니다.</string>
     <string name="department_notice_title">글로컬 IT 학과 정보 게시판</string>
     <string name="CLIENT_ID">MJH2cXLtz_lvhesMICpC</string>
+    <string name="CLIENTSECRET">k7_YDv67QI</string>
     <string name="str_done">완료</string>
     <string name="map_show">지도 보기</string>
     <string name="add_recommend">추천 등록</string>

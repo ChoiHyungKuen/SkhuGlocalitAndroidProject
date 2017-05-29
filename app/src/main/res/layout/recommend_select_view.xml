@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:minHeight="400dp"
+    android:minWidth="400dp"
+    android:weightSum="10"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        android:weightSum="10"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/recommend_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="3dp"
+            android:layout_weight="5"
+            android:clickable="true"
+            android:text="Title"
+            android:textSize="9pt"
+            android:textStyle="bold"
+            android:textColor="#151359"/>
+
+        <TextView
+            android:id="@+id/recommend_id"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginLeft="1dp"
+            android:layout_marginRight="1dp"
+            android:layout_weight="3"
+            android:gravity="end"
+            android:text="201234010"
+            android:textSize="6pt"
+            android:textStyle="bold"
+            android:textColor="#232325"/>
+
+        <TextView
+            android:id="@+id/recommend_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginLeft="1dp"
+            android:layout_marginRight="11dp"
+            android:layout_weight="2"
+            android:gravity="center_horizontal"
+            android:text="성현석"
+            android:textSize="6pt"
+            android:textStyle="bold"
+            android:textColor="#232325"/>
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/freeboard_round"
+        android:id="@+id/content_layout"
+        android:paddingLeft="10dp"
+        android:layout_weight="8"
+        android:weightSum="5"
+        android:layout_margin="10dp">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:gravity="center_vertical"
+            android:layout_weight="1"
+            android:weightSum="5">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:textColor="#000000"
+                android:layout_weight="1"
+                android:text="카테고리"/>
+
+            <TextView
+                android:id="@+id/recommend_category"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:paddingLeft="20dp"
+                android:gravity="center_vertical"
+                android:visibility="visible"
+                android:layout_weight="4"
+                android:text="#카테고리#"/>
+
+            <Spinner
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/recommend_category_sp"
+                android:visibility="gone"
+                android:prompt="@string/category_prompt"
+                android:layout_weight="4" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:gravity="center_vertical"
+            android:layout_weight="1"
+            android:weightSum="10">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:textColor="#000000"
+                android:layout_weight="2"
+                android:text="전화번호"/>
+
+            <TextView
+                android:id="@+id/recommend_callNumber"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:paddingLeft="20dp"
+                android:visibility="visible"
+                android:gravity="center_vertical"
+                android:layout_weight="5"
+                android:text="#전화번호#"/>
+
+            <EditText
+                android:id="@+id/recommend_call_edit"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="5"
+                android:textSize="17dp"
+                android:inputType="number"
+                android:visibility="gone"
+                android:layout_gravity="center" />
+
+            <CheckBox
+                android:id="@+id/recommend_delivery"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:textSize="10dp"
+                android:enabled="false"
+                android:text="@string/delivery" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/review_layout"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:visibility="visible"
+            android:gravity="center_vertical"
+            android:layout_weight="2"
+            android:weightSum="5">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:textColor="#000000"
+                android:layout_weight="1"
+                android:text="리      뷰"/>
+
+            <TextView
+                android:id="@+id/recommend_review"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:paddingLeft="20dp"
+                android:gravity="center_vertical"
+                android:layout_weight="4"
+                android:text="#리뷰#"/>
+        </LinearLayout>
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textMultiLine"
+            android:id="@+id/recommend_edit_review"
+            android:background="@drawable/round"
+            android:hint="@string/review_hint"
+            android:textColorHint="@color/GRAY"
+            android:layout_weight="1"
+            android:visibility="gone"
+            android:textSize="15dp"
+            android:padding="10dp"
+            android:layout_margin="10dp" />
+
+
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:gravity="bottom|end"
+            android:paddingRight="5dp"
+            android:layout_weight="1"
+            android:weightSum="10">
+
+            <Button
+                android:id="@+id/recommend_up"
+                android:layout_width="0dp"
+                android:layout_height="25dp"
+                android:layout_weight="2"
+                android:paddingRight="10dp"
+                android:layout_margin="5dp"
+                android:gravity="end|center_vertical"
+                android:background="@drawable/thumb_up4"
+                android:textSize="10dp"
+                android:text="0"/>
+
+            <Button
+                android:id="@+id/recommend_down"
+                android:layout_width="0dp"
+                android:layout_height="25dp"
+                android:layout_weight="2"
+                android:paddingRight="10dp"
+                android:layout_margin="5dp"
+                android:gravity="end|center_vertical"
+                android:background="@drawable/thumb_down5"
+                android:textSize="10dp"
+                android:text="0"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:gravity="bottom|end"
+            android:id="@+id/edit_layout"
+            android:visibility="gone"
+            android:paddingRight="5dp"
+            android:layout_weight="1"
+            android:weightSum="5">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/round_btn"
+                android:clickable="true"
+                android:id="@+id/recommend_edit"
+                android:text="수정"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="5dp"
+                android:layout_marginBottom="10dp"
+                android:textSize="13dp"
+                android:gravity="center" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/round_btn"
+                android:clickable="true"
+                android:id="@+id/recommend_save"
+                android:visibility="gone"
+                android:text="저장"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="5dp"
+                android:layout_marginBottom="10dp"
+                android:textSize="13dp"
+                android:gravity="center" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/round_btn"
+                android:clickable="true"
+                android:id="@+id/recommend_delete"
+                android:text="삭제"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:textSize="13dp"
+                android:gravity="center"/>
+
+        </LinearLayout>
+
+
+
+    </LinearLayout>
+
+
+</LinearLayout>
