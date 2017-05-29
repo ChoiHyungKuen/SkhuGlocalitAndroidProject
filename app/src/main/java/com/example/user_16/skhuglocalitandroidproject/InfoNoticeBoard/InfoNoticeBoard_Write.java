@@ -1,4 +1,4 @@
-package com.example.user_16.skhuglocalitandroidproject.FreeNoticeBoard;
+package com.example.user_16.skhuglocalitandroidproject.InfoNoticeBoard;
 
 import android.annotation.TargetApi;
 import android.content.Intent;
@@ -37,12 +37,11 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 
+public class InfoNoticeBoard_Write extends AppCompatActivity {
 
-public class FreeNoticeBoard_Write extends AppCompatActivity {
+    static int indexNum_info;
 
-    static int indexNum;
-
-    TextView gallaryBtn, photoBtn;                      //갤러리,사진찍기
+    TextView Infoboard_gallaryBtn, Infoboard_photoBtn;      // 갤러리,사진찍기
         private static final int PICK_FROM_CAMERA = 0;
         private static final int PICK_FROM_ALBUM = 1;
         private static final int CROP_FROM_iMAGE = 2;
@@ -51,17 +50,16 @@ public class FreeNoticeBoard_Write extends AppCompatActivity {
         private Drawable uploadingImage = null;
         private Drawable getImage = null;
 
-    private ImageView image_input;      //자유게시판이미지 넣기
-    TextView freeboard_writeClearBtn;   //자유게시판 글쓰기 완료 버튼
-    TextView backBtn;                   //자유게시판 뒤로가기 버튼
-    EditText freeboard_edit_content, freeboard_edit_title;    //자유게시판 글 내용, 글 제목
+    private ImageView Infoboard_image_input;                //정보게시판 이미지 넣기
+    TextView Infoboard_writeClearBtn;                       //정보게시판 글쓰기 완료 버튼
+    TextView Infoboard_backBtn;                             //정보게시판 뒤로가기 버튼
+    EditText Infoboard_edit_title, Infoboard_edit_content;  //정보게시판 글 제목, 글 내용
 
-    static public WriteAsyncThread backgroundWriteThread;       // 글쓰기 스레드
+    static public WriteAsyncThread backgroundWriteThread;   //글쓰기 스레드
 
-
-    /*---------------------------------------
-        이미지를 업로드 하기위해 권한 허용
-    ----------------------------------------*/
+    /*-------------------------------------
+       이미지를 업로드 하기위해 권한 허용
+   ---------------------------------------*/
     protected boolean shouldAskPermissions() {
         return (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1);
     }
@@ -76,10 +74,9 @@ public class FreeNoticeBoard_Write extends AppCompatActivity {
         requestPermissions(permissions, requestCode);
     }
 
-
-    /*----------------------------------------------------------------------------------------------
-       자유 게시판에 글을 올린 경우, DB와 상호작용 하는 핸들러
-    ----------------------------------------------------------------------------------------------*/
+    /*-----------------------------------------------------------
+       정보 게시판에 글을 올린 경우, DB와 상호작용 하는 핸들러
+    ------------------------------------------------------------*/
     final Handler handler = new Handler()
     {
         public void handleMessage(Message msg)
@@ -99,24 +96,25 @@ public class FreeNoticeBoard_Write extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.freeboard_write); //자유게시판 글쓰기
+        setContentView(R.layout.infoboard_write); // 정보 게시판 글쓰기
 
-        Intent intent = getIntent();                    //FreeNoticeBoard_Main에서 FreeNoticeBoard_Write로 인텐트를 할 떄 넘겨준
-                                                        //현재 리스트 뷰의 개수를 받아옴.
-        indexNum = intent.getExtras().getInt("no");     //받아온 리스트 뷰의 key값인 "no"을 정수형 변수 indexNum에 저장
-        Log.d("여기서 현재의 키값>>>>>>>>>>>>.",indexNum+"");
+        Intent intent = getIntent();                        //InfoNoticeBoard_Main에서 InfoNoticeBoard_Write로 인텐트를 할 떄 넘겨준
+                                                            //현재 리스트 뷰의 개수를 받아옴.
+        indexNum_info = intent.getExtras().getInt("no");    //받아온 리스트 뷰의 key값인 "no"을 정수형 변수 n에 저장
+        Log.d("여기서 현재의 키 값>>>>>>>>>>.",indexNum_info+"");
 
-        freeboard_writeClearBtn = (TextView) findViewById(R.id.freeboard_writeClearBtn);    //글쓰기완료버튼
-        freeboard_writeClearBtn.setOnClickListener(writtingClearListener);                  //글쓰기완료버튼 리스너
+        Infoboard_writeClearBtn = (TextView) findViewById(R.id.infoboard_writeClearBtn);    //글쓰기완료버튼
+        Infoboard_writeClearBtn.setOnClickListener(writtingClearListener2);                 //글쓰기완료버튼 리스너
 
-        image_input = (ImageView)findViewById(R.id.image_input);    //이미지 들어갈 자리
-        gallaryBtn = (TextView) findViewById(R.id.gallaryBtn);
-        gallaryBtn.setOnClickListener(gallaryBtnListener);          //갤러리버튼 리스너
-        photoBtn = (TextView) findViewById(R.id.photoBtn);
-        photoBtn.setOnClickListener(photoBtnListener);              //사진찍기버튼 리스너
+        Infoboard_gallaryBtn = (TextView) findViewById(R.id.infoboard_gallaryBtn);
+        Infoboard_gallaryBtn.setOnClickListener(gallaryBtnListener);                        //갤러리버튼 리스너
+        Infoboard_photoBtn = (TextView) findViewById(R.id.infoboard_photoBtn);
+        Infoboard_photoBtn.setOnClickListener(photoBtnListener);                            //사진찍기버튼 리스너
 
-        backBtn = (TextView)findViewById(R.id.backBtn);
-        backBtn.setOnClickListener(backBtnClickListener);           //뒤로가기버튼 리스너
+        Infoboard_backBtn = (TextView)findViewById(R.id.infoboard_backBtn);
+        Infoboard_backBtn.setOnClickListener(backBtnClickListener);                         //뒤로가기 버튼 리스너
+
+        Infoboard_image_input = (ImageView)findViewById(R.id.infoboard_image_input);         //이미지 들어갈 자리
 
         //이미지 업로드 시 해상도
         try {
@@ -142,33 +140,32 @@ public class FreeNoticeBoard_Write extends AppCompatActivity {
         try {
             if (backgroundWriteThread.getStatus() == AsyncTask.Status.RUNNING) {
                 backgroundWriteThread.cancel(true);
-            }
+             }
         } catch (Exception e) {}
     }
 
 
     /*----------------------------------------------------------------------------------------------
-        자유 게시판 글쓰기 완료버튼 리스너
+        정보 게시판 글쓰기 완료버튼 리스너
     ----------------------------------------------------------------------------------------------*/
-    TextView.OnClickListener writtingClearListener = new View.OnClickListener() {
-
+    TextView.OnClickListener writtingClearListener2 = new View.OnClickListener() {
         String title = null;    //글 제목
         String content = null;  //글 내용
         boolean flag;
 
         @Override
         public void onClick(View v) {
-            Log.d("자유게시판 글쓰기 완료 버튼","누름");
+            Log.d("정보게시판 글쓰기 완료 버튼","누름");
 
             flag = true;
-            freeboard_edit_title = (EditText)findViewById(R.id.freeboard_edit_title);     //글쓰기 title
-            freeboard_edit_content = (EditText)findViewById(R.id.freeboard_edit_content); //글쓰기 content
-            image_input = (ImageView)findViewById(R.id.image_input);    //이미지 들어갈 자리
+            Infoboard_edit_title = (EditText)findViewById(R.id.infoboard_edit_title);       //글쓰기 title
+            Infoboard_edit_content = (EditText)findViewById(R.id.infoboard_edit_content);   //글쓰기 content
+            Infoboard_image_input = (ImageView)findViewById(R.id.infoboard_image_input);    //이미지 들어갈 자리
 
             // 제목을 쓰지 않는 경우 요청 불가 설정
             if (flag) {
                 try {
-                    title = freeboard_edit_title.getText().toString();
+                    title = Infoboard_edit_title.getText().toString();
                     Log.d("제목", title);
                     if (title.length() == 0) {
                         flag = false;
@@ -180,7 +177,7 @@ public class FreeNoticeBoard_Write extends AppCompatActivity {
                     }
                 } catch (Exception e) {
                     flag = false;
-                    Log.d("오류발생...", "-----------------------------------------------" + flag);
+                    Log.d("오류 발생...", "-----------------------------------------------" + flag);
                     Toast.makeText(getApplicationContext(), "Demand Content ERR : " + e.getMessage(), Toast.LENGTH_LONG).show();
                 }
             }
@@ -188,19 +185,19 @@ public class FreeNoticeBoard_Write extends AppCompatActivity {
             // 설명을 쓰지 않는 경우 요청 불가 설정
             if (flag) {
                 try {
-                    content = freeboard_edit_content.getText().toString();
-                    Log.d("글 내용", content);
+                    content = Infoboard_edit_content.getText().toString();
+                    Log.d("내용", content);
                     if (content.length() == 0) {
                         flag = false;
-                        Log.d("글 내용 안씀", "-----------------------------------------------" + flag);
+                        Log.d("글안씀", "-----------------------------------------------" + flag);
                         Toast.makeText(getApplicationContext(), "내용을 입력해주세요.", Toast.LENGTH_LONG).show();
                     } else {
                         flag = true;
-                        Log.d("글 내용 씀", "-----------------------------------------------" + flag);
+                        Log.d("글씀", "-----------------------------------------------" + flag);
                     }
                 } catch (Exception e) {
                     flag = false;
-                    Log.d("오류발생...", "-----------------------------------------------" + flag);
+                    Log.d("오류 발생...", "-----------------------------------------------" + flag);
                     Toast.makeText(getApplicationContext(), "Demand Content ERR : " + e.getMessage(), Toast.LENGTH_LONG).show();
                 }
             }
@@ -222,7 +219,7 @@ public class FreeNoticeBoard_Write extends AppCompatActivity {
                 }
             }
 
-            // 모든 요청 데이터가 채워진 경우, 요청 완료(DB 업로드, List 업로드) 후 다이얼로그 종료
+            // 모든 데이터가 채워진 경우, 글쓰기 완료(DB 업로드, List 업로드) 후 메인화면으로 인텐트
             if (flag) {
                 final DBManager dbManager = new DBManager(getApplicationContext(), "app_data.db", null, 1);
                 final HashMap<String, String> dataMap = dbManager.getMemberInfo();
@@ -230,12 +227,12 @@ public class FreeNoticeBoard_Write extends AppCompatActivity {
                 Calendar cal = Calendar.getInstance();
                 String date = (cal.get(Calendar.YEAR) + "." + (cal.get(Calendar.MONTH) + 1) + "." + cal.get(Calendar.DATE));
 
-                insertDatabase(indexNum, title, userName, content, date, getImage); //DB에 새로운 데이터를 추가
+                insertDatabase(indexNum_info, title, userName, content, date, getImage); //DB에 새로운 데이터를 추가
 
-                FreeNoticeBoard_Main.a = true;
-                Intent intent = new Intent(getApplicationContext(), FreeNoticeBoard_Main.class);
+                InfoNoticeBoard_Main.a = true;
+                Intent intent = new Intent(getApplicationContext(), InfoNoticeBoard_Main.class);
                 startActivity(intent);
-                FreeNoticeBoard_Write.this.finish();//
+                InfoNoticeBoard_Write.this.finish();
 
                 Toast.makeText(getApplicationContext(), "글쓰기가 완료되었습니다.", Toast.LENGTH_SHORT).show();
             }
@@ -243,17 +240,17 @@ public class FreeNoticeBoard_Write extends AppCompatActivity {
     };
 
 
-    /*----------------------------------------------------------------------------------------------
+     /*---------------------------------------------------------------------------------------------
         DB에 새로운 데이터를 추가하는 메소드
-    ----------------------------------------------------------------------------------------------*/
-    public void insertDatabase(int uniqueNum, String title, String userName, String content, String date,  Drawable getImage) {
+     ---------------------------------------------------------------------------------------------*/
+    public void insertDatabase(int indexNum_info, String title, String userName, String content, String date, Drawable getImage) {
         Bundle b = new Bundle();
-        b.putString("no", uniqueNum+"");
+        b.putString("no", indexNum_info+"");
         b.putString("title", title);
         b.putString("user", userName);
         b.putString("content", content);
         b.putString("date", date);
-        b.putString("file_name", uniqueNum + "_" + title + "_" + date + ".png");
+        b.putString("file_name", indexNum_info + "_" + title + "_" + date + ".png");
 
         Message msg= new Message();
         msg.setData(b);
@@ -277,8 +274,8 @@ public class FreeNoticeBoard_Write extends AppCompatActivity {
             HttpURLConnection conn = null;
             String urlStr = "";
 
-            urlStr = "http://"+getString(R.string.ip_address)+":8080/SkhuGlocalitWebProject/FreeNoticeBoard_Write";
-            //urlStr = "http://192.168.25.55:8080/BookDreamServerProject/FreeNoticeBoard_Write"; //테스트용
+            urlStr = "http://"+getString(R.string.ip_address)+":8080/SkhuGlocalitWebProject/InfoNoticeBoard_Write";
+            //urlStr = "http://192.168.25.55:8080/BookDreamServerProject/InfoNoticeBoard_Write"; //테스트용
 
             try {
                 url = new URL(urlStr);
@@ -359,7 +356,7 @@ public class FreeNoticeBoard_Write extends AppCompatActivity {
         protected void onCancelled() {
             super.onCancelled();
         }
-    }//WriteAsyncThread끝
+    }
 
 
     /*----------------------------------------------------------------------------------------------
@@ -376,7 +373,7 @@ public class FreeNoticeBoard_Write extends AppCompatActivity {
     };
 
     /*
-        사용자가 직접 사진을 찍는 경우, 사진 앱으로 연결해주는 리스너
+       사용자가 직접 사진을 찍는 경우, 사진 앱으로 연결해주는 리스너
     */
     TextView.OnClickListener photoBtnListener = new View.OnClickListener() {
         @Override
@@ -384,7 +381,7 @@ public class FreeNoticeBoard_Write extends AppCompatActivity {
             Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
             // 임시로 사용할 파일의 경로를 생성
-            String url = "temp_" + String.valueOf(System.currentTimeMillis()) + ".jpg";
+            String url = "ex_" + String.valueOf(System.currentTimeMillis()) + ".jpg";
             mImageCaptureUri = Uri.fromFile(new File(Environment.getExternalStorageDirectory(), url));
 
             intent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, mImageCaptureUri);
@@ -431,14 +428,14 @@ public class FreeNoticeBoard_Write extends AppCompatActivity {
                 }
                 final Bundle extras = data.getExtras();
                 // CROP된 이미지를 저장하기 위한 FILE 경로
-                String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/NoticeBoard/" + System.currentTimeMillis() + ".jpg";
+                String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/FreeBoard/" + System.currentTimeMillis() + ".jpg";
                 Log.d(filePath, " <<< 크롭된 이미지가 저장된 경로");
                 if (extras != null) {
                     Bitmap photo = extras.getParcelable("data"); // CROP된 BITMAP
                     storeCropImage(photo, filePath); // CROP된 이미지를 외부저장소, 앨범에 저장한다.
                     uploadingImage = new BitmapDrawable(getResources(), photo);
                     Log.d("카메라로 찍은 사진이 저장 됨 >>> ", "완료");
-                    image_input.setImageDrawable(uploadingImage); // 레이아웃의 이미지칸에 CROP된 BITMAP을 보여줌
+                    Infoboard_image_input.setImageDrawable(uploadingImage); // 레이아웃의 이미지칸에 CROP된 BITMAP을 보여줌
                     break;
                 }
 
@@ -455,7 +452,7 @@ public class FreeNoticeBoard_Write extends AppCompatActivity {
     */
     private void storeCropImage(Bitmap bitmap, String filePath) {
         // SmartWheel 폴더를 생성하여 이미지를 저장하는 방식이다.
-        String dirPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/NoticeBoard/";
+        String dirPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/FreeBoard/";
         Log.d("경로가 뭐니",dirPath);
         File directory_FreeBoard = new File(dirPath);
 
@@ -484,7 +481,6 @@ public class FreeNoticeBoard_Write extends AppCompatActivity {
         }
     }
 
-
     /*
         뒤로가기 버튼 클릭시 인텐트 종료
     */
@@ -492,7 +488,7 @@ public class FreeNoticeBoard_Write extends AppCompatActivity {
 
         @Override
         public void onClick(View v) {
-            finish();
+            InfoNoticeBoard_Write.this.finish();
         }
     };
 

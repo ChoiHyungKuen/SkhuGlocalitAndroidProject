@@ -33,8 +33,8 @@ public class MainActivity extends AppCompatActivity {
             tabLayout.addTab(tabLayout.newTab().setText("요청").setIcon(imageResId[0]));
             tabLayout.addTab(tabLayout.newTab().setText("드림").setIcon(imageResId[1]));
             tabLayout.addTab(tabLayout.newTab().setText("정보").setIcon(imageResId[2]));
-            tabLayout.addTab(tabLayout.newTab().setText("설정").setIcon(imageResId[3]));
-            tabLayout.getBackground().setColorFilter(Color.parseColor("#3247B2"), PorterDuff.Mode.SRC);
+            tabLayout.addTab(tabLayout.newTab().setText("설정").setIcon(imageResId[3]));/*
+            tabLayout.getBackground().setColorFilter(Color.parseColor("#3247B2"), PorterDuff.Mode.SRC);*/
             tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
             // 5개의 탭에 맞게 프래그먼트 구성

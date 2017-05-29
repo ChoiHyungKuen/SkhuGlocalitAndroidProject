@@ -1,4 +1,4 @@
-package com.example.user_16.skhuglocalitandroidproject.FreeNoticeBoard;
+package com.example.user_16.skhuglocalitandroidproject.InfoNoticeBoard;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -36,34 +36,33 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import static com.example.user_16.skhuglocalitandroidproject.R.id.swipe_layout;
 
-public class FreeNoticeBoard_Main extends AppCompatActivity {
+public class InfoNoticeBoard_Main extends AppCompatActivity {
 
     private final long	FINSH_INTERVAL_TIME = 2000;         //2초안에 Back 버튼을 2번 누르면 앱 종료 -> 2초
     private long backPressedTime = 0;
 
-    private ListView freeboard_ListView = null;             //자유게시판의 리스트 뷰
-    static private ListViewAdapter listAdapter = null;      //ListViewAdapter클래스
+    private ListView Infoboard_listView = null;             //정보게시판의 리스트 뷰
+    private ListViewAdapter listAdapter = null;             //ListViewAdapter클래스
 
-    private SwipeRefreshLayout mSwipeRefreshLayout = null;  //새로고침
+    private SwipeRefreshLayout Infoboard_swipe_layout = null;  //새로고침
 
-    private InitAsyncThread backgroundInitThread;           //초기화 스레드
-    private RemoveAsyncThread backgroundRemoveThread;       //삭제 스레드
+    private InitAsyncThread backgroundInitThread;              //초기화 스레드
+    private RemoveAsyncThread backgroundRemoveThread;          //삭제 스레드
 
-    TextView freeboard_writeBtn;                            //글쓰기 버튼
-    TextView backBtn;                                       //뒤로가기 버튼
-    ImageView freeboard_list_image;                         //리스트뷰의 이미지
-
-    static boolean a = false;
+    TextView Infoboard_writeBtn;                               //글쓰기 버튼
+    TextView Infoboard_main_backBtn;                           //뒤로가기 버튼
+    ImageView Infoboard_list_image;                            //리스트 뷰의 이미지
 
     // View창으로 인텐트 할 때
     Drawable intentImage;
     String intentTitle, intentUser, intentContent, intentDate;
 
-    /*----------------------------------------------------------------------------------------------
-        자유 게시판에 글을 올린 경우, DB와 상호작용 하는 핸들러
-    ----------------------------------------------------------------------------------------------*/
+    static boolean a = false;
+
+    /*----------------------------------------------------------
+        정보 게시판에 글을 올린 경우, DB와 상호작용 하는 핸들러
+    -----------------------------------------------------------*/
     final Handler handler = new Handler()
     {
         public void handleMessage(Message msg)
@@ -79,8 +78,8 @@ public class FreeNoticeBoard_Main extends AppCompatActivity {
                     ByteArrayInputStream is = new ByteArrayInputStream(bytes);
                     Drawable icon = Drawable.createFromStream(is, "articleImage");
                     listAdapter.addItem(Integer.parseInt(b.getString("no")), icon, b.getString("title"), b.getString("user"),
-                            b.getString("content"), b.getString("date"));
-                    Log.d("핸들러", "자유게시판 아이템 추가했니?");
+                                        b.getString("content"), b.getString("date"));
+                    Log.d("핸들러", "정보게시판 아이템 추가했니?");
                     listAdapter.dataChange();
                 }
             }
@@ -90,18 +89,18 @@ public class FreeNoticeBoard_Main extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.freeboard_main);
+        setContentView(R.layout.infoboard_main);
 
-        freeboard_writeBtn = (TextView) findViewById(R.id.freeboard_writeBtn);  //글쓰기 버튼
-        freeboard_writeBtn.setOnClickListener(writtingClickListener);           //글쓰기 버튼 리스너
-        backBtn = (TextView)findViewById(R.id.backBtn);                         //뒤로가기 버튼
-        backBtn.setOnClickListener(backBtnClickListener);
+        Infoboard_writeBtn = (TextView) findViewById(R.id.Infoboard_writeBtn);          //글쓰기 버튼
+        Infoboard_writeBtn.setOnClickListener(writtingClickListener);                   //글쓰기 버튼 리스너
+        Infoboard_main_backBtn = (TextView)findViewById(R.id.Infoboard_main_backBtn);   //뒤로가기 버튼
+        Infoboard_main_backBtn.setOnClickListener(backBtnClickListener);
 
-        freeboard_list_image= (ImageView)findViewById(R.id.freeboard_list_image);  //리스트 뷰의 이미지
+        Infoboard_list_image = (ImageView)findViewById(R.id.infoboard_list_image);      //리스트 뷰의 이미지
 
         //리스트 뷰 새로고침
-        mSwipeRefreshLayout = (SwipeRefreshLayout)findViewById(swipe_layout);  //새로고침
-        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        Infoboard_swipe_layout = (SwipeRefreshLayout)findViewById(R.id.Infoboard_swipe_layout);
+        Infoboard_swipe_layout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 listAdapter.clear(); //리스트뷰 갱신
@@ -111,65 +110,66 @@ public class FreeNoticeBoard_Main extends AppCompatActivity {
             }
         });
 
-        // 자유게시판의 리스트 뷰
-        freeboard_ListView = (ListView)findViewById(R.id.freeboard_listView);
+        // 정보게시판의 리스트 뷰
+        Infoboard_listView = (ListView)findViewById(R.id.Infoboard_listView);
 
         // 리스트 뷰 클릭시 게시된 글 view 인텐트로 넘기기
-        freeboard_ListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        Infoboard_listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
 
-                Intent intent = new Intent(getApplicationContext(), FreeNoticeBoard_View.class);
-                int p = position;               // Main에서 View로 인텐트할 때 position값을 넘겨주기 위해
-                intent.putExtra("position",p);  // 현재리스트 숫자로 만드는 uniqueNum
-                Log.d("현재 위치 인덱스 값---->>", p+"");
+                Intent intent = new Intent(getApplicationContext(), InfoNoticeBoard_View.class);
+                    int p = position;               // Main에서 View로 인텐트할 때 position값을 넘겨주기 위해
+                    intent.putExtra("position",p);  // 현재리스트 숫자로 만드는 uniqueNum
+                    Log.d("현재 위치 인덱스 값---->>", p+"");
 
-                FreeNoticeBoard_ListData freeData = (FreeNoticeBoard_ListData) listAdapter.getItem(position);
-                intentImage = freeData.fIcon; //drawable형 선택한 해당 위치 이미지
+                InfoNoticeBoard_ListData infoData = (InfoNoticeBoard_ListData) listAdapter.getItem(position);
+                    intentImage = infoData.infoIcon; //drawable형 선택한 해당 위치 이미지
 
-                // 인텐트할 때 이미지 데이터형을 drawable로 못넘겨주기때문에 byte[]으로 바꿔서 보내준다.
-                Bitmap bitmap = ((BitmapDrawable)intentImage).getBitmap();  //drawable->bitmap
-                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-                byte[] myBitmapData = stream.toByteArray();
-                intent.putExtra("intentImage", myBitmapData);           Log.d("현재 위치 이미지 값---->>", myBitmapData+"");
+                    // 인텐트할 때 이미지 데이터형을 drawable로 못넘겨주기때문에 byte[]으로 바꿔서 보내준다.
+                    Bitmap bitmap = ((BitmapDrawable)intentImage).getBitmap();  //drawable->bitmap
+                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                    byte[] myBitmapData = stream.toByteArray();
+                    intent.putExtra("intentImage", myBitmapData);           Log.d("현재 위치 이미지 값---->>", myBitmapData+"");
 
-                intentTitle = freeData.fTitle;
-                intent.putExtra("intentTitle",intentTitle);             Log.d("현재 위치 제목 값---->>", intentTitle);
-                intentUser = freeData.fUser;
-                intent.putExtra("intentUser",intentUser);               Log.d("현재 위치 유저 값---->>", intentUser);
-                intentContent = freeData.fContent;
-                intent.putExtra("intentContent",intentContent);         Log.d("현재 위치 내용 값---->>", intentContent);
-                intentDate = freeData.fDate;
-                intent.putExtra("intentDate",intentDate);               Log.d("현재 위치 날짜 값---->>", intentDate);
+                    intentTitle = infoData.infoTitle;
+                    intent.putExtra("intentTitle",intentTitle);             Log.d("현재 위치 제목 값---->>", intentTitle);
+                    intentUser = infoData.infoUser;
+                    intent.putExtra("intentUser",intentUser);               Log.d("현재 위치 유저 값---->>", intentUser);
+                    intentContent = infoData.infoContent;
+                    intent.putExtra("intentContent",intentContent);         Log.d("현재 위치 내용 값---->>", intentContent);
+                    intentDate = infoData.infoDate;
+                    intent.putExtra("intentDate",intentDate);               Log.d("현재 위치 날짜 값---->>", intentDate);
                 startActivity(intent);
+
             }
         });
 
         //리스트 뷰 갱신
         listAdapter = new ListViewAdapter(getApplicationContext());
-        freeboard_ListView.setAdapter(listAdapter);
+        Infoboard_listView.setAdapter(listAdapter);
         backgroundInitThread = new InitAsyncThread(); // DB로부터 데이터를 새로 받아온다.
         backgroundInitThread.execute();
 
-
         // 리스트뷰의 글을 오래 클릭한 경우 글 삭제하기
-        freeboard_ListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+        Infoboard_listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
                 final DBManager dbManager = new DBManager(getApplicationContext(), "app_data.db", null, 1);
                 final HashMap<String, String> dataMap = dbManager.getMemberInfo();
                 String userName = dataMap.get("name");
 
-                FreeNoticeBoard_ListData fData = (FreeNoticeBoard_ListData) listAdapter.getItem(position);
-                if (!fData.fUser.equals(userName)) {    // 해당 글 작성자가 아닌 경우 실패 메세지를 띄우고 삭제 취소
-                    Log.d("user", fData.fUser);
+                InfoNoticeBoard_ListData iData = (InfoNoticeBoard_ListData) listAdapter.getItem(position);
+                if (!iData.infoUser.equals(userName)) {    // 해당 글 작성자가 아닌 경우 실패 메세지를 띄우고 삭제 취소
+                    Log.d("user", iData.infoUser);
                     Log.d("userInfo", userName);
                     Toast.makeText(getApplicationContext(), "글 작성자가 아닙니다. 확인 후 다시 시도해주세요.", Toast.LENGTH_LONG).show();
                     return true;
                 }
 
-                AlertDialog.Builder alert = new AlertDialog.Builder(FreeNoticeBoard_Main.this);
+                AlertDialog.Builder alert = new AlertDialog.Builder(InfoNoticeBoard_Main.this);
                 alert.setTitle("확인창")
                         .setMessage("정말로 삭제하시겠습니까?")
                         .setPositiveButton("확인", new DialogInterface.OnClickListener(){
@@ -179,7 +179,7 @@ public class FreeNoticeBoard_Main extends AppCompatActivity {
                                 listAdapter.clear();
 
                                 backgroundRemoveThread = new RemoveAsyncThread();
-                                backgroundRemoveThread.execute(position+"");        // DB에서 삭제
+                                backgroundRemoveThread.execute(position+"");        // DB에서 해당 글 삭제
 
                                 backgroundInitThread = new InitAsyncThread();       // 삭제 후 새로고침
                                 backgroundInitThread.execute();
@@ -212,7 +212,6 @@ public class FreeNoticeBoard_Main extends AppCompatActivity {
             if (backgroundRemoveThread.getStatus() == AsyncTask.Status.RUNNING) {
                 backgroundRemoveThread.cancel(true);
             }
-
         } catch (Exception e) {}
     }
 
@@ -221,11 +220,11 @@ public class FreeNoticeBoard_Main extends AppCompatActivity {
 
         @Override
         public void onClick(View v) {
-            Intent intent = new Intent(getApplicationContext(), FreeNoticeBoard_Write.class);
-            intent.putExtra("no",listAdapter.getCount());//현재리스트 숫자로 만드는 uniqueNum -- 원래거
-            Log.d("자유게시판 리스트뷰 몇 개? >>>>",listAdapter.getCount()+"");
+            Intent intent = new Intent(getApplicationContext(), InfoNoticeBoard_Write.class);
+            intent.putExtra("no",listAdapter.getCount());//현재리스트 숫자로 만드는 uniqueNum
+            Log.d("리스트뷰 몇 개? >>>>",listAdapter.getCount()+"");
             startActivity(intent);
-            FreeNoticeBoard_Main.this.finish();//
+            InfoNoticeBoard_Main.this.finish();
         }
     };
 
@@ -234,23 +233,23 @@ public class FreeNoticeBoard_Main extends AppCompatActivity {
 
         @Override
         public void onClick(View v) {
-            FreeNoticeBoard_Main.this.finish();
+            InfoNoticeBoard_Main.this.finish();
         }
     };
 
 
-    private class ViewHolder {//-------------------------------------------------------------------
-        public ImageView fIcon;
-        public TextView fTitle;
-        public TextView fContent;
-        public TextView fUser;
-        public TextView fDate;
+    private class ViewHolder {//--------------------------------------------------------------------
+        public ImageView infoIcon;
+        public TextView infoTitle;
+        public TextView infoContent;
+        public TextView infoUser;
+        public TextView infoDate;
     }
     // <리스트 뷰> 요청 프래그먼트의 리스트뷰를 관리하는 메소드
     private class ListViewAdapter extends BaseAdapter {
 
         private Context mContext = null;
-        private ArrayList<FreeNoticeBoard_ListData> free_ListData = new ArrayList<>();
+        private ArrayList<InfoNoticeBoard_ListData> info_ListData = new ArrayList<>();
 
         public ListViewAdapter(Context mContext) {
             super();
@@ -259,12 +258,12 @@ public class FreeNoticeBoard_Main extends AppCompatActivity {
 
         @Override
         public int getCount() {
-            return free_ListData.size();
+            return info_ListData.size();
         }
 
         @Override
         public Object getItem(int position) {
-            return free_ListData.get(position);
+            return info_ListData.get(position);
         }
 
         @Override
@@ -272,7 +271,7 @@ public class FreeNoticeBoard_Main extends AppCompatActivity {
             return position;
         }
 
-        // 사용자가 선택한 아이템 데이터를 freeboard_item 형태에 맞춰 반환한다.
+        // 사용자가 선택한 아이템 데이터를 infoboard_item 형태에 맞춰 반환한다.
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             ViewHolder holder;
@@ -280,65 +279,64 @@ public class FreeNoticeBoard_Main extends AppCompatActivity {
                 holder = new ViewHolder();
 
                 LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                convertView = inflater.inflate(R.layout.freeboard_item, null);
+                convertView = inflater.inflate(R.layout.infoboard_item, null);
 
-                holder.fIcon = (ImageView) convertView.findViewById(R.id.freeboard_list_image);
-                holder.fTitle = (TextView) convertView.findViewById(R.id.list_title);
-                holder.fUser = (TextView) convertView.findViewById(R.id.list_user);
-                holder.fContent = (TextView) convertView.findViewById(R.id.list_content);
-                holder.fDate = (TextView) convertView.findViewById(R.id.list_date);
+                holder.infoIcon = (ImageView) convertView.findViewById(R.id.infoboard_list_image);
+                holder.infoTitle = (TextView) convertView.findViewById(R.id.infoboard_list_title);
+                holder.infoUser = (TextView) convertView.findViewById(R.id.infoboard_list_user);
+                holder.infoContent = (TextView) convertView.findViewById(R.id.infoboard_list_content);
+                holder.infoDate = (TextView) convertView.findViewById(R.id.infoboard_list_date);
 
                 convertView.setTag(holder);
             } else {
                 holder = (ViewHolder) convertView.getTag();
             }
 
-            // FreeNoticeBoard_ListData로부터 해당 아이템의 데이터를 받아온다.
-            FreeNoticeBoard_ListData fData = free_ListData.get(position);
+            InfoNoticeBoard_ListData infoData = info_ListData.get(position); // InfoNoticeBoard_ListData로부터 해당 아이템의 데이터를 받아온다.
             Log.d("position값 : ", position+"");
 
-            if (fData.fIcon != null) {
-                holder.fIcon.setVisibility(View.VISIBLE);
-                holder.fIcon.setImageDrawable(fData.fIcon);
+            if (infoData.infoIcon != null) {
+                holder.infoIcon.setVisibility(View.VISIBLE);
+                holder.infoIcon.setImageDrawable(infoData.infoIcon);
             }else{
-                holder.fIcon.setVisibility(View.GONE);
+                holder.infoIcon.setVisibility(View.GONE);
             }
 
-            holder.fTitle.setText(fData.fTitle);
-            holder.fUser.setText(fData.fUser);
-            holder.fContent.setText(fData.fContent);
-            holder.fDate.setText(fData.fDate);
-            Log.d("-----자유게시판 리스트 뷰 제목 : ",fData.fTitle);
-            Log.d("-----자유게시판 리스트 뷰 유저 : ",fData.fUser);
-            Log.d("-----자유게시판 리스트 뷰 내용 : ",fData.fContent);
-            Log.d("-----자유게시판 리스트 뷰 내용 : ",fData.fDate);
+            holder.infoTitle.setText(infoData.infoTitle);
+            holder.infoUser.setText(infoData.infoUser);
+            holder.infoContent.setText(infoData.infoContent);
+            holder.infoDate.setText(infoData.infoDate);
+            Log.d("-----정보게시판 리스트 뷰 제목 : ",infoData.infoTitle);
+            Log.d("-----정보게시판 리스트 뷰 유저 : ",infoData.infoUser);
+            Log.d("-----정보게시판 리스트 뷰 내용 : ",infoData.infoContent);
+            Log.d("-----정보게시판 리스트 뷰 날짜 : ",infoData.infoDate);
             return convertView;
+
         }
 
-        //리스트에 아이템을 추가하는 메소드
-        public void addItem(int fNo, Drawable icon, String fTitle, String fUser, String fContent, String fDate) {
-            FreeNoticeBoard_ListData addInfo = null;
-            addInfo = new FreeNoticeBoard_ListData();
+        // 리스트 뷰에 아이템을 추가하는 메소드
+        public void addItem(int infoNo, Drawable icon, String infoTitle, String infoUser, String infoContent, String infoDate) {
+            InfoNoticeBoard_ListData addInfo = null;
+            addInfo = new InfoNoticeBoard_ListData();
 
-            //디비에서 받아온 데이터 저장
-            addInfo.fNo = fNo;
-            addInfo.fIcon = icon;                //이미지 추가
-            addInfo.fTitle = fTitle;
-            addInfo.fUser = fUser;
-            addInfo.fContent = fContent;
-            addInfo.fDate = fDate;
-            Log.d("자유게시판 리스트 뷰 글번호",fNo+"");
-            Log.d("자유게시판 리스트 뷰 제목",fTitle);
-            Log.d("자유게시판 리스트 뷰 유저",fUser);
-            Log.d("자유게시판 리스트 뷰 내용",fContent);
-            Log.d("자유게시판 리스트 뷰 현재시간",fDate);
-            free_ListData.add(addInfo);
-            Log.d("자유게시판 에드아이템","-----------------------------------------");
+            addInfo.infoNo = infoNo;
+            addInfo.infoIcon = icon;                //이미지 추가
+            addInfo.infoTitle = infoTitle;
+            addInfo.infoUser = infoUser;
+            addInfo.infoContent = infoContent;
+            addInfo.infoDate = infoDate;
+            Log.d("리스트 뷰 글넘버",infoNo+"");
+            Log.d("리스트 뷰 유저",infoTitle);
+            Log.d("리스트 뷰 유저",infoUser);
+            Log.d("리스트 뷰 내용",infoContent);
+            Log.d("리스트 뷰 현재시간",infoDate);
+            info_ListData.add(addInfo);
+            Log.d("정보게시판 에드아이템","-----------------------------------------");
         }
 
         // 리스트를 새로고침 하는 메소드
         public void clear() {
-            free_ListData.clear();
+            info_ListData.clear();
         }
 
         // 데이터가 바뀌었음을 DB에 알려주는 메소드
@@ -354,8 +352,8 @@ public class FreeNoticeBoard_Main extends AppCompatActivity {
     private class InitAsyncThread extends AsyncTask<Void, String, String> {
         // Thread를 시작하기 전에 호출되는 함수
         protected void onPreExecute() {
-            super.onPreExecute();
-        }
+        super.onPreExecute();
+    }
 
         // Thread의 주요 작업을 처리 하는 함수
         // Thread를 실행하기 위해 excute(~)에서 전달한 값을 인자로 받습니다.
@@ -364,68 +362,68 @@ public class FreeNoticeBoard_Main extends AppCompatActivity {
             HttpURLConnection conn = null;
             String urlStr = "";
 
-            urlStr = "http://"+getString(R.string.ip_address)+":8080/SkhuGlocalitWebProject/FreeNoticeBoard_Init";
-            //urlStr = "http://192.168.25.55:8080/BookDreamServerProject/FreeNoticeBoard_Init"; //테스트용
+            urlStr = "http://"+getString(R.string.ip_address)+":8080/SkhuGlocalitWebProject/InfoNoticeBoard_Init";
+            //urlStr = "http://192.168.25.55:8080/BookDreamServerProject/InfoNoticeBoard_Init"; //테스트용
 
-            try {
-                url = new URL(urlStr);
-                Log.d("test", urlStr);
-                conn = (HttpURLConnection) url.openConnection();
-                conn.setConnectTimeout(10000);
-                conn.setReadTimeout(10000);
-                conn.setRequestMethod("POST");
-                conn.setRequestProperty("Cache-Control", "no-cache");
-                conn.setRequestProperty("Accept", "application/json");
-                conn.setRequestProperty("Content-type", "application/x-www-form-urlencoded");
-                conn.setDoInput(true);
-                conn.setDoOutput(true);
-                int responseCode = conn.getResponseCode();
-                Log.d("D", responseCode+"");
-                if (responseCode == HttpURLConnection.HTTP_OK) {    // 송수신이 잘되면 - 데이터를 받은 것입니다.
-                    Log.d("coded", "자유게시판 데이터 들어옴");
-                    ObjectInputStream ois = new ObjectInputStream(conn.getInputStream());
-                    HashMap<String, HashMap<String,String>> dataMap = (HashMap<String, HashMap<String,String>>)ois.readObject();
-                    HashMap<String, byte[]> imgByteMap = (HashMap<String, byte[]>)ois.readObject();
-                    ois.close();
+        try {
+            url = new URL(urlStr);
+            Log.d("test", urlStr);
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setConnectTimeout(10000);
+            conn.setReadTimeout(10000);
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Cache-Control", "no-cache");
+            conn.setRequestProperty("Accept", "application/json");
+            conn.setRequestProperty("Content-type", "application/x-www-form-urlencoded");
+            conn.setDoInput(true);
+            conn.setDoOutput(true);
+            int responseCode = conn.getResponseCode();
+            Log.d("D", responseCode+"");
+            if (responseCode == HttpURLConnection.HTTP_OK) {    // 송수신이 잘되면 - 데이터를 받은 것입니다.
+                Log.d("coded", "정보게시판 데이터 들어옴");
+                ObjectInputStream ois = new ObjectInputStream(conn.getInputStream());
+                HashMap<String, HashMap<String,String>> dataMap = (HashMap<String, HashMap<String,String>>)ois.readObject();
+                HashMap<String, byte[]> imgByteMap = (HashMap<String, byte[]>)ois.readObject();
+                ois.close();
 
-                    for(int i=0; i<dataMap.size(); i++) {
-                        HashMap<String, String> map = dataMap.get(i+"");
-                        Message msg = handler.obtainMessage();
-                        Bundle b = new Bundle();
-                        b.putString("status", "init");//체크
-                        b.putString("no", map.get("no"));
-                        b.putString("title", map.get("title"));
-                        b.putString("user", map.get("user"));
-                        b.putString("content", map.get("content"));
-                        b.putString("date", map.get("date"));
-                        msg.obj = imgByteMap.get(map.get("img_des"));   //이미지
-                        msg.setData(b);
-                        handler.sendMessage(msg);
-                    }
+                for(int i=0; i<dataMap.size(); i++) {
+                    HashMap<String, String> map = dataMap.get(i+"");
+                    Message msg = handler.obtainMessage();
+                    Bundle b = new Bundle();
+                    b.putString("status", "init");//체크
+                    b.putString("no", map.get("no"));
+                    b.putString("title", map.get("title"));
+                    b.putString("user", map.get("user"));
+                    b.putString("content", map.get("content"));
+                    b.putString("date", map.get("date"));           //똑같고
+                    msg.obj = imgByteMap.get(map.get("img_des"));   //이미지
+                    msg.setData(b);
+                    handler.sendMessage(msg);
                 }
-                conn.disconnect();
-            } catch (Exception e) {
-                Toast.makeText(getApplicationContext(), "Error 발생", Toast.LENGTH_SHORT).show();
-                Log.e("ERR", "InitAsyncThread ERR : " + e.getMessage());
             }
-            return "";
+            conn.disconnect();
+        } catch (Exception e) {
+            Toast.makeText(getApplicationContext(), "Error 발생", Toast.LENGTH_SHORT).show();
+            Log.e("ERR", "InitAsyncThread ERR : " + e.getMessage());
         }
-
-        // doInBackground(~)에서 호출되어 주로 UI 관련 작업을 하는 함수
-        protected void onProgressUpdate(String... progress) {}
-
-        // Thread를 처리한 후에 호출되는 함수
-        // doInBackground(~)의 리턴값을 인자로 받습니다.
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-            mSwipeRefreshLayout.setRefreshing(false); //  새로고침이 완료 되었음을 표시
-        }
-
-        // AsyncTask.cancel(true) 호출시 실행되어 thread를 취소 합니다.
-        protected void onCancelled() {
-            super.onCancelled();
-        }
+        return "";
     }
+
+    // doInBackground(~)에서 호출되어 주로 UI 관련 작업을 하는 함수
+    protected void onProgressUpdate(String... progress) {}
+
+    // Thread를 처리한 후에 호출되는 함수
+    // doInBackground(~)의 리턴값을 인자로 받습니다.
+    protected void onPostExecute(String result) {
+        super.onPostExecute(result);
+        Infoboard_swipe_layout.setRefreshing(false); //  새로고침이 완료 되었음을 표시
+    }
+
+    // AsyncTask.cancel(true) 호출시 실행되어 thread를 취소 합니다.
+    protected void onCancelled() {
+        super.onCancelled();
+    }
+}
 
     /*----------------------------------------------------------------------------------------------
         글 삭제 스레드
@@ -444,8 +442,8 @@ public class FreeNoticeBoard_Main extends AppCompatActivity {
                 HttpURLConnection conn = null;
                 String urlStr = "";
 
-                urlStr = "http://"+getString(R.string.ip_address)+":8080/SkhuGlocalitWebProject/FreeNoticeBoard_Remove";
-                //urlStr = "http://192.168.25.55:8080/BookDreamServerProject/FreeNoticeBoard_Remove"; //테스트용
+                urlStr = "http://"+getString(R.string.ip_address)+":8080/SkhuGlocalitWebProject/InfoNoticeBoard_Remove";
+                //urlStr = "http://192.168.25.55:8080/BookDreamServerProject/InfoNoticeBoard_Remove"; //테스트용
 
                 url = new URL(urlStr);
                 Log.d("test", urlStr);
@@ -467,7 +465,7 @@ public class FreeNoticeBoard_Main extends AppCompatActivity {
                 Log.d("test", "remove_write");
                 int responseCode = conn.getResponseCode();
                 if (responseCode == HttpURLConnection.HTTP_OK) { // 서버가 받았다면
-                    Log.d("coded", "자유게시판 데이터 들어옴");
+                    Log.d("coded", "정보게시판 데이터 들어옴");
                     ObjectInputStream ois = new ObjectInputStream(conn.getInputStream());
                     HashMap<String, HashMap<String,String>> dataMap = (HashMap<String, HashMap<String,String>>)ois.readObject();
                     HashMap<String, byte[]> imgByteMap = (HashMap<String, byte[]>)ois.readObject();

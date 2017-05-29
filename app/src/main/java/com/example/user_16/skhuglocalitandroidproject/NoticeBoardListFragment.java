@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import com.example.user_16.skhuglocalitandroidproject.BookDream.MainActivity;
 import com.example.user_16.skhuglocalitandroidproject.FreeNoticeBoard.FreeNoticeBoard_Main;
+import com.example.user_16.skhuglocalitandroidproject.InfoNoticeBoard.InfoNoticeBoard_Main;
 
 import java.util.ArrayList;
 
@@ -43,23 +44,32 @@ public class NoticeBoardListFragment extends Fragment {
                     Log.d("인텐트!!",intent.toString());
                     getActivity().startActivity(intent);
                 }
-                //내가추가
+
                 if(data.mTitle.equals("자유게시판")) { //자유게시판을 눌렀을 경우
                     Intent intent1 = new Intent(getContext(), FreeNoticeBoard_Main.class);
                     getActivity().startActivity(intent1);
-                    Toast.makeText(getContext(), data.mTitle + "을 선택했습니다.", Toast.LENGTH_SHORT).show();
-                }//내가추가
+                }
+                if(data.mTitle.equals("정보게시판")) { //정보게시판을 눌렀을 경우
+                    Intent intent = new Intent(getContext(), InfoNoticeBoard_Main.class);
+                    getActivity().startActivity(intent);
+                }
 
                 else {
                     Toast.makeText(getContext(), data.mTitle + "을 선택했습니다.", Toast.LENGTH_SHORT).show();
+                }
+                if(data.mTitle.equals("학과게시판")) { //북드림을 눌렀을 경우
+                    Intent intent = new Intent(getContext(), DepartmentNoticeboardActivity.class);
+                    getActivity().startActivity(intent);
                 }
             }
         });
         listViewAdapter = new ListViewAdapter(getContext());
         noticeBoardListView.setAdapter(listViewAdapter);
-        listViewAdapter.addItem(ContextCompat.getDrawable(getContext(), R.mipmap.ic_launcher) ,"Book:Dream", "선,후배 간에 책을 주고 받을 수 있습니다.");
-        listViewAdapter.addItem(ContextCompat.getDrawable(getContext(), R.mipmap.ic_launcher), "자유게시판", "자유롭게 소통하세요!");
-        listViewAdapter.addItem(ContextCompat.getDrawable(getContext(), R.mipmap.ic_launcher), "정보게시판", "정보를 주고 받을 수 있습니다.");
+        listViewAdapter.addItem(ContextCompat.getDrawable(getContext(), R.drawable.image_book) ,"Book:Dream", "선,후배 간에 책을 주고 받을 수 있습니다.");
+        listViewAdapter.addItem(ContextCompat.getDrawable(getContext(), R.drawable.book), "자유게시판", "자유롭게 소통하세요!");
+        listViewAdapter.addItem(ContextCompat.getDrawable(getContext(), R.drawable.image_info), "정보게시판", "정보를 주고 받을 수 있습니다.");
+        listViewAdapter.addItem(ContextCompat.getDrawable(getContext(), R.drawable.image_gt), "학과게시판", "학과의 소식을 알 수 있습니다.");
+
         listViewAdapter.dataChange();
         return rootView;
     }

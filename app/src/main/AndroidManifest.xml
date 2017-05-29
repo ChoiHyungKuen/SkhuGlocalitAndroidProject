@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.user_16.skhuglocalitandroidproject">
-
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -23,44 +22,60 @@
         <activity android:name=".Activity_Login">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".MainActivity"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustPan">
-        </activity>
-        <!---->
+            android:windowSoftInputMode="adjustPan"></activity>
+        <!--  -->
         <activity
             android:name=".RecommendFragmentActivity"
-            android:windowSoftInputMode="adjustPan"></activity>
+            android:windowSoftInputMode="adjustPan" />
         <activity android:name=".MapViewer" />
-
         <activity
             android:name=".BookDream.MatchActivity"
-            android:theme="@style/AppTheme"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" />
+
+        <activity
+            android:name=".DepartmentNoticeboardActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" />
+
+        <activity
+            android:name=".DepartmentNoticeboardContentActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" />
         <activity
             android:name=".BookDream.GiveMatchMessageActivity"
-            android:theme="@style/AppTheme"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" />
         <activity
             android:name=".BookDream.MainActivity"
             android:label="@string/title_activity_book_dream_main"
-            android:theme="@style/AppTheme">
-        </activity>
-
+            android:theme="@style/AppTheme"></activity>
         <activity
             android:name=".FreeNoticeBoard.FreeNoticeBoard_Main"
             android:label="@string/title_activity_book_dream_main"
+            android:theme="@style/AppTheme"></activity>
+        <activity
+            android:name=".FreeNoticeBoard.FreeNoticeBoard_Write"
+            android:label="@string/title_activity_book_dream_main"
+            android:theme="@style/AppTheme"></activity>
+        <activity
+            android:name=".FreeNoticeBoard.FreeNoticeBoard_View"
+            android:label="@string/title_activity_book_dream_main"
+            android:theme="@style/AppTheme">
 
             android:theme="@style/AppTheme">
 
         </activity>
 
         <activity
-            android:name=".FreeNoticeBoard.FreeNoticeBoard_Write"
+            android:name=".InfoNoticeBoard.InfoNoticeBoard_Main"
             android:label="@string/title_activity_book_dream_main"
 
             android:theme="@style/AppTheme">
@@ -68,7 +83,15 @@
         </activity>
 
         <activity
-            android:name=".FreeNoticeBoard.FreeNoticeBoard_View"
+            android:name=".InfoNoticeBoard.InfoNoticeBoard_Write"
+            android:label="@string/title_activity_book_dream_main"
+
+            android:theme="@style/AppTheme">
+
+        </activity>
+
+        <activity
+            android:name=".InfoNoticeBoard.InfoNoticeBoard_View"
             android:label="@string/title_activity_book_dream_main"
 
             android:theme="@style/AppTheme">
@@ -87,6 +110,7 @@
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>
         </service>
+
     </application>
 
 </manifest>

@@ -680,7 +680,6 @@ public class GiveFragment extends Fragment {
             out.flush();
             out.close();
         } catch (Exception e) {
-            Toast.makeText(getActivity(), "Error 발생", Toast.LENGTH_SHORT).show();
             Log.e("ERR", "Image Setting  ERR : " + e.getMessage());
         }
     }

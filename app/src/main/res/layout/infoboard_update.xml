@@ -16,7 +16,7 @@
         android:weightSum="10">
 
         <TextView
-            android:id="@+id/view_backBtn"
+            android:id="@+id/info_update_backBtn"
             android:layout_width="0dp"
             android:textColor="@color/BLUEGREEN"
             android:layout_height="wrap_content"
@@ -30,22 +30,19 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="7"/>
+            android:layout_weight="6"/>
 
         <TextView
-            android:id="@+id/view_editBtn"
-            android:text="글 수정"
-            android:layout_width="wrap_content"
+            android:id="@+id/info_updateBtn"
+            android:layout_width="0dp"
+            android:textStyle="bold"
+            android:textColor="@color/BLUEGREEN"
             android:layout_height="wrap_content"
-            android:paddingTop="5dp"
-            android:paddingBottom="5dp"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:layout_weight="1"
-            android:textColor="@color/WHITE"
-            android:background="@drawable/round_btn"
-            android:clickable="true"
-            android:textAlignment="center"/>
+            android:layout_weight="2"
+            android:textSize="12dp"
+            android:text="글 수정 창      "
+            android:textAlignment="center" />
+
     </LinearLayout>
 
     <LinearLayout
@@ -55,18 +52,20 @@
         android:layout_marginBottom="3dp"
         android:layout_marginTop="3dp">
 
-        <TextView
-            android:id="@+id/view_title"
+        <EditText
+            android:id="@+id/info_update_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="7dp"
             android:layout_marginLeft="30dp"
-            android:layout_marginRight="3dp"
+            android:layout_marginRight="13dp"
             android:layout_weight="2"
             android:text="Title"
+            android:maxLength="20"
             android:textSize="9pt"
             android:textStyle="bold"
-            android:textColor="#151359"/>
+            android:textColor="#151359"
+            android:background="@null"/>
     </LinearLayout>
 
     <LinearLayout
@@ -83,7 +82,7 @@
             android:layout_weight="13"/>
 
         <TextView
-            android:id="@+id/view_user"
+            android:id="@+id/info_update_user"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="30dp"
@@ -95,7 +94,7 @@
             android:textColor="#3c3c3d"/>
 
         <TextView
-            android:id="@+id/view_date"
+            android:id="@+id/info_update_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="1dp"
@@ -114,15 +113,16 @@
         android:orientation="vertical"
         android:background="@drawable/round_text"
         android:paddingLeft="10dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
+        android:layout_marginTop="3dp"
+        android:layout_marginBottom="3dp"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="10dp"
         android:layout_weight="12"
         android:weightSum="5"
         android:gravity="center_vertical">
-        <TextView
-            android:id="@+id/view_content"
+
+        <EditText
+            android:id="@+id/info_update_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="9dp"
@@ -131,8 +131,52 @@
             android:weightSum="5"
             android:text="글 내용"
             android:hint="\n\n\n\n\n\n\n\n\n"
+            android:maxLength="200"
             android:textSize="7pt"
-            android:textColor="#757273"/>
+            android:textColor="#757273"
+            android:background="@null" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="horizontal"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_weight="2">
+
+        <TextView
+            android:id="@+id/info_update_photoBtn"
+            android:text="카메라"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:layout_margin="1dp"
+            android:layout_weight="1"
+            android:textColor="@color/WHITE"
+            android:background="@drawable/round_btn"
+            android:clickable="true"
+            android:textAlignment="center"/>
+
+        <TextView
+            android:id="@+id/info_update_gallaryBtn"
+            android:text="갤러리"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:layout_margin="1dp"
+            android:layout_weight="1"
+            android:textColor="@color/WHITE"
+            android:background="@drawable/round_btn"
+            android:clickable="true"
+            android:textAlignment="center"/>
+
     </LinearLayout>
 
     <LinearLayout
@@ -148,14 +192,9 @@
             android:scaleType="fitCenter"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="15dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="1dp"
             android:gravity="center_vertical"
-            android:id="@+id/view_image" />
+            android:id="@+id/info_update_image" />
     </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"/>
 
 </LinearLayout>

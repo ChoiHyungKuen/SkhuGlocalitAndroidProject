@@ -1,4 +1,4 @@
-package com.example.user_16.skhuglocalitandroidproject.FreeNoticeBoard;
+package com.example.user_16.skhuglocalitandroidproject.InfoNoticeBoard;
 
 import android.annotation.TargetApi;
 import android.content.DialogInterface;
@@ -41,9 +41,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 
+import static com.example.user_16.skhuglocalitandroidproject.R.id.infoboard_view_image;
 
-// 자유게시판 -> 게시된 리스트 뷰를 눌렀을 때
-public class FreeNoticeBoard_View extends AppCompatActivity {
+public class InfoNoticeBoard_View extends AppCompatActivity {
 
     // 이미지 크롭 관련
     private static final int PICK_FROM_CAMERA = 0;
@@ -56,18 +56,18 @@ public class FreeNoticeBoard_View extends AppCompatActivity {
 
     int position;
 
-    private ImageView view_image;
-    TextView view_title, view_user, view_content, view_date;
-    TextView view_backBtn, view_editBtn;
+    private ImageView Infoboard_view_image;
+    TextView Infoboard_view_title, Infoboard_view_user, Infoboard_view_content, Infoboard_view_date;
+    TextView Infoboard_backBtn, infoboard_view_editBtn;
 
     // 인텐트 할 때 받아온 데이터 저장
     byte[] intentImage;
     String intentTitle, intentUser, intentContent, intentDate;
 
     // 글 수정 창(다이얼로그)
-    TextView free_update_user, free_update_date, free_update_photoBtn, free_update_gallaryBtn, free_update_backBtn;
-    EditText free_update_title, free_update_content;
-    ImageView free_update_image;
+    TextView info_update_user, info_update_date, info_update_photoBtn, info_update_gallaryBtn, info_update_backBtn;
+    EditText info_update_title, info_update_content;
+    ImageView info_update_image;
 
     private UpdateAsyncThread backgroundUpdateThread;           // 글 수정 스레드
 
@@ -88,9 +88,9 @@ public class FreeNoticeBoard_View extends AppCompatActivity {
         requestPermissions(permissions, requestCode);
     }
 
-    /*----------------------------------------------------------------------------------------------
-        자유 게시판에 글을 올린 경우, DB와 상호작용 하는 핸들러
-    ----------------------------------------------------------------------------------------------*/
+    /*---------------------------------------------------------
+       정보 게시판에 글을 올린 경우, DB와 상호작용 하는 핸들러
+    ---------------------------------------------------------*/
     final Handler handler = new Handler()
     {
         public void handleMessage(Message msg)
@@ -107,25 +107,24 @@ public class FreeNoticeBoard_View extends AppCompatActivity {
         }
     };
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.freeboard_view);
+        setContentView(R.layout.infoboard_view);
 
-        view_title = (TextView) findViewById(R.id.view_title);
-        view_user = (TextView) findViewById(R.id.view_user);
-        view_content = (TextView) findViewById(R.id.view_content);
-        view_date = (TextView) findViewById(R.id.view_date);
-        view_image = (ImageView)findViewById(R.id.view_image);
+        Infoboard_view_title = (TextView)findViewById(R.id.infoboard_view_title);
+        Infoboard_view_user = (TextView)findViewById(R.id.infoboard_view_user);
+        Infoboard_view_content = (TextView)findViewById(R.id.infoboard_view_content);
+        Infoboard_view_date = (TextView)findViewById(R.id.infoboard_view_date);
+        Infoboard_view_image = (ImageView)findViewById(infoboard_view_image);
 
-        view_backBtn = (TextView)findViewById(R.id.view_backBtn);       // 뒤로가기 버튼
-        view_backBtn.setOnClickListener(backBtnClickListener);
-        view_editBtn = (TextView)findViewById(R.id.view_editBtn);       // 글 수정 버튼
+        Infoboard_backBtn = (TextView)findViewById(R.id.infoboard_view_backBtn);        // 뒤로가기 버튼
+        Infoboard_backBtn.setOnClickListener(backBtnClickListener);
+        infoboard_view_editBtn = (TextView)findViewById(R.id.infoboard_view_editBtn);   // 글 수정 버튼
 
         // Main에서 인텐트 할 때 넘겨준 값 받아오기
-        Intent intent = getIntent();                                    //FreeNoticeBoard_Main에서 FreeNoticeBoard_View로 인텐트를 할 떄 넘겨준 데이터값을 받아옴.
-            position = intent.getExtras().getInt("position");           //받아온 리스트 뷰의 position값을 정수형 변수 position에 저장
+        Intent intent = getIntent();
+            position = intent.getExtras().getInt("position");     //받아온 리스트 뷰의 position값을 정수형 변수 position에 저장
             Log.d("View에서 현재 position값", position+"");
             intentImage = (byte[]) intent.getExtras().get("intentImage");
             Bitmap bitmap = BitmapFactory.decodeByteArray(intentImage, 0, intentImage.length);      // 인텐트로 받은 데이터형은 byte[]형이고 이걸 다시 비트맵으로
@@ -135,58 +134,58 @@ public class FreeNoticeBoard_View extends AppCompatActivity {
             intentDate = intent.getExtras().getString("intentDate");
 
         // view에 출력
-        view_image.setImageBitmap(bitmap);
-        view_title.setText(intentTitle);
-        view_user.setText(intentUser);
-        view_content.setText(intentContent);
-        view_date.setText(intentDate);
+        Infoboard_view_image.setImageBitmap(bitmap);
+        Infoboard_view_title.setText(intentTitle);
+        Infoboard_view_user.setText(intentUser);
+        Infoboard_view_content.setText(intentContent);
+        Infoboard_view_date.setText(intentDate);
 
-        // 수정 전 내용 불러오기
-        final Bitmap b = bitmap;                                                        // 수정 전 이미지
-        final String getTitle = view_title.getText().toString();                        Log.d("수정 전 제목", getTitle);
-        final String getUser = view_user.getText().toString();                          Log.d("수정 전 유저", getUser);
-        final String getDate = view_date.getText().toString();                          Log.d("수정 전 날짜", getDate);
-        final String getContent = view_content.getText().toString();                    Log.d("수정 전 내용", getContent);
+        // 글 수정 전 내용 불러오기
+        final Bitmap b = bitmap;                                                                  // 수정 전 이미지
+        final String getTitle = Infoboard_view_title.getText().toString();                        Log.d("수정 전 제목", getTitle);
+        final String getUser = Infoboard_view_user.getText().toString();                          Log.d("수정 전 유저", getUser);
+        final String getDate = Infoboard_view_date.getText().toString();                          Log.d("수정 전 날짜", getDate);
+        final String getContent = Infoboard_view_content.getText().toString();                    Log.d("수정 전 내용", getContent);
 
-        // 글 수정 버튼 클릭 시 다이얼로그 창 띄우기
-        view_editBtn.setOnClickListener( new View.OnClickListener() {
+        // 글 수정버튼 클릭 시 다이얼로그 창 띄우기
+        infoboard_view_editBtn.setOnClickListener(new View.OnClickListener(){
+
             @Override
             public void onClick(View v) {
-
                 final DBManager dbManager = new DBManager(getApplicationContext(), "app_data.db", null, 1);
                 final HashMap<String, String> dataMap = dbManager.getMemberInfo();
                 String userName = dataMap.get("name");
-                if(!intentUser.equals(userName)) {          // 글 작성자 아니면 수정 못함
+                if(!intentUser.equals(userName)) {          //글작성자 아니면 수정 못함
                     Toast.makeText(getApplicationContext(), "글 작성자가 아닙니다.", Toast.LENGTH_LONG).show();
                     return ;
                 }
 
                 // Dialog에서 보여줄 입력화면 View 객체 생성 작업
-                LayoutInflater inflater = FreeNoticeBoard_View.this.getLayoutInflater();
-                View alertLayout = inflater.inflate(R.layout.freeboard_update, null);
+                LayoutInflater inflater = InfoNoticeBoard_View.this.getLayoutInflater();
+                View alertLayout = inflater.inflate(R.layout.infoboard_update, null);
 
-                free_update_image = (ImageView) alertLayout.findViewById(R.id.free_update_image);
-                free_update_title = (EditText) alertLayout.findViewById(R.id.free_update_title);
-                free_update_user = (TextView)alertLayout.findViewById(R.id.free_update_user);
-                free_update_content = (EditText) alertLayout.findViewById(R.id.free_update_content);
-                free_update_date = (TextView)alertLayout.findViewById(R.id.free_update_date);
+                info_update_image = (ImageView) alertLayout.findViewById(R.id.info_update_image);
+                info_update_title = (EditText) alertLayout.findViewById(R.id.info_update_title);
+                info_update_user = (TextView)alertLayout.findViewById(R.id.info_update_user);
+                info_update_content = (EditText) alertLayout.findViewById(R.id.info_update_content);
+                info_update_date = (TextView)alertLayout.findViewById(R.id.info_update_date);
 
-                free_update_backBtn = (TextView)alertLayout.findViewById(R.id.free_update_backBtn);
-                free_update_photoBtn = (TextView)alertLayout.findViewById(R.id.free_update_photoBtn);
-                free_update_gallaryBtn = (TextView)alertLayout.findViewById(R.id.free_update_gallaryBtn);
+                info_update_backBtn = (TextView)alertLayout.findViewById(R.id.info_update_backBtn);
+                info_update_photoBtn = (TextView)alertLayout.findViewById(R.id.info_update_photoBtn);
+                info_update_gallaryBtn = (TextView)alertLayout.findViewById(R.id.info_update_gallaryBtn);
 
-                free_update_backBtn.setOnClickListener(backListener);
-                free_update_photoBtn.setOnClickListener(takePhotoClickListener);                            // 수정 창의 카메라 버튼
-                free_update_gallaryBtn.setOnClickListener(uploadClickListener);                             // 수정 창의 갤러리 버튼
+                info_update_backBtn.setOnClickListener(backListener);
+                info_update_photoBtn.setOnClickListener(takePhotoClickListener);                            // 수정 창의 카메라 버튼
+                info_update_gallaryBtn.setOnClickListener(uploadClickListener);                             // 수정 창의 갤러리 버튼
 
                 // 수정 전 내용 출력
-                free_update_image.setImageBitmap(b);
-                free_update_title.setText(getTitle);
-                free_update_user.setText(getUser);
-                free_update_date.setText(getDate);
-                free_update_content.setText(getContent);
+                info_update_image.setImageBitmap(b);
+                info_update_title.setText(getTitle);
+                info_update_user.setText(getUser);
+                info_update_date.setText(getDate);
+                info_update_content.setText(getContent);
 
-                AlertDialog.Builder buider = new AlertDialog.Builder(FreeNoticeBoard_View.this); // AlertDialog.Builder 객체 생성
+                AlertDialog.Builder buider = new AlertDialog.Builder(InfoNoticeBoard_View.this); // AlertDialog.Builder 객체 생성
                 buider.setCancelable(false);
                 buider.setView(alertLayout); // 위에서 inflater가 만든 dialogView 객체 세팅 (Customize)
 
@@ -198,7 +197,7 @@ public class FreeNoticeBoard_View extends AppCompatActivity {
                     }
                 });
 
-                // 글 수정 서블릿 작성
+                // 글 수정 서블릿 코드 작성
                 buider.setPositiveButton("글 수정", new DialogInterface.OnClickListener() { // Dialog에 "확인"라는 타이틀의 버튼을 설정
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -206,9 +205,9 @@ public class FreeNoticeBoard_View extends AppCompatActivity {
                         Calendar cal = Calendar.getInstance();
                         String date = (cal.get(Calendar.YEAR) + "." + (cal.get(Calendar.MONTH) + 1) + "." + cal.get(Calendar.DATE));
 
-                        String editTitle = free_update_title.getText().toString();                       Log.d("수정 후 제목", editTitle);
-                        String editUser = free_update_user.getText().toString();
-                        String editContent = free_update_content.getText().toString();                   Log.d("수정 후 내용", editContent);
+                        String editTitle = info_update_title.getText().toString();                       Log.d("수정 후 제목", editTitle);
+                        String editUser = info_update_user.getText().toString();
+                        String editContent = info_update_content.getText().toString();                   Log.d("수정 후 내용", editContent);
 
                         // 이미지 업로드 여부
                         flag = true;
@@ -233,14 +232,13 @@ public class FreeNoticeBoard_View extends AppCompatActivity {
                         Log.d("수정창 다이얼로그에서 position값", position+"");
 
                         // 수정된 내용 출력
-                        view_image.setImageDrawable(getImage);
-                        view_title.setText(editTitle);
-                        view_user.setText(editUser);
-                        view_content.setText(editContent);
-                        view_date.setText(date);
+                        Infoboard_view_image.setImageDrawable(getImage);
+                        Infoboard_view_title.setText(editTitle);
+                        Infoboard_view_user.setText(editUser);
+                        Infoboard_view_content.setText(editContent);
+                        Infoboard_view_date.setText(date);
 
                         Toast.makeText(getApplicationContext(), "글이 수정되었습니다. 새로고침해주세요.", Toast.LENGTH_SHORT).show();
-
                     }
                 });
 
@@ -271,7 +269,7 @@ public class FreeNoticeBoard_View extends AppCompatActivity {
     }
 
     /*----------------------------------------------------------------------------------------------
-         어플리케이션 종료시 쓰레드의 종료를 요청하는 메소드
+       어플리케이션 종료시 쓰레드의 종료를 요청하는 메소드
     ----------------------------------------------------------------------------------------------*/
     @Override
     public void onDestroy() {
@@ -283,17 +281,17 @@ public class FreeNoticeBoard_View extends AppCompatActivity {
         } catch (Exception e) {}
     }
 
-    /*---------------------------------------------------------------------------------------------
-       DB에 새로운 데이터를 추가하는 메소드
-    ---------------------------------------------------------------------------------------------*/
-    public void insertDatabase(int indexNum_info, String title, String userName, String content, String date, Drawable getImage) {
+     /*---------------------------------------------------------------------------------------------
+        DB에 새로운 데이터를 추가하는 메소드
+     ---------------------------------------------------------------------------------------------*/
+     public void insertDatabase(int indexNum_info, String title, String userName, String content, String date, Drawable getImage) {
         Bundle b = new Bundle();
         b.putString("no", indexNum_info+"");
         b.putString("title", title);
         b.putString("user", userName);
         b.putString("content", content);
         b.putString("date", date);
-        b.putString("file_name", indexNum_info + "_" + title + "_" + date + ".png");
+         b.putString("file_name", indexNum_info + "_" + title + "_" + date + ".png");
 
         Message msg= new Message();
         msg.setData(b);
@@ -318,8 +316,8 @@ public class FreeNoticeBoard_View extends AppCompatActivity {
             HttpURLConnection conn = null;
             String urlStr = "";
 
-            urlStr = "http://"+getString(R.string.ip_address)+":8080/SkhuGlocalitWebProject/FreeNoticeBoard_Update";
-            //urlStr = "http://192.168.25.55:8080/BookDreamServerProject/FreeNoticeBoard_Update"; //테스트용
+            urlStr = "http://"+getString(R.string.ip_address)+":8080/SkhuGlocalitWebProject/InfoNoticeBoard_Update";
+            //urlStr = "http://192.168.25.55:8080/BookDreamServerProject/InfoNoticeBoard_Update"; //테스트용
 
             try {
                 url = new URL(urlStr);
@@ -400,6 +398,14 @@ public class FreeNoticeBoard_View extends AppCompatActivity {
     }
 
 
+    TextView.OnClickListener backListener = new View.OnClickListener(){
+
+        @Override
+        public void onClick(View v) {
+            finish();
+        }
+    };
+
     /*----------------------------------------------------------------------------------------------
        사진 업로드를 사용자 핸드폰의 갤러리로부터 하는 경우,
        갤러리로 이동시켜 사진을 선택할 수 있게 하는 리스너
@@ -424,7 +430,7 @@ public class FreeNoticeBoard_View extends AppCompatActivity {
             Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
             // 임시로 사용할 파일의 경로를 생성
-            String url = "temp_free2" + String.valueOf(System.currentTimeMillis()) + ".jpg";
+            String url = "ex_" + String.valueOf(System.currentTimeMillis()) + ".jpg";
             mImageCaptureUri = Uri.fromFile(new File(Environment.getExternalStorageDirectory(), url));
 
             intent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, mImageCaptureUri);
@@ -479,7 +485,7 @@ public class FreeNoticeBoard_View extends AppCompatActivity {
                     storeCropImage(photo, filePath); // CROP된 이미지를 외부저장소, 앨범에 저장한다.
                     uploadingImage = new BitmapDrawable(getResources(), photo);
                     Log.d("카메라로 찍은 사진이 저장 됨 >>> ", "완료");
-                    free_update_image.setImageDrawable(uploadingImage); // 레이아웃의 이미지칸에 CROP된 BITMAP을 보여줌
+                    info_update_image.setImageDrawable(uploadingImage); // 레이아웃의 이미지칸에 CROP된 BITMAP을 보여줌
                     break;
                 }
 
@@ -499,7 +505,7 @@ public class FreeNoticeBoard_View extends AppCompatActivity {
         String dirPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/NoticeBoard/";
         File directory_FreeBoard = new File(dirPath);
 
-        if (!directory_FreeBoard.exists()) { // FreeBoard 디렉터리에 폴더가 없다면 (새로 이미지를 저장할 경우에 속한다.)
+        if (!directory_FreeBoard.exists()) { // InfoBoard 디렉터리에 폴더가 없다면 (새로 이미지를 저장할 경우에 속한다.)
             directory_FreeBoard.mkdir();
             Log.d("디렉터리에 폴더없으면 생성","");
         }
@@ -523,24 +529,12 @@ public class FreeNoticeBoard_View extends AppCompatActivity {
         }
     }
 
-    // 수정 창의 뒤로가기 버튼
-    TextView.OnClickListener backListener = new View.OnClickListener(){
-
-        @Override
-        public void onClick(View v) {
-            finish();
-        }
-    };
-
-
-    // VIew 뒤로가기 버튼 클릭시 인텐트 종료
+    // 뒤로가기 버튼 클릭시 인텐트 종료
     TextView.OnClickListener backBtnClickListener = new View.OnClickListener() {
 
         @Override
         public void onClick(View v) {
-            FreeNoticeBoard_View.this.finish();
+            InfoNoticeBoard_View.this.finish();
         }
     };
-
-
 }

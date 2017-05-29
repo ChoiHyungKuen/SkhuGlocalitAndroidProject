@@ -16,7 +16,7 @@
         android:weightSum="10">
 
         <TextView
-            android:id="@+id/backBtn"
+            android:id="@+id/Infoboard_main_backBtn"
             android:layout_width="0dp"
             android:textStyle="bold"
             android:textColor="@color/BLUEGREEN"
@@ -28,14 +28,13 @@
             android:textAlignment="center" />
 
         <TextView
-            android:id="@+id/freetext"
             android:layout_width="0dp"
             android:textStyle="bold"
             android:textColor="@color/BLACK"
             android:layout_height="wrap_content"
             android:layout_weight="4"
             android:textSize="20dp"
-            android:text="자유게시판"
+            android:text="정보게시판"
             android:textAlignment="center" />
 
         <TextView
@@ -49,7 +48,7 @@
             android:textAlignment="center" />
 
         <TextView
-            android:id="@+id/freeboard_writeBtn"
+            android:id="@+id/Infoboard_writeBtn"
             android:text="@string/writing"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -67,14 +66,14 @@
     <android.support.v4.widget.SwipeRefreshLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:id="@+id/swipe_layout"
+        android:id="@+id/Infoboard_swipe_layout"
         android:layout_weight="18">
 
         <ListView
             android:transcriptMode="alwaysScroll"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:id="@+id/freeboard_listView" />
+            android:id="@+id/Infoboard_listView" />
 
     </android.support.v4.widget.SwipeRefreshLayout>
 
