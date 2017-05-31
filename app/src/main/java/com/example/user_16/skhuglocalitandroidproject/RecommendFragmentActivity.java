@@ -229,7 +229,7 @@ public class RecommendFragmentActivity extends FragmentActivity {
         recommend_delete.setOnClickListener(selectOnClickListener);
 
 
-        AlertDialog.Builder buider = new AlertDialog.Builder(getParent()); //AlertDialog.Builder 객체 생성
+        AlertDialog.Builder buider = new AlertDialog.Builder(RecommendFragmentActivity.this); //AlertDialog.Builder 객체 생성
         buider.setCancelable(false);
         buider.setView(alertLayout);
 
@@ -292,6 +292,28 @@ public class RecommendFragmentActivity extends FragmentActivity {
 //                        startActivity(intent);
                     }
                     break;
+//                case R.id.recommend_callNumber:
+//                    if (!recommend_callNumber.getText().equals("미지정")){
+//                        String callNumber = recommend_callNumber.getText().toString();
+//                        final String tel = "tel:" + callNumber;
+//                        AlertDialog.Builder builder = new AlertDialog.Builder(RecommendFragmentActivity.this);
+//                        builder.setTitle("전화 걸기")        // 제목 설정
+//                                .setMessage(callNumber+" 에 전화연결 하시겠습니까?")
+//                                .setCancelable(false)        // 뒤로 버튼 클릭시 취소 가능 설정
+//                                .setPositiveButton("확인", new DialogInterface.OnClickListener(){
+//                                    // 확인 버튼 클릭시 설정
+//                                    public void onClick(DialogInterface dialog, int whichButton){
+//                                        startActivity(new Intent("android.intent.action.CALL", Uri.parse(tel)));
+//                                    }
+//                                })
+//                                .setNegativeButton("취소", new DialogInterface.OnClickListener(){
+//                                    // 취소 버튼 클릭시 설정
+//                                    public void onClick(DialogInterface dialog, int whichButton){
+//                                        dialog.cancel();
+//                                    }
+//                                });
+//                    }
+//                    break;
                 case R.id.recommend_up:
                     if(recommend_flag){
                         if(up_flag){

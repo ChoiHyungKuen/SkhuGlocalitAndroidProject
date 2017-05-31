@@ -300,7 +300,7 @@ public class MapViewer extends NMapActivity {
         NMapPOIdata poiData = new NMapPOIdata(++markerCount, mMapViewerResourceProvider);
         markerCount = poiData.count();
         poiData.beginPOIdata(1);
-        poiData.addPOIitem(selectPoint, RecommendAddFragment.title +" 위치 추가 완료", markerID, markerCount);
+        poiData.addPOIitem(selectPoint, RecommendAddFragment.title, markerID, markerCount);
         poiData.endPOIdata();
         add_pref = getSharedPreferences("recommend_Info", MODE_PRIVATE);
         editor = add_pref.edit();
