@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.user_16.skhuglocalitandroidproject">
+    
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -33,8 +34,18 @@
         <!--  -->
         <activity
             android:name=".RecommendFragmentActivity"
-            android:windowSoftInputMode="adjustPan" />
-        <activity android:name=".MapViewer" />
+            android:windowSoftInputMode="adjustPan"
+            android:theme="@style/AppTheme"/>
+
+        <activity
+            android:name=".MapViewer"
+            android:theme="@style/AppTheme">
+            </activity>
+
+        <activity android:name=".SearchNaverActivity"
+            android:theme="@style/AppTheme">
+            </activity>
+
         <activity
             android:name=".BookDream.MatchActivity"
             android:screenOrientation="portrait"
@@ -97,6 +108,7 @@
             android:theme="@style/AppTheme">
 
         </activity>
+
 
         // 추가된 서비스
         <service android:name=".BookDream.FirebaseMessagingService">

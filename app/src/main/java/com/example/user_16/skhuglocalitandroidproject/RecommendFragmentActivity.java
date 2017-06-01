@@ -1,13 +1,19 @@
 package com.example.user_16.skhuglocalitandroidproject;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -22,6 +28,7 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Spinner;
@@ -41,14 +48,21 @@ import java.util.HashMap;
 
 public class RecommendFragmentActivity extends FragmentActivity {
 
+    private final static int ADD_SUCCESS = 100;
+    private final static int SELECT_VIEW = 101;
+    private final static int EDIT_SUCCESS = 102;
+    private final static int DELETE_SUCCESS = 103;
+    private final static int SEARCH_SUCCESS = 104;
+
     private final long FINSH_INTERVAL_TIME = 2000; // 2초안에 Back 버튼을 2번 누르면 앱 종료 -> 2초
     private long backPressedTime = 0;
     private SharedPreferences login_pref, map_pref, add_pref;
     private SharedPreferences.Editor editor;
 
     private LinearLayout content_layout, edit_layout, review_layout;
-    private TextView recommend_title, recommend_id, recommend_name, recommend_category,
+    private TextView recommend_title, recommend_branch, recommend_search, recommend_id, recommend_name, recommend_category,
             recommend_callNumber, recommend_review, recommend_edit, recommend_save, recommend_delete;
+    private ImageView recommend_searchImg;
     private Spinner recommend_category_sp;
     private int category_position;
     private CheckBox recommend_delivery;
@@ -102,22 +116,21 @@ public class RecommendFragmentActivity extends FragmentActivity {
             super.handleMessage(msg);
 
             switch (msg.what) {
-                case 0:
+                case ADD_SUCCESS:
                     Toast.makeText(RecommendFragmentActivity.this, "추천 등록 완료", Toast.LENGTH_SHORT).show();
                     changeMapFragment();
                     break;
-                case 1:
-                    HashMap<String, String> selectMap = (HashMap<String, String>)msg.obj;
+                case SELECT_VIEW:
+                    HashMap<String, String> selectMap = (HashMap<String, String>) msg.obj;
                     selectRecommendView(selectMap);
                     break;
-                case 2:
-                    HashMap<String, String> resultDataMap = (HashMap<String, String>)msg.obj;
-                    if (resultDataMap.get("result").equals("success")){
-                        Toast.makeText(getParent(),"수정 완료",Toast.LENGTH_SHORT).show();
+                case EDIT_SUCCESS:
+                    HashMap<String, String> resultDataMap = (HashMap<String, String>) msg.obj;
+                    if (resultDataMap.get("result").equals("success")) {
+                        Toast.makeText(getParent(), "수정 완료", Toast.LENGTH_SHORT).show();
                         recommend_category.setText(resultDataMap.get("category"));
                         recommend_callNumber.setText(resultDataMap.get("callNumber"));
                         recommend_review.setText(resultDataMap.get("review"));
-
                         content_layout.setWeightSum(6);
                         recommend_category.setVisibility(View.VISIBLE);
                         recommend_callNumber.setVisibility(View.VISIBLE);
@@ -128,31 +141,35 @@ public class RecommendFragmentActivity extends FragmentActivity {
                         recommend_delivery.setEnabled(false);
                         recommend_edit_review.setVisibility(View.GONE);
                         recommend_save.setVisibility(View.GONE);
-                    } else if(resultDataMap.get("result").equals("fail")){
-                        Toast.makeText(getParent(),"수정 실패",Toast.LENGTH_SHORT).show();
+                    } else if (resultDataMap.get("result").equals("fail")) {
+                        Toast.makeText(getParent(), "수정 실패", Toast.LENGTH_SHORT).show();
                     }
                     break;
-                case 3:
-                    if(msg.obj.equals("success")){
+                case DELETE_SUCCESS:
+                    if (msg.obj.equals("success")) {
                         changeAddFragment();
                         changeMapFragment();
-                        if(selectDialog.isShowing()){
+                        if (selectDialog.isShowing()) {
                             selectDialog.dismiss();
                         }
-                        Toast.makeText(getParent(),"삭제가 완료되었습니다",Toast.LENGTH_SHORT).show();
-                    }else {
-                        Toast.makeText(getParent(),"삭제 실패",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getParent(), "삭제가 완료되었습니다", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(getParent(), "삭제 실패", Toast.LENGTH_SHORT).show();
                     }
                     break;
-                case 4:
-                    HashMap<Integer, HashMap<String, String>> searchMap = (HashMap<Integer, HashMap<String, String>>)msg.obj;
+                case SEARCH_SUCCESS:
+                    HashMap<Integer, HashMap<String, String>> searchMap = (HashMap<Integer, HashMap<String, String>>) msg.obj;
                     searchListView(searchMap);
                     break;
             }
         }
     };
 
-    public void selectRecommendView(HashMap<String,String> selectMap){
+    /**
+     * 위치 정보 보기 기능 (다이얼로그)
+     * @param selectMap
+     */
+    public void selectRecommendView(HashMap<String, String> selectMap) {
         LayoutInflater inflater = getParent().getLayoutInflater();
         View alertLayout = inflater.inflate(R.layout.recommend_select_view, null);
 
@@ -164,33 +181,45 @@ public class RecommendFragmentActivity extends FragmentActivity {
         content_layout = (LinearLayout) alertLayout.findViewById(R.id.content_layout);
         edit_layout = (LinearLayout) alertLayout.findViewById(R.id.edit_layout);
         review_layout = (LinearLayout) alertLayout.findViewById(R.id.review_layout);
+        recommend_searchImg = (ImageView) alertLayout.findViewById(R.id.recommend_searchImage);
+        recommend_search = (TextView) alertLayout.findViewById(R.id.recommend_searchText);
         recommend_title = (TextView) alertLayout.findViewById(R.id.recommend_title);
-        recommend_id = (TextView)alertLayout.findViewById(R.id.recommend_id);
-        recommend_name = (TextView)alertLayout.findViewById(R.id.recommend_name);
-        recommend_category = (TextView)alertLayout.findViewById(R.id.recommend_category);
-        recommend_callNumber = (TextView)alertLayout.findViewById(R.id.recommend_callNumber);
-        recommend_review = (TextView)alertLayout.findViewById(R.id.recommend_review);
-        recommend_category_sp = (Spinner)alertLayout.findViewById(R.id.recommend_category_sp);
+        recommend_branch = (TextView) alertLayout.findViewById(R.id.recommend_branch);
+        recommend_id = (TextView) alertLayout.findViewById(R.id.recommend_id);
+        recommend_name = (TextView) alertLayout.findViewById(R.id.recommend_name);
+        recommend_category = (TextView) alertLayout.findViewById(R.id.recommend_category);
+        recommend_callNumber = (TextView) alertLayout.findViewById(R.id.recommend_callNumber);
+        recommend_review = (TextView) alertLayout.findViewById(R.id.recommend_review);
+        recommend_category_sp = (Spinner) alertLayout.findViewById(R.id.recommend_category_sp);
         recommend_call_edit = (EditText) alertLayout.findViewById(R.id.recommend_call_edit);
-        recommend_delivery = (CheckBox)alertLayout.findViewById(R.id.recommend_delivery);
-        recommend_edit_review = (EditText)alertLayout.findViewById(R.id.recommend_edit_review);
-        recommend_up = (Button)alertLayout.findViewById(R.id.recommend_up);
-        recommend_down = (Button)alertLayout.findViewById(R.id.recommend_down);
-        recommend_edit = (TextView)alertLayout.findViewById(R.id.recommend_edit);
-        recommend_save = (TextView)alertLayout.findViewById(R.id.recommend_save);
-        recommend_delete = (TextView)alertLayout.findViewById(R.id.recommend_delete);
+        recommend_delivery = (CheckBox) alertLayout.findViewById(R.id.recommend_delivery);
+        recommend_edit_review = (EditText) alertLayout.findViewById(R.id.recommend_edit_review);
+        recommend_up = (Button) alertLayout.findViewById(R.id.recommend_up);
+        recommend_down = (Button) alertLayout.findViewById(R.id.recommend_down);
+        recommend_edit = (TextView) alertLayout.findViewById(R.id.recommend_edit);
+        recommend_save = (TextView) alertLayout.findViewById(R.id.recommend_save);
+        recommend_delete = (TextView) alertLayout.findViewById(R.id.recommend_delete);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkSelfPermission(android.Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_DENIED) {
+                if (!shouldShowRequestPermissionRationale(Manifest.permission.CALL_PHONE)) {
+                    String[] permission = {"android.permission.CALL_PHONE",};
+                    getParent().requestPermissions(permission, 1000);
+                }
+            }
+        }
 
         //내용 초기화
         String state = selectMap.get("state");
-        if(state.equals("not")){
+        if (state.equals("not")) {
             recommend_flag = true;
             up_flag = true;
             down_flag = true;
-        } else if (state.equals("up")){
+        } else if (state.equals("up")) {
             recommend_flag = false;
             up_flag = false;
             down_flag = true;
-        } else if (state.equals("down")){
+        } else if (state.equals("down")) {
             recommend_flag = false;
             up_flag = true;
             down_flag = false;
@@ -199,6 +228,7 @@ public class RecommendFragmentActivity extends FragmentActivity {
         up = Integer.parseInt(selectMap.get("up"));
         down = Integer.parseInt(selectMap.get("down"));
         recommend_title.setText(selectMap.get("title"));
+        recommend_branch.setText(selectMap.get("branch"));
         recommend_id.setText(selectMap.get("id"));
         recommend_name.setText(selectMap.get("name"));
         recommend_category.setText(selectMap.get("category"));
@@ -206,28 +236,30 @@ public class RecommendFragmentActivity extends FragmentActivity {
         recommend_review.setText(selectMap.get("review"));
         recommend_up.setText(selectMap.get("up"));
         recommend_down.setText(selectMap.get("down"));
-        setSelectedPoint(selectMap.get("longitude"),selectMap.get("latitude"));
+        setSelectedPoint(selectMap.get("longitude"), selectMap.get("latitude"));
 
         String[] subject = getResources().getStringArray(R.array.category_sp_array);
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getParent(), android.R.layout.simple_spinner_dropdown_item, subject);
         recommend_category_sp.setAdapter(adapter);
         category_position = adapter.getPosition(recommend_category.getText().toString());
-        if(selectMap.get("delivery").equals("true")){
+        if (selectMap.get("delivery").equals("true")) {
             recommend_delivery.setChecked(true);
         }
         recommend_edit_review.setText(selectMap.get("review"));
-        if (memberInfo.get("id").equals(selectMap.get("id"))){
+        if (memberInfo.get("id").equals(selectMap.get("id"))) {
             content_layout.setWeightSum(6);
             edit_layout.setVisibility(View.VISIBLE);
         }
 
+        recommend_searchImg.setOnClickListener(selectOnClickListener);
+        recommend_search.setOnClickListener(selectOnClickListener);
         recommend_title.setOnClickListener(selectOnClickListener);
+        recommend_callNumber.setOnClickListener(selectOnClickListener);
         recommend_up.setOnClickListener(selectOnClickListener);
         recommend_down.setOnClickListener(selectOnClickListener);
         recommend_edit.setOnClickListener(selectOnClickListener);
         recommend_save.setOnClickListener(selectOnClickListener);
         recommend_delete.setOnClickListener(selectOnClickListener);
-
 
         AlertDialog.Builder buider = new AlertDialog.Builder(RecommendFragmentActivity.this); //AlertDialog.Builder 객체 생성
         buider.setCancelable(false);
@@ -243,9 +275,9 @@ public class RecommendFragmentActivity extends FragmentActivity {
                 String update_up = recommend_up.getText().toString();
                 String update_down = recommend_down.getText().toString();
                 String state = "not";
-                if(!up_flag) {
+                if (!up_flag) {
                     state = "up";
-                } else if(!down_flag) {
+                } else if (!down_flag) {
                     state = "down";
                 }
                 updownUpdate(title, recommend_longitude, recommend_latitude, id, state, update_up, update_down);
@@ -260,24 +292,25 @@ public class RecommendFragmentActivity extends FragmentActivity {
         });
         selectDialog = buider.create();
         selectDialog.setCanceledOnTouchOutside(false);//없어지지 않도록 설정
-        if(!selectDialog.isShowing()){
+        if (!selectDialog.isShowing()) {
             selectDialog.show();
         }
 
     }
 
-    public void setSelectedPoint(String longitude, String latitude){
+    public void setSelectedPoint(String longitude, String latitude) {
         this.recommend_longitude = longitude;
         this.recommend_latitude = latitude;
     }
 
-    class SelectOnClickListener implements View.OnClickListener{
+    private class SelectOnClickListener implements View.OnClickListener {
         String category, title, callNumber, delivery, review;
+
         @Override
         public void onClick(View v) {
-            switch (v.getId()){
+            switch (v.getId()) {
                 case R.id.recommend_title:
-                    if(searchDialog != null){
+                    if (searchDialog != null) {
                         map_pref = getSharedPreferences("map_center", MODE_PRIVATE);
                         editor = map_pref.edit();
                         editor.putInt("longitude", Integer.parseInt(recommend_longitude));
@@ -287,36 +320,55 @@ public class RecommendFragmentActivity extends FragmentActivity {
                         selectDialog.dismiss();
                         searchDialog.dismiss();
                         changeMapFragment();
-//                        Intent intent = new Intent(RecommendFragmentActivity.this,SearchNaverActivity.class);
-//                        intent.putExtra("title",recommend_title.getText().toString());
-//                        startActivity(intent);
                     }
                     break;
-//                case R.id.recommend_callNumber:
-//                    if (!recommend_callNumber.getText().equals("미지정")){
-//                        String callNumber = recommend_callNumber.getText().toString();
-//                        final String tel = "tel:" + callNumber;
-//                        AlertDialog.Builder builder = new AlertDialog.Builder(RecommendFragmentActivity.this);
-//                        builder.setTitle("전화 걸기")        // 제목 설정
-//                                .setMessage(callNumber+" 에 전화연결 하시겠습니까?")
-//                                .setCancelable(false)        // 뒤로 버튼 클릭시 취소 가능 설정
-//                                .setPositiveButton("확인", new DialogInterface.OnClickListener(){
-//                                    // 확인 버튼 클릭시 설정
-//                                    public void onClick(DialogInterface dialog, int whichButton){
-//                                        startActivity(new Intent("android.intent.action.CALL", Uri.parse(tel)));
-//                                    }
-//                                })
-//                                .setNegativeButton("취소", new DialogInterface.OnClickListener(){
-//                                    // 취소 버튼 클릭시 설정
-//                                    public void onClick(DialogInterface dialog, int whichButton){
-//                                        dialog.cancel();
-//                                    }
-//                                });
-//                    }
-//                    break;
+                case R.id.recommend_callNumber:
+                    if (!recommend_callNumber.getText().equals("미지정")) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                            if (shouldShowRequestPermissionRationale(Manifest.permission.CALL_PHONE)) {
+                                String[] permission = {"android.permission.CALL_PHONE"};
+                                getParent().requestPermissions(permission, 1000);
+                            } else {
+                                String callNumber = recommend_callNumber.getText().toString();
+                                final String tel = "tel:" + callNumber;
+                                AlertDialog.Builder builder = new AlertDialog.Builder(RecommendFragmentActivity.this);
+                                builder.setTitle("전화 걸기")        // 제목 설정
+                                        .setMessage(callNumber + " 에 전화연결 하시겠습니까?")
+                                        .setCancelable(false)        // 뒤로 버튼 클릭시 취소 가능 설정
+                                        .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                                            // 확인 버튼 클릭시 설정
+                                            public void onClick(DialogInterface dialog, int whichButton) {
+                                                Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse(tel));
+                                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                                    if (checkSelfPermission(Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_DENIED){
+                                                        startActivity(intent);
+                                                    }
+                                                }
+                                            }
+                                        })
+                                        .setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                                            // 취소 버튼 클릭시 설정
+                                            public void onClick(DialogInterface dialog, int whichButton) {
+                                                dialog.dismiss();
+                                            }
+                                        });
+                                AlertDialog dialog = builder.create();
+                                dialog.setCanceledOnTouchOutside(false);
+                                dialog.show();
+                            }
+                        }
+                    }
+                    break;
+                case R.id.recommend_searchText:
+                case R.id.recommend_searchImage:
+                    Intent intent = new Intent(RecommendFragmentActivity.this, SearchNaverActivity.class);
+                    intent.putExtra("title", recommend_title.getText().toString());
+                    intent.putExtra("branch", recommend_branch.getText().toString());
+                    startActivity(intent);
+                    break;
                 case R.id.recommend_up:
-                    if(recommend_flag){
-                        if(up_flag){
+                    if (recommend_flag) {
+                        if (up_flag) {
                             up += 1;
                             recommend_up.setText(Integer.toString(up));
                             up_flag = false;
@@ -329,13 +381,13 @@ public class RecommendFragmentActivity extends FragmentActivity {
                             up_flag = true;
                             recommend_flag = true;
                         } else {
-                            Toast.makeText(getParent(),"이미 비추천을 하셨습니다", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getParent(), "이미 비추천을 하셨습니다", Toast.LENGTH_SHORT).show();
                         }
                     }
                     break;
                 case R.id.recommend_down:
-                    if(recommend_flag){
-                        if(down_flag){
+                    if (recommend_flag) {
+                        if (down_flag) {
                             down += 1;
                             recommend_down.setText(Integer.toString(down));
                             down_flag = false;
@@ -348,7 +400,7 @@ public class RecommendFragmentActivity extends FragmentActivity {
                             down_flag = true;
                             recommend_flag = true;
                         } else {
-                            Toast.makeText(getParent(),"이미 추천을 하셨습니다", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getParent(), "이미 추천을 하셨습니다", Toast.LENGTH_SHORT).show();
                         }
                     }
                     break;
@@ -362,7 +414,7 @@ public class RecommendFragmentActivity extends FragmentActivity {
                     recommend_category_sp.setSelection(category_position);
                     recommend_call_edit.setVisibility(View.VISIBLE);
                     callNumber = recommend_callNumber.getText().toString();
-                    if(!callNumber.equals("미지정")){
+                    if (!callNumber.equals("미지정")) {
                         recommend_call_edit.setText(callNumber);
                     }
                     recommend_delivery.setEnabled(true);
@@ -375,17 +427,17 @@ public class RecommendFragmentActivity extends FragmentActivity {
                     category_position = recommend_category_sp.getSelectedItemPosition();
                     title = recommend_title.getText().toString();
                     callNumber = recommend_call_edit.getText().toString();
-                    if(callNumber.isEmpty() || callNumber.length() == 0){
-                        callNumber="미지정";
+                    if (callNumber.isEmpty() || callNumber.length() == 0) {
+                        callNumber = "미지정";
                     }
-                    if(recommend_delivery.isChecked()){
+                    if (recommend_delivery.isChecked()) {
                         delivery = "true";
-                    }else {
+                    } else {
                         delivery = "false";
                     }
                     review = recommend_edit_review.getText().toString();
-                    if(review.isEmpty() || review.length() == 0){
-                        callNumber="내용 없음";
+                    if (review.isEmpty() || review.length() == 0) {
+                        callNumber = "내용 없음";
                     }
 
                     updateRecommend(category, title, callNumber, delivery, review, recommend_longitude, recommend_latitude);
@@ -395,18 +447,18 @@ public class RecommendFragmentActivity extends FragmentActivity {
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(RecommendFragmentActivity.this);
                     builder.setTitle("삭제 확인")        // 제목 설정
-                            .setMessage(title+" 정보를 삭제 하시겠습니까?")
+                            .setMessage(title + " 정보를 삭제 하시겠습니까?")
                             .setCancelable(false)        // 뒤로 버튼 클릭시 취소 가능 설정
-                            .setPositiveButton("확인", new DialogInterface.OnClickListener(){
+                            .setPositiveButton("확인", new DialogInterface.OnClickListener() {
                                 // 확인 버튼 클릭시 설정
-                                public void onClick(DialogInterface dialog, int whichButton){
+                                public void onClick(DialogInterface dialog, int whichButton) {
                                     deleteRecommend(title, recommend_longitude, recommend_latitude);
                                     dialog.dismiss();
                                 }
                             })
-                            .setNegativeButton("취소", new DialogInterface.OnClickListener(){
+                            .setNegativeButton("취소", new DialogInterface.OnClickListener() {
                                 // 취소 버튼 클릭시 설정
-                                public void onClick(DialogInterface dialog, int whichButton){
+                                public void onClick(DialogInterface dialog, int whichButton) {
                                     dialog.cancel();
                                 }
                             });
@@ -418,8 +470,49 @@ public class RecommendFragmentActivity extends FragmentActivity {
             }
         }
     }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == 1000) { // 요청한 권한을 사용자가 "허용" 했다면...
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                String callNumber = recommend_callNumber.getText().toString();
+                final String tel = "tel:" + callNumber;
+                AlertDialog.Builder builder = new AlertDialog.Builder(RecommendFragmentActivity.this);
+                builder.setTitle("전화 걸기")        // 제목 설정
+                        .setMessage(callNumber + " 에 전화연결 하시겠습니까?")
+                        .setCancelable(false)        // 뒤로 버튼 클릭시 취소 가능 설정
+                        .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                            // 확인 버튼 클릭시 설정
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse(tel));
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                    if (checkSelfPermission(Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_DENIED){
+                                        startActivity(intent);
+                                    }
+                                }
+                            }
+                        })
+                        .setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                            // 취소 버튼 클릭시 설정
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                dialog.dismiss();
+                            }
+                        });
+                AlertDialog dialog = builder.create();
+                dialog.setCanceledOnTouchOutside(false);
+                dialog.show();
+            } else {
+                Toast.makeText(RecommendFragmentActivity.this, "권한요청을 거부했습니다.", Toast.LENGTH_SHORT).show();
+            }
+        }
 
-    public void searchListView(HashMap<Integer, HashMap<String, String>> searchMap){
+    }
+    //-----------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * 위치 검색 기능 (다이얼로그)
+     * @param searchMap
+     */
+    public void searchListView(HashMap<Integer, HashMap<String, String>> searchMap) {
         LayoutInflater inflater = getLayoutInflater();
         View alertLayout = inflater.inflate(R.layout.recommend_search_view, null);
 
@@ -431,7 +524,7 @@ public class RecommendFragmentActivity extends FragmentActivity {
         recommendSearchListView.setAdapter(listViewAdapter);
 
         String title, longitude, latitude, up, down;
-        for(int i = 0; i < searchMap.size(); i++){
+        for (int i = 0; i < searchMap.size(); i++) {
             HashMap<String, String> searchOne = searchMap.get(i);
             title = searchOne.get("title");
             longitude = searchOne.get("longitude");
@@ -452,6 +545,7 @@ public class RecommendFragmentActivity extends FragmentActivity {
                 String longitude = searchList.sLongitude;
                 String latitude = searchList.sLatitude;
                 selectRecommend(title, longitude, latitude, userId);
+                dbManager.close();
             }
         });
         AlertDialog.Builder buider = new AlertDialog.Builder(RecommendFragmentActivity.this); //AlertDialog.Builder 객체 생성
@@ -475,36 +569,84 @@ public class RecommendFragmentActivity extends FragmentActivity {
         searchDialog.show();
 
     }
+    //----------------------------------------------------------------------------------------------------------------------
 
-    public void selectRecommend(String title, String longitude, String latitude, String id){
+    /**
+     * 위치 추가 기능
+     */
+    public void addRecommend() {
+        final DBManager dbManager = new DBManager(getApplicationContext(), "app_data.db", null, 1);
+        HashMap<String, String> data = dbManager.getMemberInfo();
+        String id = data.get("id");
+        add_pref = getSharedPreferences("recommend_Info", MODE_PRIVATE);
+        String category = add_pref.getString("category", "");
+        String title = add_pref.getString("title", "");
+        String branch = add_pref.getString("branch", "");
+        String callNumber = add_pref.getString("callNumber", "");
+        String delivery = add_pref.getString("delivery", "");
+        String review = add_pref.getString("review", "");
+        String longitude = add_pref.getString("longitude", "");
+        String latitude = add_pref.getString("latitude", "");
+        String up = "0";
+        String down = "0";
+        editor = add_pref.edit();
+        editor.clear();
+        editor.commit();
+        recommendAddAsyncThread = new RecommendAddAsyncThread();
+        recommendAddAsyncThread.execute(id, category, title, branch, callNumber, delivery, review, longitude, latitude, up, down);
+    }
+    public void setMakable(boolean m) { markable = m; }
+
+    public boolean getMakable() {
+        return markable;
+    }
+
+    public void setMaking(boolean m) {
+        marking = m;
+    }
+
+    public boolean getMaking() {
+        return marking;
+    }
+    //-----------------------------------------------------------------------------------------------------------------------
+
+
+    /**
+     * 백그라운드 스레드 실행
+     */
+    public void selectRecommend(String title, String longitude, String latitude, String id) {
         selectRecommendAsyncThread = new SelectRecommendAsyncThread();
         selectRecommendAsyncThread.execute(title, longitude, latitude, id);
     }
-    public void deleteRecommend(String title, String longitude, String latitude){
+
+    public void deleteRecommend(String title, String longitude, String latitude) {
         deleteRecommendAsyncThread = new DeleteRecommendAsyncThread();
         deleteRecommendAsyncThread.execute(title, longitude, latitude);
     }
-    public void updateRecommend(String category, String title, String callNumber, String delivery, String review, String longitude, String latitude){
+
+    public void updateRecommend(String category, String title, String callNumber, String delivery, String review, String longitude, String latitude) {
         updateRecommendAsyncThread = new UpdateRecommendAsyncThread();
         updateRecommendAsyncThread.execute(category, title, callNumber, delivery, review, longitude, latitude);
     }
-    public void updownUpdate(String title, String longitude, String latitude, String id, String state, String up, String down){
+
+    public void updownUpdate(String title, String longitude, String latitude, String id, String state, String up, String down) {
         updownUpdateAsyncThread = new UpdownUpdateAsyncThread();
         updownUpdateAsyncThread.execute(title, longitude, latitude, id, state, up, down);
     }
-    public void searchRecommend(String[] conditionArray){
-        for (int i = 0; i < conditionArray.length; i++){
-            if (conditionArray[i] != null){
-                if (i == 0){
+
+    public void searchRecommend(String[] conditionArray) {
+        for (int i = 0; i < conditionArray.length; i++) {
+            if (conditionArray[i] != null) {
+                if (i == 0) {
                     condition = conditionArray[i];
-                } else if (i == 1){
+                } else if (i == 1) {
                     condition += " / ";
                     condition += conditionArray[i];
-                } else if (i == 2){
+                } else if (i == 2) {
                     condition += " / ";
-                    if(conditionArray[2].equals("true")){
+                    if (conditionArray[2].equals("true")) {
                         condition += "배달 가능";
-                    }else {
+                    } else {
                         condition += "배달 불가능";
                     }
                 }
@@ -513,20 +655,11 @@ public class RecommendFragmentActivity extends FragmentActivity {
         searchRecommendAsyncThread = new SearchRecommendAsyncThread();
         searchRecommendAsyncThread.execute(conditionArray[0], conditionArray[1], conditionArray[2]);
     }
+    //-----------------------------------------------------------------------------------------------------------------------
 
-    public void setMakable(boolean m) {
-        markable = m;
-    }
-    public boolean getMakable() {
-        return markable;
-    }
-
-    public void setMaking(boolean m) { marking = m; }
-    public boolean getMaking() {
-        return marking;
-    }
-
-
+     /**
+     * 프래그먼트 이동 메소드
+     */
     public void changeMapFragment() {
         fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.fragment_map, map_fragment);
@@ -547,29 +680,11 @@ public class RecommendFragmentActivity extends FragmentActivity {
         fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
         fragmentTransaction.commit();
     }
+    //-------------------------------------------------------------------------------------------------------------------
 
-
-    public void addRecommend() {
-        final DBManager dbManager = new DBManager(getApplicationContext(), "app_data.db", null, 1);
-        HashMap<String, String> data = dbManager.getMemberInfo();
-        String id = data.get("id");
-        add_pref = getSharedPreferences("recommend_Info", MODE_PRIVATE);
-        String category = add_pref.getString("category", "");
-        String title = add_pref.getString("title", "");
-        String callNumber = add_pref.getString("callNumber", "");
-        String delivery = add_pref.getString("delivery", "");
-        String review = add_pref.getString("review", "");
-        String longitude = add_pref.getString("longitude", "");
-        String latitude = add_pref.getString("latitude", "");
-        String up = "0";
-        String down = "0";
-        editor = add_pref.edit();
-        editor.clear();
-        editor.commit();
-        recommendAddAsyncThread = new RecommendAddAsyncThread();
-        recommendAddAsyncThread.execute(id, category, title, callNumber, delivery, review, longitude, latitude, up, down);
-    }
-
+    /**
+     * 리스트 뷰 관련
+     */
     private class ViewHolder {
         public TextView sTitle;
         public TextView sUp;
@@ -652,7 +767,6 @@ public class RecommendFragmentActivity extends FragmentActivity {
         }
     }
 
-
     public class RecommendAddAsyncThread extends AsyncTask<String, String, String> {
 
         @Override
@@ -666,7 +780,8 @@ public class RecommendFragmentActivity extends FragmentActivity {
             HttpURLConnection conn = null;
             String urlStr = "";
 
-            urlStr = "http://"+getString(R.string.ip_address)+":8080/SkhuGlocalitWebProject/recommend/AddRecommend";
+//            urlStr = "http://" + getString(R.string.ip_address) + ":8080/SkhuGlocalitWebProject/recommend/AddRecommend";
+            urlStr = "http://192.168.123.175:8080/ServerProject/Recommend/AddRecommend";
 
             try {
                 url = new URL(urlStr);
@@ -681,23 +796,24 @@ public class RecommendFragmentActivity extends FragmentActivity {
                 conn.setDoInput(true);
                 conn.setDoOutput(true);
                 HashMap<String, String> addDataMap = new HashMap<String, String>();
-                addDataMap.put("id",args[0]);
+                addDataMap.put("id", args[0]);
                 addDataMap.put("category", args[1]);
                 addDataMap.put("title", args[2]);
-                addDataMap.put("callNumber", args[3]);
-                addDataMap.put("delivery", args[4]);
-                addDataMap.put("review", args[5]);
-                addDataMap.put("longitude", args[6]);
-                addDataMap.put("latitude", args[7]);
-                addDataMap.put("up", args[8]);
-                addDataMap.put("down", args[9]);
+                addDataMap.put("branch", args[3]);
+                addDataMap.put("callNumber", args[4]);
+                addDataMap.put("delivery", args[5]);
+                addDataMap.put("review", args[6]);
+                addDataMap.put("longitude", args[7]);
+                addDataMap.put("latitude", args[8]);
+                addDataMap.put("up", args[9]);
+                addDataMap.put("down", args[10]);
                 ObjectOutputStream oos = new ObjectOutputStream(conn.getOutputStream());
                 oos.writeObject(addDataMap);
                 oos.flush();
                 oos.close();
                 Log.d("응답메세지", "실행중5---" + conn.getResponseCode());
                 if (conn.getResponseCode() == 200) { // 서버가 받았다면
-                    handler.sendEmptyMessage(0);
+                    handler.sendEmptyMessage(ADD_SUCCESS);
                 }
                 conn.disconnect();
             } catch (Exception e) {
@@ -735,7 +851,8 @@ public class RecommendFragmentActivity extends FragmentActivity {
             HttpURLConnection conn;
             String urlStr;
 
-            urlStr = "http://"+getString(R.string.ip_address)+":8080/SkhuGlocalitWebProject/recommend/SelectRecommend";
+            urlStr = "http://" + getString(R.string.ip_address) + ":8080/SkhuGlocalitWebProject/recommend/SelectRecommend";
+//            urlStr = "http://192.168.123.175:8080/ServerProject/Recommend/SelectRecommend";
 
             try {
                 url = new URL(urlStr);
@@ -753,7 +870,7 @@ public class RecommendFragmentActivity extends FragmentActivity {
                 selectDataMap.put("title", args[0]);
                 selectDataMap.put("longitude", args[1]);
                 selectDataMap.put("latitude", args[2]);
-                selectDataMap.put("id",args[3]);
+                selectDataMap.put("id", args[3]);
                 ObjectOutputStream oos = new ObjectOutputStream(conn.getOutputStream());
                 oos.writeObject(selectDataMap);
                 oos.flush();
@@ -765,7 +882,7 @@ public class RecommendFragmentActivity extends FragmentActivity {
                     HashMap<String, String> selectMap = (HashMap<String, String>) ois.readObject();
                     Message msg = handler.obtainMessage();
                     msg.obj = selectMap;
-                    msg.what = 1;
+                    msg.what = SELECT_VIEW;
                     handler.sendMessage(msg);
                 }
                 conn.disconnect();
@@ -804,7 +921,8 @@ public class RecommendFragmentActivity extends FragmentActivity {
             HttpURLConnection conn;
             String urlStr;
 
-            urlStr = "http://"+getString(R.string.ip_address)+":8080/SkhuGlocalitWebProject/recommend/UpdateRecommend";
+            urlStr = "http://" + getString(R.string.ip_address) + ":8080/SkhuGlocalitWebProject/recommend/UpdateRecommend";
+//            urlStr = "http://192.168.123.175:8080/ServerProject/Recommend/UpdateRecommend";
 
             try {
                 url = new URL(urlStr);
@@ -836,7 +954,7 @@ public class RecommendFragmentActivity extends FragmentActivity {
                     HashMap<String, String> resultData = (HashMap<String, String>) ois.readObject();
                     Message msg = handler.obtainMessage();
                     msg.obj = resultData;
-                    msg.what = 2;
+                    msg.what = EDIT_SUCCESS;
                     handler.sendMessage(msg);
                 }
                 conn.disconnect();
@@ -875,7 +993,8 @@ public class RecommendFragmentActivity extends FragmentActivity {
             HttpURLConnection conn;
             String urlStr;
 
-            urlStr = "http://"+getString(R.string.ip_address)+":8080/SkhuGlocalitWebProject/recommend/UpdownUpdate"; //집
+            urlStr = "http://" + getString(R.string.ip_address) + ":8080/SkhuGlocalitWebProject/recommend/UpdownUpdate";
+//            urlStr = "http://192.168.123.175:8080/ServerProject/Recommend/UpdownUpdate";
 
             try {
                 url = new URL(urlStr);
@@ -939,7 +1058,8 @@ public class RecommendFragmentActivity extends FragmentActivity {
             HttpURLConnection conn;
             String urlStr;
 
-            urlStr = "http://"+getString(R.string.ip_address)+":8080/SkhuGlocalitWebProject/recommend/DeleteRecommend";
+            urlStr = "http://" + getString(R.string.ip_address) + ":8080/SkhuGlocalitWebProject/recommend/DeleteRecommend";
+//            urlStr = "http://192.168.123.175:8080/ServerProject/Recommend/DeleteRecommend";
 
             try {
                 url = new URL(urlStr);
@@ -964,10 +1084,10 @@ public class RecommendFragmentActivity extends FragmentActivity {
                 Log.d("응답메세지", "실행중5---" + conn.getResponseCode());
                 if (conn.getResponseCode() == 200) { // 서버가 받았다면
                     ObjectInputStream ois = new ObjectInputStream(conn.getInputStream());
-                    ArrayList<String> resultData = (ArrayList <String>) ois.readObject();
+                    ArrayList<String> resultData = (ArrayList<String>) ois.readObject();
                     Message msg = handler.obtainMessage();
                     msg.obj = resultData.get(0);
-                    msg.what = 3;
+                    msg.what = DELETE_SUCCESS;
                     handler.sendMessage(msg);
                 }
                 conn.disconnect();
@@ -1006,7 +1126,8 @@ public class RecommendFragmentActivity extends FragmentActivity {
             HttpURLConnection conn;
             String urlStr;
 
-            urlStr = "http://"+getString(R.string.ip_address)+":8080/SkhuGlocalitWebProject/recommend/SearchRecommend";
+            urlStr = "http://" + getString(R.string.ip_address) + ":8080/SkhuGlocalitWebProject/recommend/SearchRecommend";
+//            urlStr = "http://192.168.123.175:8080/ServerProject/Recommend/SearchRecommend";
 
             try {
                 url = new URL(urlStr);
@@ -1022,10 +1143,10 @@ public class RecommendFragmentActivity extends FragmentActivity {
                 conn.setDoOutput(true);
                 HashMap<String, String> searchDataMap = new HashMap<String, String>();
                 searchDataMap.put("category", args[0]);
-                if(args[1]!=null){
+                if (args[1] != null) {
                     searchDataMap.put("title", args[1]);
                 }
-                if(args[2]!=null){
+                if (args[2] != null) {
                     searchDataMap.put("delivery", args[2]);
                 }
                 ObjectOutputStream oos = new ObjectOutputStream(conn.getOutputStream());
@@ -1038,7 +1159,7 @@ public class RecommendFragmentActivity extends FragmentActivity {
                     HashMap<Integer, HashMap<String, String>> searchMap = (HashMap<Integer, HashMap<String, String>>) ois.readObject();
                     Message msg = handler.obtainMessage();
                     msg.obj = searchMap;
-                    msg.what = 4;
+                    msg.what = SEARCH_SUCCESS;
                     handler.sendMessage(msg);
                 }
                 conn.disconnect();
@@ -1083,13 +1204,14 @@ public class RecommendFragmentActivity extends FragmentActivity {
             if (updownUpdateAsyncThread.getStatus() == AsyncTask.Status.RUNNING) {
                 updownUpdateAsyncThread.cancel(true);
             }
-            if (searchRecommendAsyncThread.getStatus() == AsyncTask.Status.RUNNING){
+            if (searchRecommendAsyncThread.getStatus() == AsyncTask.Status.RUNNING) {
                 searchRecommendAsyncThread.cancel(true);
             }
         } catch (Exception e) {
 
         }
     }
+
     /*
      뒤로가기 버튼을 2초내로 2번 누를 시 Application 종료
   */

@@ -76,5 +76,6 @@
     <string name="search">검색</string>
     <string name="auth">인증하기</string>
     <string name="freeboard_content">글을 작성해 주세요 (최대 100자)\n\n\n\n\n\n\n\n\n\n\n\n\n</string>
+    <string name="search_error">검색결과가 없습니다</string>
 
 </resources>

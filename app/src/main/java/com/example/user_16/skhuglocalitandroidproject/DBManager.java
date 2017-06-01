@@ -13,7 +13,6 @@ import java.util.HashMap;
  */
 
 public class DBManager extends SQLiteOpenHelper {
-    static int i, j;
 
     SQLiteDatabase db;
     String query = "";

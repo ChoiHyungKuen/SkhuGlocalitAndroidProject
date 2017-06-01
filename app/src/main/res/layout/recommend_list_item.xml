@@ -3,31 +3,29 @@
     android:orientation="horizontal"
     android:id="@+id/map"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:weightSum="12">
 
     <ImageView
         android:id="@+id/recommend_list_icon"
-        android:layout_width="wrap_content"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:layout_weight="1" />
+
+
+    <TextView
+        android:id="@+id/recommend_list_title"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1"/>
-
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="2"
-        android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/recommend_list_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="15dp"
-            android:layout_marginLeft="5dp"
-            android:layout_marginTop="14dp"
-            android:text="TextView" />
-
-    </LinearLayout>
+        android:layout_gravity="center_vertical"
+        android:layout_weight="11"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:textSize="15dp"
+        android:paddingLeft="15dp"
+        android:text="TextView" />
 
 
 

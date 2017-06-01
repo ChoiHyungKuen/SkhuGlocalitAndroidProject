@@ -52,9 +52,9 @@ public class RecommendListFragment extends Fragment{
         });
         listViewAdapter = new RecommendListFragment.ListViewAdapter(getContext());
         recommendListView.setAdapter(listViewAdapter);
-        listViewAdapter.addItem(ContextCompat.getDrawable(getContext(), R.drawable.icon), getString(R.string.map_show));
-        listViewAdapter.addItem(ContextCompat.getDrawable(getContext(), R.drawable.icon), getString(R.string.add_recommend));
-        listViewAdapter.addItem(ContextCompat.getDrawable(getContext(), R.drawable.icon), getString(R.string.recommend_search));
+        listViewAdapter.addItem(ContextCompat.getDrawable(getContext(), R.drawable.mapview), getString(R.string.map_show));
+        listViewAdapter.addItem(ContextCompat.getDrawable(getContext(), R.drawable.add), getString(R.string.add_recommend));
+        listViewAdapter.addItem(ContextCompat.getDrawable(getContext(), R.drawable.search_green), getString(R.string.recommend_search));
         listViewAdapter.dataChange();
         Log.d("리스트뷰 프래그먼트","완료");
         return rootView;
