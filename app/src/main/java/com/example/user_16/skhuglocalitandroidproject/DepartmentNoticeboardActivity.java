@@ -7,26 +7,17 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.ScrollView;
-import android.widget.TableLayout;
-import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.example.user_16.skhuglocalitandroidproject.BookDream.*;
-import com.example.user_16.skhuglocalitandroidproject.FreeNoticeBoard.FreeNoticeBoard_Main;
 
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -35,9 +26,10 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import static java.security.AccessController.getContext;
-
 public class DepartmentNoticeboardActivity extends AppCompatActivity {
+    private final long	FINSH_INTERVAL_TIME = 2000;         //2초안에 Back 버튼을 2번 누르면 앱 종료 -> 2초
+    private long backPressedTime = 0;
+    private TextView backBtn;
     private ListView noticeBoardListView = null;
     private SwipeRefreshLayout mSwipeRefreshLayout = null;
     private ListViewAdapter listViewAdapter = null;
@@ -90,6 +82,14 @@ public class DepartmentNoticeboardActivity extends AppCompatActivity {
         listViewAdapter.dataChange();
         backgroundInitDepartmentInfoThread = new InitDepartmentInfoAsyncThread();
         backgroundInitDepartmentInfoThread.execute();
+
+        backBtn = (TextView)findViewById(R.id.backBtn);
+        backBtn.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                DepartmentNoticeboardActivity.this.finish();    // 액티비티 종료
+            }
+        });
     }
 
     /*
@@ -265,6 +265,20 @@ public class DepartmentNoticeboardActivity extends AppCompatActivity {
         // AsyncTask.cancel(true) 호출시 실행되어 thread를 취소 합니다.
         protected void onCancelled() {
             super.onCancelled();
+        }
+    }
+
+    // 뒤로가기 버튼을 2초내로 2번 누를 시 Application 종료
+    @Override
+    public void onBackPressed() {
+        long tempTime = System.currentTimeMillis();
+        long intervalTime = tempTime - backPressedTime;
+
+        if ( 0 <= intervalTime && FINSH_INTERVAL_TIME >= intervalTime ) {
+            super.onBackPressed();
+        } else {
+            backPressedTime = tempTime;
+            Toast.makeText(getApplicationContext(), "\'뒤로\'버튼을 한번 더 누르시면 종료됩니다.", Toast.LENGTH_SHORT).show();
         }
     }
 }

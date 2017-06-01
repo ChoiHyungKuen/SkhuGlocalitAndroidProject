@@ -66,7 +66,7 @@ public class NoticeBoardListFragment extends Fragment {
         listViewAdapter = new ListViewAdapter(getContext());
         noticeBoardListView.setAdapter(listViewAdapter);
         listViewAdapter.addItem(ContextCompat.getDrawable(getContext(), R.drawable.image_book) ,"Book:Dream", "선,후배 간에 책을 주고 받을 수 있습니다.");
-        listViewAdapter.addItem(ContextCompat.getDrawable(getContext(), R.drawable.book), "자유게시판", "자유롭게 소통하세요!");
+        listViewAdapter.addItem(ContextCompat.getDrawable(getContext(), R.drawable.image_free), "자유게시판", "자유롭게 소통하세요!");
         listViewAdapter.addItem(ContextCompat.getDrawable(getContext(), R.drawable.image_info), "정보게시판", "정보를 주고 받을 수 있습니다.");
         listViewAdapter.addItem(ContextCompat.getDrawable(getContext(), R.drawable.image_gt), "학과게시판", "학과의 소식을 알 수 있습니다.");
 

@@ -1,10 +1,8 @@
 
 package com.example.user_16.skhuglocalitandroidproject;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -24,13 +22,19 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.user_16.skhuglocalitandroidproject.BookDream.GiveListData;
+import com.example.user_16.skhuglocalitandroidproject.BookDream.RequestListData;
+import com.example.user_16.skhuglocalitandroidproject.FreeNoticeBoard.FreeNoticeBoard_ListData;
+import com.example.user_16.skhuglocalitandroidproject.FreeNoticeBoard.FreeNoticeBoard_Main;
+import com.example.user_16.skhuglocalitandroidproject.InfoNoticeBoard.InfoNoticeBoard_ListData;
+import com.example.user_16.skhuglocalitandroidproject.InfoNoticeBoard.InfoNoticeBoard_Main;
+
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Random;
-import java.util.StringTokenizer;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -42,58 +46,67 @@ public class HomeFragment extends Fragment {
     private SharedPreferences auth_pref;
     SharedPreferences.Editor editor;
     private GetAttendanceInfoAsyncThread backgroundGetAttendanceInfoThread;
+
+    private TextView home_bookDream, home_bookDream2, home_freeBoard, home_infoBoard, home_departmentBoard;
+    private free_InitAsyncThread free_backgroundInitThread;             // 자유게시판 데이터 받아오기
+    private info_InitAsyncThread info_backgroundInitThread;             // 정보게시판 데이터 받아오기
+    private book_InitAsyncThread book_backgroundInitThread;             // 북드림(요청) 데이터 받아오기
+    private dream_InitAsyncThread dream_backgroundInitThread;           // 북드림(드림) 데이터 받아오기
+    private InitDepartmentInfoAsyncThread depart_backgroundInitThread;  // 학과게시판 데이터 받아오기
+
     final Handler handler = new Handler()
     {
         public void handleMessage(Message msg)
         {
             Bundle b = msg.getData();
 
-            String[][] attendanceInfo = (String[][]) msg.obj;
+            if(msg.what == 0){
+                String[][] attendanceInfo = (String[][]) msg.obj;
 
-            final TableLayout table = new TableLayout(getActivity());
-            table.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.MATCH_PARENT));
-            table.setShrinkAllColumns(true);
-            table.setStretchAllColumns(true);
-            TableRow rowTitle = new TableRow(getActivity());
-            rowTitle.setGravity(Gravity.CENTER_HORIZONTAL);
-            TableRow row = new TableRow(getActivity());
+                final TableLayout table = new TableLayout(getActivity());
+                table.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.MATCH_PARENT));
+                table.setShrinkAllColumns(true);
+                table.setStretchAllColumns(true);
+                TableRow rowTitle = new TableRow(getActivity());
+                rowTitle.setGravity(Gravity.CENTER_HORIZONTAL);
+                TableRow row = new TableRow(getActivity());
 
-            // title column/row
-            TextView title = new TextView(getActivity());
-            title.setText("출석 현황");
+                // title column/row
+                TextView title = new TextView(getActivity());
+                title.setText("출석 현황");
 
-            title.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 22);
-            title.setGravity(Gravity.CENTER);
-            title.setTypeface(Typeface.SERIF, Typeface.BOLD);
+                title.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 22);
+                title.setGravity(Gravity.CENTER);
+                title.setTypeface(Typeface.SERIF, Typeface.BOLD);
 
-            TableRow.LayoutParams params = new TableRow.LayoutParams();
-            params.span = 7;
+                TableRow.LayoutParams params = new TableRow.LayoutParams();
+                params.span = 7;
 
-            rowTitle.addView(title, params);
-            table.addView(rowTitle);
+                rowTitle.addView(title, params);
+                table.addView(rowTitle);
 
 
-            for(int i=0; i<attendanceInfo.length; i++) {
-                row=new TableRow(getActivity());
-                //row.setWeightSum(12f);
-                //row.setLayoutParams( new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT));
-                int subjectCnt =1;  // 75분 수업인경우 한셀에 두개과목이 들어감
-                for(int j=0; j<7; j++) {
-                    String s = attendanceInfo[i][j];
-                    TextView tx = new TextView(getActivity());
-                    tx.setText(s);
-                    tx.setTextSize(12f);
-                    tx.setTypeface(Typeface.DEFAULT_BOLD);
-                    row.addView(tx);
+                for(int i=0; i<attendanceInfo.length; i++) {
+                    row=new TableRow(getActivity());
+                    //row.setWeightSum(12f);
+                    //row.setLayoutParams( new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT));
+                    int subjectCnt =1;  // 75분 수업인경우 한셀에 두개과목이 들어감
+                    for(int j=0; j<7; j++) {
+                        String s = attendanceInfo[i][j];
+                        TextView tx = new TextView(getActivity());
+                        tx.setText(s);
+                        tx.setTextSize(12f);
+                        tx.setTypeface(Typeface.DEFAULT_BOLD);
+                        row.addView(tx);
+                    }
+
+                    table.addView(row);
                 }
 
-                table.addView(row);
-            }
-
-            table.setBackgroundResource(R.drawable.row_border);
-            ScrollView sv = new ScrollView(getActivity());
-            sv.addView(table);
-            attendanceLayout.addView(sv);
+                table.setBackgroundResource(R.drawable.row_border);
+                ScrollView sv = new ScrollView(getActivity());
+                sv.addView(table);
+                attendanceLayout.addView(sv);
             /*
 
             LinearLayout layout = new LinearLayout(getActivity());
@@ -104,6 +117,30 @@ public class HomeFragment extends Fragment {
             ViewGroup viewGroup =(ViewGroup) getView();
             viewGroup.removeAllViews();
             viewGroup.addView(layout);*/
+            }
+
+            // 자유게시판
+            if(msg.what == 1){
+                addItem_freeboard(b.getString("title"));
+            }
+            // 정보게시판
+            if(msg.what == 2){
+                addItem_infoboard(b.getString("title"));
+            }
+            // 북드림 게시판(요청)
+            if(msg.what == 3){
+                addItem_bookdream(b.getString("title"));
+            }
+            // 학과 게시판
+            if(msg.what == 4){
+                String[][] departmentInfo = (String[][]) msg.obj;
+                    String title = departmentInfo[0][0];
+                    addItem_department(title);
+            }
+            // 북드림 게시판(드림)
+            if(msg.what == 5){
+                addItem_dream(b.getString("title"));
+            }
         }
 
     };
@@ -142,9 +179,66 @@ public class HomeFragment extends Fragment {
             backgroundGetAttendanceInfoThread = new GetAttendanceInfoAsyncThread();
             backgroundGetAttendanceInfoThread.execute(dbManager.getMemberInfo().get("id"));
         }
+
+
+        free_backgroundInitThread = new free_InitAsyncThread();            // 자유게시판 DB로부터 데이터를 새로 받아온다.
+        free_backgroundInitThread.execute();
+        info_backgroundInitThread = new info_InitAsyncThread();            // 정보게시판 DB로부터 데이터를 새로 받아온다.
+        info_backgroundInitThread.execute();
+        book_backgroundInitThread = new book_InitAsyncThread();            // 북드림(요청) DB로부터 데이터를 새로 받아온다.
+        book_backgroundInitThread.execute();
+        dream_backgroundInitThread = new dream_InitAsyncThread();          // 북드림(드림) DB로부터 데이터를 새로 받아온다.
+        dream_backgroundInitThread.execute();
+        depart_backgroundInitThread = new InitDepartmentInfoAsyncThread(); // 학과 게시판 DB로부터 데이터를 새로 받아온다.
+        depart_backgroundInitThread.execute();
+
+        //북드림(요청)
+        home_bookDream = (TextView) rootView.findViewById(R.id.home_bookDream);
+        home_bookDream.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), com.example.user_16.skhuglocalitandroidproject.BookDream.MainActivity.class);
+                getActivity().startActivity(intent);
+            }
+        });
+        //북드림(드림)
+        home_bookDream2 = (TextView) rootView.findViewById(R.id.home_bookDream2);
+        home_bookDream2.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), com.example.user_16.skhuglocalitandroidproject.BookDream.MainActivity.class);
+                getActivity().startActivity(intent);
+            }
+        });
+        //자유게시판
+        home_freeBoard = (TextView) rootView.findViewById(R.id.home_freeBoard);
+        home_freeBoard.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), FreeNoticeBoard_Main.class);
+                getActivity().startActivity(intent);
+            }
+        });
+        //정보게시판
+        home_infoBoard = (TextView) rootView.findViewById(R.id.home_infoBoard);
+        home_infoBoard.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), InfoNoticeBoard_Main.class);
+                getActivity().startActivity(intent);
+            }
+        });
+        //학과게시판
+        home_departmentBoard = (TextView) rootView.findViewById(R.id.home_departmentBoard);
+        home_departmentBoard.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), DepartmentNoticeboardActivity.class);
+                getActivity().startActivity(intent);
+            }
+        });
+
         return rootView;
-
-
     }
     public  boolean isAuthStudent() {
         auth_pref = getActivity().getSharedPreferences("auth_Info", MODE_PRIVATE);
@@ -195,6 +289,7 @@ public class HomeFragment extends Fragment {
                 if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) { // 서버가 받았다면
                     Log.d("ois","왔다!");
                     Message msg = handler.obtainMessage();
+                    msg.what = 0;
                     Bundle b = new Bundle();
                     ObjectInputStream ois = new ObjectInputStream(conn.getInputStream());
                     String[][] attendanceInfo = (String[][]) ois.readObject();
@@ -234,5 +329,434 @@ public class HomeFragment extends Fragment {
         protected void onCancelled() {
             super.onCancelled();
         }
+    }
+
+    /*----------------------------------------------------------------------------------------------
+        홈 화면 - 자유게시판 한 줄 게시판 내용 받아오기
+    ----------------------------------------------------------------------------------------------*/
+    private class free_InitAsyncThread extends AsyncTask<Void, String, String> {
+        // Thread를 시작하기 전에 호출되는 함수
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        // Thread의 주요 작업을 처리 하는 함수
+        // Thread를 실행하기 위해 excute(~)에서 전달한 값을 인자로 받습니다.
+        protected String doInBackground(Void...args) {
+            URL url = null;
+            HttpURLConnection conn = null;
+            String urlStr = "";
+
+            urlStr = "http://"+getString(R.string.ip_address)+":8080/SkhuGlocalitWebProject/FreeNoticeBoard_Init";
+
+            try {
+                url = new URL(urlStr);
+                Log.d("test", urlStr);
+                conn = (HttpURLConnection) url.openConnection();
+                conn.setConnectTimeout(10000);
+                conn.setReadTimeout(10000);
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Cache-Control", "no-cache");
+                conn.setRequestProperty("Accept", "application/json");
+                conn.setRequestProperty("Content-type", "application/x-www-form-urlencoded");
+                conn.setDoInput(true);
+                conn.setDoOutput(true);
+                int responseCode = conn.getResponseCode();
+                Log.d("D", responseCode+"");
+                if (responseCode == HttpURLConnection.HTTP_OK) {    // 송수신이 잘되면 - 데이터를 받은 것입니다.
+                    Log.d("coded", "자유게시판 데이터 들어옴");
+                    ObjectInputStream ois = new ObjectInputStream(conn.getInputStream());
+                    HashMap<String, HashMap<String,String>> dataMap = (HashMap<String, HashMap<String,String>>)ois.readObject();
+                    ois.close();
+
+                    int i = dataMap.size()-1;
+                        HashMap<String, String> map = dataMap.get(i+"");
+                        Message msg_free = handler.obtainMessage();
+                        msg_free.what = 1;
+                        Bundle b = new Bundle();
+                        b.putString("title", map.get("title"));
+                        msg_free.setData(b);
+                        handler.sendMessage(msg_free);
+                }
+                conn.disconnect();
+            } catch (Exception e) {
+                Toast.makeText(getContext(), "Error 발생", Toast.LENGTH_SHORT).show();
+                Log.e("ERR", "InitAsyncThread ERR : " + e.getMessage());
+            }
+            return "";
+        }
+
+        // doInBackground(~)에서 호출되어 주로 UI 관련 작업을 하는 함수
+        protected void onProgressUpdate(String... progress) {}
+
+        // Thread를 처리한 후에 호출되는 함수
+        // doInBackground(~)의 리턴값을 인자로 받습니다.
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+        }
+
+        // AsyncTask.cancel(true) 호출시 실행되어 thread를 취소 합니다.
+        protected void onCancelled() {
+            super.onCancelled();
+        }
+    }
+
+    /*----------------------------------------------------------------------------------------------
+        홈 화면 - 정보게시판 한 줄 게시판 내용 받아오기
+    ----------------------------------------------------------------------------------------------*/
+    private class info_InitAsyncThread extends AsyncTask<Void, String, String> {
+        // Thread를 시작하기 전에 호출되는 함수
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        // Thread의 주요 작업을 처리 하는 함수
+        // Thread를 실행하기 위해 excute(~)에서 전달한 값을 인자로 받습니다.
+        protected String doInBackground(Void...args) {
+            URL url = null;
+            HttpURLConnection conn = null;
+            String urlStr = "";
+
+            urlStr = "http://"+getString(R.string.ip_address)+":8080/SkhuGlocalitWebProject/InfoNoticeBoard_Init";
+
+            try {
+                url = new URL(urlStr);
+                Log.d("test", urlStr);
+                conn = (HttpURLConnection) url.openConnection();
+                conn.setConnectTimeout(10000);
+                conn.setReadTimeout(10000);
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Cache-Control", "no-cache");
+                conn.setRequestProperty("Accept", "application/json");
+                conn.setRequestProperty("Content-type", "application/x-www-form-urlencoded");
+                conn.setDoInput(true);
+                conn.setDoOutput(true);
+                int responseCode = conn.getResponseCode();
+                Log.d("D", responseCode+"");
+                if (responseCode == HttpURLConnection.HTTP_OK) {    // 송수신이 잘되면 - 데이터를 받은 것입니다.
+                    Log.d("coded", "정보게시판 데이터 들어옴");
+                    ObjectInputStream ois = new ObjectInputStream(conn.getInputStream());
+                    HashMap<String, HashMap<String,String>> dataMap = (HashMap<String, HashMap<String,String>>)ois.readObject();
+                    ois.close();
+
+                        int i = dataMap.size()-1;
+                        HashMap<String, String> map = dataMap.get(i+"");
+                        Message msg_info = handler.obtainMessage();
+                        msg_info.what = 2;
+                        Bundle b = new Bundle();
+                        b.putString("title", map.get("title"));
+                        msg_info.setData(b);
+                        handler.sendMessage(msg_info);
+                }
+                conn.disconnect();
+            } catch (Exception e) {
+                Toast.makeText(getContext(), "Error 발생", Toast.LENGTH_SHORT).show();
+                Log.e("ERR", "InitAsyncThread ERR : " + e.getMessage());
+            }
+            return "";
+        }
+
+        // doInBackground(~)에서 호출되어 주로 UI 관련 작업을 하는 함수
+        protected void onProgressUpdate(String... progress) {}
+
+        // Thread를 처리한 후에 호출되는 함수
+        // doInBackground(~)의 리턴값을 인자로 받습니다.
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+        }
+
+        // AsyncTask.cancel(true) 호출시 실행되어 thread를 취소 합니다.
+        protected void onCancelled() {
+            super.onCancelled();
+        }
+    }
+
+    /*----------------------------------------------------------------------------------------------
+        홈 화면 - 북 드림(요청) 한 줄 게시판 내용 받아오기
+    ----------------------------------------------------------------------------------------------*/
+    public class book_InitAsyncThread extends AsyncTask<Void, String, String> {
+        // Thread를 시작하기 전에 호출되는 함수
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        // Thread의 주요 작업을 처리 하는 함수
+        // Thread를 실행하기 위해 excute(~)에서 전달한 값을 인자로 받습니다.
+        protected String doInBackground(Void...args) {
+            URL url = null;
+            HttpURLConnection conn = null;
+            String urlStr = "";
+
+            urlStr = "http://"+getString(R.string.ip_address)+":8080/SkhuGlocalitWebProject/bookdream/initRequestInfo";
+
+            try {
+                url = new URL(urlStr);
+                Log.d("test", urlStr);
+
+                conn = (HttpURLConnection) url.openConnection();
+                conn.setConnectTimeout(10000);
+                conn.setReadTimeout(10000);
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Cache-Control", "no-cache");
+                conn.setRequestProperty("Accept", "application/json");
+                conn.setRequestProperty("Content-type", "application/x-www-form-urlencoded");
+                conn.setDoInput(true);
+                conn.setDoOutput(true);
+                int responseCode = conn.getResponseCode();
+                Log.d("D", responseCode+"");
+                if (responseCode== HttpURLConnection.HTTP_OK) {    // 송수신이 잘되면 - 데이터를 받은 것
+                    Log.d("coded", "들어옴");
+                    ObjectInputStream ois = new ObjectInputStream(conn.getInputStream());
+                    HashMap<String, HashMap<String, String>> dataMap = (HashMap<String, HashMap<String, String>>) ois.readObject();
+                    ois.close();
+
+                    int i = dataMap.size()-1;
+                    HashMap<String, String> stringDataMap = dataMap.get(i + "");
+                    Message msg_book = handler.obtainMessage();
+                    msg_book.what = 3;
+                    Bundle b = new Bundle();
+                    b.putString("title", stringDataMap.get("title"));
+                    msg_book.setData(b);
+                    handler.sendMessage(msg_book);
+                }
+                conn.disconnect();
+            } catch (Exception e) {
+                //Toast.makeText(getActivity(), "Error 발생", Toast.LENGTH_SHORT).show();
+                Log.e("ERR", "InitAsyncThread ERR : " + e);
+            }
+            return "";
+        }
+
+        // doInBackground(~)에서 호출되어 주로 UI 관련 작업을 하는 함수
+        protected void onProgressUpdate(String... progress) {}
+
+        // Thread를 처리한 후에 호출되는 함수
+        // doInBackground(~)의 리턴값을 인자로 받는다.
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+        }
+
+        // AsyncTask.cancel(true) 호출시 실행되어 thread를 취소 합니다.
+        protected void onCancelled() {
+            super.onCancelled();
+        }
+    }
+
+    /*----------------------------------------------------------------------------------------------
+        홈 화면 - 학과 게시판 한 줄 게시판 내용 받아오기
+    ----------------------------------------------------------------------------------------------*/
+    public class InitDepartmentInfoAsyncThread extends AsyncTask<String, String, String> {
+
+        // Thread를 시작하기 전에 호출되는 함수
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        // Thread의 주요 작업을 처리 하는 함수
+        // Thread를 실행하기 위해 excute(~)에서 전달한 값을 인자로 받습니다.
+        protected String doInBackground(String... args) {
+            URL url = null;
+            HttpURLConnection conn = null;
+            String urlStr = "";
+            HashMap<String, String> dataMap = new HashMap<>();
+
+            urlStr = "http://"+getString(R.string.ip_address)+":8080/ForestWebProject/departmentNoticeboard/init";
+            try {
+                url = new URL(urlStr);
+                Log.d("test", urlStr);
+                conn = (HttpURLConnection) url.openConnection();
+                conn.setConnectTimeout(10000);
+                conn.setReadTimeout(10000);
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Cache-Control", "no-cache");
+                conn.setRequestProperty("Accept", "application/json");
+                conn.setRequestProperty("Content-type", "application/x-www-form-urlencoded");
+                conn.setDoInput(true);
+                conn.setDoOutput(true);
+
+                ObjectOutputStream oos =new ObjectOutputStream(conn.getOutputStream());
+                oos.writeObject(dataMap);
+                oos.flush();
+                if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) { // 서버가 받았다면
+                    Message msg_depart = handler.obtainMessage();
+                    msg_depart.what = 4;
+                    Bundle b = new Bundle();
+                    ObjectInputStream ois = new ObjectInputStream(conn.getInputStream());
+                    String[][] departmentInfo = (String[][]) ois.readObject();
+
+                    msg_depart.obj = departmentInfo;
+
+                    ois.close();
+                    msg_depart.setData(b);
+                    handler.sendMessage(msg_depart);
+                }
+                oos.close();
+                conn.disconnect();
+            } catch (Exception e) {
+                Log.e("ERR", "CompletePrecentCondionInfoAsyncThread ERR : " + e);
+            }
+
+            return "";
+        }
+
+        // doInBackground(~)에서 호출되어 주로 UI 관련 작업을 하는 함수
+        protected void onProgressUpdate(String... progress) {
+
+        }
+
+        // Thread를 처리한 후에 호출되는 함수
+        // doInBackground(~)의 리턴값을 인자로 받습니다.
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+        }
+
+        // AsyncTask.cancel(true) 호출시 실행되어 thread를 취소 합니다.
+        protected void onCancelled() {
+            super.onCancelled();
+        }
+    }
+
+    /*----------------------------------------------------------------------------------------------
+        홈 화면 - 북드림(드림) 한 줄 게시판 내용 받아오기
+    ----------------------------------------------------------------------------------------------*/
+    public class dream_InitAsyncThread extends AsyncTask<Void, String, String> {
+        // Thread를 시작하기 전에 호출되는 함수
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        // Thread의 주요 작업을 처리 하는 함수
+        // Thread를 실행하기 위해 excute(~)에서 전달한 값을 인자로 받습니다.
+        protected String doInBackground(Void...args) {
+            URL url = null;
+            HttpURLConnection conn = null;
+            String urlStr = "";
+            urlStr = "http://"+getString(R.string.ip_address)+":8080/SkhuGlocalitWebProject/bookdream/initGiveInfo";
+            try {
+                url = new URL(urlStr);
+                Log.d("test", urlStr);
+                conn = (HttpURLConnection) url.openConnection();
+                conn.setConnectTimeout(10000);
+                conn.setReadTimeout(10000);
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Cache-Control", "no-cache");
+                conn.setRequestProperty("Accept", "application/json");
+                conn.setRequestProperty("Content-type", "application/x-www-form-urlencoded");
+                conn.setDoInput(true);
+                conn.setDoOutput(true);
+                int responseCode = conn.getResponseCode();
+                Log.d("D", responseCode+"");
+                if (responseCode == HttpURLConnection.HTTP_OK) {    // 송수신이 잘되면 - 데이터를 받은 것입니다.
+                    Log.d("coded", "들어옴");
+                    ObjectInputStream ois = new ObjectInputStream(conn.getInputStream());
+                    HashMap<String, HashMap<String,String>> dataMap = (HashMap<String, HashMap<String,String>>)ois.readObject();
+                    ois.close();
+
+                        int i = dataMap.size()-1;
+                        HashMap<String, String> map = dataMap.get(i+"");
+                        Message msg_dream = handler.obtainMessage();
+                        msg_dream.what = 5;
+                        Bundle b = new Bundle();
+                        b.putString("title" , map.get("title"));
+                        msg_dream.setData(b);
+                        handler.sendMessage(msg_dream);
+
+                }
+                conn.disconnect();
+            } catch (Exception e) {
+                Toast.makeText(getActivity(), "Error 발생", Toast.LENGTH_SHORT).show();
+                Log.e("ERR", "InitAsyncThread ERR : " + e.getMessage());
+            }
+
+            return "";
+        }
+
+        // doInBackground(~)에서 호출되어 주로 UI 관련 작업을 하는 함수
+        protected void onProgressUpdate(String... progress) {}
+
+        // Thread를 처리한 후에 호출되는 함수
+        // doInBackground(~)의 리턴값을 인자로 받습니다.
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+        }
+
+        // AsyncTask.cancel(true) 호출시 실행되어 thread를 취소 합니다.
+        protected void onCancelled() {
+            super.onCancelled();
+        }
+    }
+
+    /*------------------------------------------
+        DB에서 받아온 데이터를 추가하는 메소드
+    --------------------------------------------*/
+    // 자유 게시판
+    public void addItem_freeboard(String fTitle) {
+        FreeNoticeBoard_ListData addInfo = null;
+        addInfo = new FreeNoticeBoard_ListData();
+
+        ArrayList<FreeNoticeBoard_ListData> free_ListData = new ArrayList<>();
+
+        //디비에서 받아온 데이터 저장
+        addInfo.fTitle = fTitle; //제목
+        free_ListData.add(addInfo);
+
+        home_freeBoard.setText(fTitle);
+        Log.d("홈화면 자유게시판 addItem","완료");
+    }
+    // 정보게시판
+    public void addItem_infoboard(String infoTitle) {
+        InfoNoticeBoard_ListData addInfo = null;
+        addInfo = new InfoNoticeBoard_ListData();
+
+        ArrayList<InfoNoticeBoard_ListData> info_ListData = new ArrayList<>();
+
+        //디비에서 받아온 데이터 저장
+        addInfo.infoTitle = infoTitle; //제목
+        info_ListData.add(addInfo);
+
+        home_infoBoard.setText(infoTitle);
+        Log.d("홈화면 정보게시판 addItem","완료");
+    }
+    // 북드림 게시판(요청)
+    public void addItem_bookdream(String bookTitle){
+        RequestListData addInfo = null;
+        addInfo = new RequestListData();
+
+        ArrayList<RequestListData> book_ListData = new ArrayList<>();
+
+        //디비에서 받아온 데이터 저장
+        addInfo.mTitle = bookTitle;
+        book_ListData.add(addInfo);
+
+        home_bookDream.setText(bookTitle);
+        Log.d("홈화면 북드림(요청) addItem","완료");
+    }
+    // 북드림 게시판(드림)
+    public void addItem_dream(String bookTitle){
+        GiveListData addInfo = null;
+        addInfo = new GiveListData();
+
+        ArrayList<GiveListData> dream_ListData = new ArrayList<>();
+
+        //디비에서 받아온 데이터 저장
+        addInfo.mTitle = bookTitle;
+        dream_ListData.add(addInfo);
+
+        home_bookDream2.setText(bookTitle);
+        Log.d("홈화면 북드림(드림) addItem","완료");
+    }
+    // 학과 게시판
+    public void addItem_department(String departTitle){
+        DepartmentNoticeBoardListData addInfo = null;
+        addInfo = new DepartmentNoticeBoardListData();
+
+        ArrayList<DepartmentNoticeBoardListData> book_ListData = new ArrayList<>();
+
+        //디비에서 받아온 데이터 저장
+        addInfo.mTitle = departTitle;
+        book_ListData.add(addInfo);
+
+        home_departmentBoard.setText(departTitle);
+        Log.d("홈화면 학과게시판 addItem","완료");
     }
 }
