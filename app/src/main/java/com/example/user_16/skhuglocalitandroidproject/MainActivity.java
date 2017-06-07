@@ -61,8 +61,6 @@ public class MainActivity extends FragmentActivity {
 
                 alert.setMessage(message);
                 alert.show();
-
-                //Toast.makeText(getContext(), "아이디나 비밀번호가 틀렸습니다. 잠시 후 시도해주세요.", Toast.LENGTH_LONG).show();
             } else {
                 succeedAuthStudent();
                 Toast.makeText(getApplicationContext(), "인증되었습니다!", Toast.LENGTH_LONG).show();
@@ -76,6 +74,12 @@ public class MainActivity extends FragmentActivity {
         setContentView(R.layout.activity_main);
         if(!isAuthStudent()) {
             showDialog();
+        } else {
+            // 이미 인증 되었으면 데이터 갱신
+            final DBManager dbManager = new DBManager(getApplicationContext(), "app_data.db", null, 1);
+            final HashMap <String, String> dataMap = dbManager.getMemberInfo();
+            backgroundGetInfoFromForestThread = new GetInfoFromForestAsyncThread();
+            backgroundGetInfoFromForestThread.execute(dataMap.get("id"));
         }
         FirebaseMessaging.getInstance().subscribeToTopic("news");
         FirebaseInstanceId.getInstance().getToken();
@@ -118,10 +122,6 @@ public class MainActivity extends FragmentActivity {
     public  boolean isAuthStudent() {
         auth_pref = getApplicationContext().getSharedPreferences("auth_Info", MODE_PRIVATE);
         if (!auth_pref.getString("auth", "").equals("")) {
-/*
-            editor = auth_pref.edit();
-            editor.putString("auth", "");
-            editor.commit();*/
             return true;
         } else {
             return false;
@@ -135,6 +135,8 @@ public class MainActivity extends FragmentActivity {
         editor.commit();
     }
     public void showDialog() {
+        final DBManager dbManager = new DBManager(getApplicationContext(), "app_data.db", null, 1);
+        final HashMap <String, String> dataMap = dbManager.getMemberInfo();
         LayoutInflater dialog = LayoutInflater.from(this);
         final View dialogLayout = dialog.inflate(R.layout.auth_dialog, null);
         final Dialog myDialog = new Dialog(this);
@@ -143,12 +145,12 @@ public class MainActivity extends FragmentActivity {
         myDialog.setContentView(dialogLayout);
         myDialog.setCancelable(false);
         myDialog.show();
-        final EditText authId = (EditText) dialogLayout.findViewById(R.id.auth_forest_input_id);
+        final TextView authId = (TextView) dialogLayout.findViewById(R.id.auth_forest_input_id);
         final EditText authPw = (EditText) dialogLayout.findViewById(R.id.auth_forest_input_pw);
         TextView contentTx = (TextView) dialogLayout.findViewById(R.id.auth_forest_tx);
         TextView requestBtn = (TextView)dialogLayout.findViewById(R.id.auth_request_btn);
         TextView cancelBtn = (TextView)dialogLayout.findViewById(R.id.auth_cancel_btn);
-
+        authId.setText(dataMap.get("id"));
         contentTx.setText("서비스를 이용하기 위해서는 Forest 사이트로부터 인증 받아야 합니다. \n" +
                 "학사 시스템 Forest 홈페이지의 아이디와 비밀번호를 입력하여 \n" +
                 "아래의 인증버튼을 누르세요.");
@@ -161,7 +163,7 @@ public class MainActivity extends FragmentActivity {
                 final HashMap <String, String> dataMap = dbManager.getMemberInfo();
                 backgroundGetInfoFromForestThread = new GetInfoFromForestAsyncThread();
                 backgroundGetInfoFromForestThread.execute(authId.getText().toString(),
-                        authPw.getText().toString(), dataMap.get("id"));
+                    authPw.getText().toString());
                 myDialog.dismiss();
             }
         });
@@ -224,8 +226,9 @@ public class MainActivity extends FragmentActivity {
             HashMap<String, String> dataMap = new HashMap<>();
 
             dataMap.put("id",args[0]);
-            dataMap.put("pw", args[1]);
-            dataMap.put("user", args[2]);
+            if(args.length > 1) {
+                dataMap.put("pw", args[1]);
+            }
             urlStr = "http://"+getString(R.string.ip_address)+":8080/ForestWebProject/auth/forest";
             try {
                 url = new URL(urlStr);

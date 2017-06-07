@@ -40,6 +40,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
 
 import okhttp3.FormBody;
@@ -87,6 +88,7 @@ public class RequestFragment extends Fragment {
                 else{
                     dAdapter.addItem(Integer.parseInt(b.getString("no")), b.getString("title"),
                             b.getString("date"), b.getString("user"), b.getString("period"), b.getString("content"));
+                    dAdapter.sort();
                     dAdapter.dataChange();
                 }
             }
@@ -285,29 +287,6 @@ public class RequestFragment extends Fragment {
                                 gTitle, user, view_user.getText().toString(),
                                 date, time, edit_where.getText().toString(),
                                 edit_content.getText().toString(), edit_phone.getText().toString());
-     /*                   OkHttpClient client = new OkHttpClient();
-                        RequestBody body = new FormBody.Builder()
-                                .add("title",gTitle)
-                                .add("giveUser", user)
-                                .add("requestUser", view_user.getText().toString())
-                                .add("date", date)
-                                .add("time", time)
-                                .add("where", edit_where.getText().toString())
-                                .add("content", edit_content.getText().toString())
-                                .add("phone", edit_phone.getText().toString())
-                                .build();
-
-                        //request
-                        Log.d("접속", "접속dd ");
-                        Request request = new Request.Builder()
-                                .url("http://"+getString(R.string.ip_address)+":8080/SkhuGlocalitWebProject/bookdream/giveMatch")
-                                .post(body)
-                                .build();
-                        try {
-                            client.newCall(request).execute();
-                        } catch (Exception e) {
-                            Log.d("에러","이거였으"+e);
-                        }*/
 
 
                     }
@@ -596,6 +575,10 @@ public class RequestFragment extends Fragment {
         // 데이터가 바뀌었음을 DB에 알려주는 메소드
         public void dataChange() {
             dAdapter.notifyDataSetChanged();
+        }
+        public void sort() {
+            Collections.sort(mListData, RequestListData.ALPHA_COMPARATOR);
+            Collections.reverse(mListData);
         }
     }
 

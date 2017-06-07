@@ -48,6 +48,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 
+import java.util.Collections;
 import java.util.HashMap;
 
 import static android.app.Activity.RESULT_OK;
@@ -101,6 +102,7 @@ public class GiveFragment extends Fragment {
                 Drawable icon = Drawable.createFromStream(is, "articleImage");
                 mAdapter.addItem(icon, b.getString("no"), b.getString("title"), b.getString("date"),
                                  b.getString("state"), b.getString("grade"), b.getString("user"));
+                mAdapter.sort();
                 mAdapter.dataChange();
             }
         }
@@ -413,7 +415,10 @@ public class GiveFragment extends Fragment {
             addInfo.mUser = mUser;
             mListData.add(addInfo);
         }
-
+        public void sort() {
+            Collections.sort(mListData, GiveListData.ALPHA_COMPARATOR);
+            Collections.reverse(mListData);
+        }
         // 리스트를 새로고침 하는 메소드
         public void clear(){
             mListData.clear();
@@ -752,7 +757,7 @@ public class GiveFragment extends Fragment {
                 stringDataMap.put("state",stringData .getString("state"));
                 stringDataMap.put("grade",stringData .getString("grade"));
                 stringDataMap.put("user",stringData .getString("user"));
-                        stringDataMap.put("file_name",stringData .getString("file_name"));
+                stringDataMap.put("file_name",stringData .getString("file_name"));
                 Bitmap bitmap = ((BitmapDrawable) dataMsg.obj).getBitmap();
                 ArrayList<byte[]> list = new ArrayList<byte[]>();
                 ByteArrayOutputStream stream = new ByteArrayOutputStream() ;

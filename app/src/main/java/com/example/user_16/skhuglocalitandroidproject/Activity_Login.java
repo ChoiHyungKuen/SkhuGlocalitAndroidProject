@@ -1,6 +1,8 @@
 
 package com.example.user_16.skhuglocalitandroidproject;
 
+import android.*;
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -24,6 +26,8 @@ import android.widget.Toast;
 import com.example.user_16.skhuglocalitandroidproject.BookDream.FirebaseInstanceIDService;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.gun0912.tedpermission.PermissionListener;
+import com.gun0912.tedpermission.TedPermission;
 
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -94,6 +98,26 @@ public class Activity_Login extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        PermissionListener permissionlistener = new PermissionListener() {
+            @Override
+            public void onPermissionGranted() {
+            }
+
+            @Override
+            public void onPermissionDenied(ArrayList<String> deniedPermissions) {
+                Toast.makeText(Activity_Login.this, "권한 거부\n" + deniedPermissions.toString(), Toast.LENGTH_SHORT).show();
+                finish();
+            }
+        };
+        new TedPermission(this)
+                .setPermissionListener(permissionlistener)
+                .setRationaleMessage("어플리케이션의 기능을 사용하시려면 권한들을 설정해주셔야 합니다.")
+
+                .setDeniedMessage("거부하시면 어플리케이션을 정상사용이 불가능합니다.\n하지만 [설정] > [권한] 에서 권한을 허용할 수 있어요.")
+                .setPermissions(android.Manifest.permission.READ_EXTERNAL_STORAGE, android.Manifest.permission.WRITE_EXTERNAL_STORAGE,android.Manifest.permission.CALL_PHONE,
+                        Manifest.permission.ACCESS_FINE_LOCATION)
+                .check();
+
         initProgram();
 
         text_id = (EditText)findViewById(R.id.text_id);
@@ -317,6 +341,7 @@ public class Activity_Login extends AppCompatActivity {
 */
     public  void initProgram() {
             Log.d("init","초기화 작업!");
+
             init_pref = getSharedPreferences("init_Info",MODE_PRIVATE);
             if(init_pref.getString("init","").equals("")) {         // 처음 프로그램 깔면 실행해야 될 것들을 여기서 처리
                 final DBManager dbManager = new DBManager(getApplicationContext(), "app_data.db", null, 1);

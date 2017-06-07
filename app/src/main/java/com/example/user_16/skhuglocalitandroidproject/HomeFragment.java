@@ -176,6 +176,10 @@ public class HomeFragment extends Fragment {
         });
         attendanceLayout = (LinearLayout) rootView.findViewById(R.id.attendance_layout);
         if(isAuthStudent()) {
+
+            auth_pref = getActivity().getSharedPreferences("auth_Info", MODE_PRIVATE);
+
+
             backgroundGetAttendanceInfoThread = new GetAttendanceInfoAsyncThread();
             backgroundGetAttendanceInfoThread.execute(dbManager.getMemberInfo().get("id"));
         }
