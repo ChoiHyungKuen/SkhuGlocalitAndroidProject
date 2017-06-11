@@ -65,13 +65,13 @@ public class RecommendFragmentActivity extends FragmentActivity {
     private ImageView recommend_searchImg;
     private Spinner recommend_category_sp;
     private int category_position;
-    private CheckBox recommend_delivery;
+    private CheckBox recommend_delivery, recommend_favorites;
     private EditText recommend_call_edit, recommend_edit_review;
     private Button recommend_up, recommend_down;
     private String recommend_longitude, recommend_latitude;
     private AlertDialog selectDialog, deleteDialog, searchDialog;
     private int up, down;
-    private boolean up_flag, down_flag, recommend_flag;
+    private boolean up_flag, down_flag, recommend_flag, favorite_flag;
 
     private FragmentManager fragmentManager;
     private FragmentTransaction fragmentTransaction;
@@ -176,7 +176,7 @@ public class RecommendFragmentActivity extends FragmentActivity {
         SelectOnClickListener selectOnClickListener = new SelectOnClickListener();
         final DBManager dbManager = new DBManager(getParent(), "app_data.db", null, 1);
         HashMap<String, String> memberInfo = dbManager.getMemberInfo();
-
+        final int favorites_count = dbManager.getCount();
         //뷰 아이디 매칭
         content_layout = (LinearLayout) alertLayout.findViewById(R.id.content_layout);
         edit_layout = (LinearLayout) alertLayout.findViewById(R.id.edit_layout);
@@ -194,6 +194,7 @@ public class RecommendFragmentActivity extends FragmentActivity {
         recommend_call_edit = (EditText) alertLayout.findViewById(R.id.recommend_call_edit);
         recommend_delivery = (CheckBox) alertLayout.findViewById(R.id.recommend_delivery);
         recommend_edit_review = (EditText) alertLayout.findViewById(R.id.recommend_edit_review);
+        recommend_favorites = (CheckBox) alertLayout.findViewById(R.id.recommend_favorites);
         recommend_up = (Button) alertLayout.findViewById(R.id.recommend_up);
         recommend_down = (Button) alertLayout.findViewById(R.id.recommend_down);
         recommend_edit = (TextView) alertLayout.findViewById(R.id.recommend_edit);
@@ -250,6 +251,8 @@ public class RecommendFragmentActivity extends FragmentActivity {
             content_layout.setWeightSum(6);
             edit_layout.setVisibility(View.VISIBLE);
         }
+        favorite_flag = dbManager.isFavorite(recommend_title.getText().toString(), recommend_longitude, recommend_latitude);
+        recommend_favorites.setChecked(favorite_flag);
 
         recommend_searchImg.setOnClickListener(selectOnClickListener);
         recommend_search.setOnClickListener(selectOnClickListener);
@@ -270,8 +273,10 @@ public class RecommendFragmentActivity extends FragmentActivity {
             public void onClick(DialogInterface dialog, int which) {
                 final DBManager dbManager = new DBManager(getApplicationContext(), "app_data.db", null, 1);
                 HashMap<String, String> data = dbManager.getMemberInfo();
+
                 String id = data.get("id");
                 String title = recommend_title.getText().toString();
+                String branch = recommend_branch.getText().toString();
                 String update_up = recommend_up.getText().toString();
                 String update_down = recommend_down.getText().toString();
                 String state = "not";
@@ -281,6 +286,25 @@ public class RecommendFragmentActivity extends FragmentActivity {
                     state = "down";
                 }
                 updownUpdate(title, recommend_longitude, recommend_latitude, id, state, update_up, update_down);
+                //이전에 등록했다
+                if (favorite_flag) {
+                    int no = dbManager.getFavoriteNo(title, recommend_longitude, recommend_latitude);
+                    //여전히 등록한다 - 업데이트
+                    if (recommend_favorites.isChecked()){
+                        dbManager.updateFavorite(no, update_up, update_down);
+                    }
+                    //추가를 취소한다 - 삭제
+                    else {
+                        dbManager.deleteFavorite(no);
+                    }
+                }
+                //등록하지 않았었다
+                else {
+                    //이번에 새로 등록한다 - 추가
+                    if (recommend_favorites.isChecked()){
+                        dbManager.add_favorites(favorites_count, title, branch, recommend_longitude, recommend_latitude, update_up, update_down);
+                    }
+                }
                 dialog.dismiss();
             }
         });
@@ -315,7 +339,7 @@ public class RecommendFragmentActivity extends FragmentActivity {
                         editor = map_pref.edit();
                         editor.putInt("longitude", Integer.parseInt(recommend_longitude));
                         editor.putInt("latitude", Integer.parseInt(recommend_latitude));
-                        editor.putInt("zoonlevel", 14);
+                        editor.putInt("zoomlevel", 14);
                         editor.commit();
                         selectDialog.dismiss();
                         searchDialog.dismiss();
@@ -523,15 +547,16 @@ public class RecommendFragmentActivity extends FragmentActivity {
         listViewAdapter = new ListViewAdapter(RecommendFragmentActivity.this);
         recommendSearchListView.setAdapter(listViewAdapter);
 
-        String title, longitude, latitude, up, down;
+        String title, branch, longitude, latitude, up, down;
         for (int i = 0; i < searchMap.size(); i++) {
             HashMap<String, String> searchOne = searchMap.get(i);
             title = searchOne.get("title");
+            branch = searchOne.get("branch");
             longitude = searchOne.get("longitude");
             latitude = searchOne.get("latitude");
             up = searchOne.get("up");
             down = searchOne.get("down");
-            listViewAdapter.addItem(title, longitude, latitude, up, down);
+            listViewAdapter.addItem(title, branch, longitude, latitude, up, down);
         }
 
         recommendSearchListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -687,6 +712,7 @@ public class RecommendFragmentActivity extends FragmentActivity {
      */
     private class ViewHolder {
         public TextView sTitle;
+        public TextView sBranch;
         public TextView sUp;
         public TextView sDown;
     }
@@ -728,6 +754,7 @@ public class RecommendFragmentActivity extends FragmentActivity {
                 convertView = inflater.inflate(R.layout.recommend_search_item, null);
 
                 holder.sTitle = (TextView) convertView.findViewById(R.id.search_title);
+                holder.sBranch = (TextView) convertView.findViewById(R.id.search_branch);
                 holder.sUp = (TextView) convertView.findViewById(R.id.search_up);
                 holder.sDown = (TextView) convertView.findViewById(R.id.search_down);
                 convertView.setTag(holder);
@@ -738,6 +765,7 @@ public class RecommendFragmentActivity extends FragmentActivity {
             RecommendSearchListData searchData = searchListData.get(position); // DListData로부터 해당 아이템의 데이터를 받아온다.
 
             holder.sTitle.setText(searchData.sTitle);
+            holder.sBranch.setText(searchData.sBranch);
             holder.sUp.setText(searchData.sUp);
             holder.sDown.setText(searchData.sDown);
             return convertView;
@@ -746,9 +774,10 @@ public class RecommendFragmentActivity extends FragmentActivity {
         /*
             리스트에 아이템을 추가하는 메소드
         */
-        public void addItem(String title, String longitude, String latitude, String up, String down) {
+        public void addItem(String title, String branch, String longitude, String latitude, String up, String down) {
             RecommendSearchListData addInfo = new RecommendSearchListData();
             addInfo.sTitle = title;
+            addInfo.sBranch = branch;
             addInfo.sLongitude = longitude;
             addInfo.sLatitude = latitude;
             addInfo.sUp = up;

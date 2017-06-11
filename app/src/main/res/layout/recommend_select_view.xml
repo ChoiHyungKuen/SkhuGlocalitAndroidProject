@@ -264,6 +264,14 @@
             android:layout_weight="1"
             android:weightSum="10">
 
+            <CheckBox
+                android:id="@+id/recommend_favorites"
+                android:layout_width="0dp"
+                android:layout_height="25dp"
+                android:layout_weight="4"
+                android:layout_margin="5dp"
+                android:text="즐겨찾기"/>
+
             <Button
                 android:id="@+id/recommend_up"
                 android:layout_width="0dp"

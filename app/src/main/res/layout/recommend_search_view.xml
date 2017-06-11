@@ -16,8 +16,10 @@
             android:id="@+id/search_condition"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:textColor="#151359"
+            android:textStyle="bold"
             android:textSize="20dp"
-            android:text="조건조건조건조건"/>
+            android:text="조건"/>
 
     </LinearLayout>
     <LinearLayout

@@ -118,6 +118,15 @@ public class MainActivity extends FragmentActivity {
         });
 
     }
+    public void setRecommendFragment(String longitude, String latitude){
+        map_pref = getSharedPreferences("map_center", MODE_PRIVATE);
+        editor = map_pref.edit();
+        editor.putInt("longitude", Integer.parseInt(longitude));
+        editor.putInt("latitude", Integer.parseInt(latitude));
+        editor.putInt("zoomlevel", 14);
+        editor.commit();
+        viewPager.setCurrentItem(4,true);
+    }
 
     public  boolean isAuthStudent() {
         auth_pref = getApplicationContext().getSharedPreferences("auth_Info", MODE_PRIVATE);

@@ -6,6 +6,7 @@ package com.example.user_16.skhuglocalitandroidproject;
 
 public class RecommendSearchListData {
     public String sTitle;
+    public String sBranch;
     public String sLongitude;
     public String sLatitude;
     public String sUp;

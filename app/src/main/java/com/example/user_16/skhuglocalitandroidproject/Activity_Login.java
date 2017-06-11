@@ -1,7 +1,6 @@
 
 package com.example.user_16.skhuglocalitandroidproject;
 
-import android.*;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -23,9 +22,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.user_16.skhuglocalitandroidproject.BookDream.FirebaseInstanceIDService;
 import com.google.firebase.iid.FirebaseInstanceId;
-import com.google.firebase.messaging.FirebaseMessaging;
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
 
@@ -114,7 +111,7 @@ public class Activity_Login extends AppCompatActivity {
                 .setRationaleMessage("어플리케이션의 기능을 사용하시려면 권한들을 설정해주셔야 합니다.")
 
                 .setDeniedMessage("거부하시면 어플리케이션을 정상사용이 불가능합니다.\n하지만 [설정] > [권한] 에서 권한을 허용할 수 있어요.")
-                .setPermissions(android.Manifest.permission.READ_EXTERNAL_STORAGE, android.Manifest.permission.WRITE_EXTERNAL_STORAGE,android.Manifest.permission.CALL_PHONE,
+                .setPermissions(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.CALL_PHONE,
                         Manifest.permission.ACCESS_FINE_LOCATION)
                 .check();
 

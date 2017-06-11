@@ -324,10 +324,10 @@ public class MapViewer extends NMapActivity {
                 String dongName = nMapPlacemark.dongName.toString();
                 String branch = null;
                 if (!doName.contains("도")){
-                    branch = doName.replace("광역시","").replace("특별시"," ");
+                    branch = doName.replace("광역시"," ").replace("특별시"," ");
                 }
                 if (branch == null){
-                    branch = siName.replace("시","");
+                    branch = siName.replace("시"," ");
                 }
                 for(int i = 0 ; i < dongName.length(); i ++) {
                     if(48 <= dongName.charAt(i) && dongName.charAt(i) <= 57)

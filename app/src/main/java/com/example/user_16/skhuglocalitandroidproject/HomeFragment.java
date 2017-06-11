@@ -1,6 +1,7 @@
 
 package com.example.user_16.skhuglocalitandroidproject;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
@@ -15,7 +16,10 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -53,6 +57,9 @@ public class HomeFragment extends Fragment {
     private book_InitAsyncThread book_backgroundInitThread;             // 북드림(요청) 데이터 받아오기
     private dream_InitAsyncThread dream_backgroundInitThread;           // 북드림(드림) 데이터 받아오기
     private InitDepartmentInfoAsyncThread depart_backgroundInitThread;  // 학과게시판 데이터 받아오기
+
+    private ListView recommendFavoriteListView = null;
+    private ListViewAdapter listViewAdapter = null;
 
     final Handler handler = new Handler()
     {
@@ -183,8 +190,31 @@ public class HomeFragment extends Fragment {
             backgroundGetAttendanceInfoThread = new GetAttendanceInfoAsyncThread();
             backgroundGetAttendanceInfoThread.execute(dbManager.getMemberInfo().get("id"));
         }
-
-
+        recommendFavoriteListView = (ListView) rootView.findViewById(R.id.favoriteList);
+        listViewAdapter = new ListViewAdapter(getActivity());
+        recommendFavoriteListView.setAdapter(listViewAdapter);
+        HashMap<Integer, HashMap<String, String>> favoritesList = dbManager.getFavoritesList();
+        HashMap<String, String> favorites;
+        String title, branch, longitude, latitude, up, down;
+        for (int i = 0; i < favoritesList.size(); i++){
+            favorites = favoritesList.get(i);
+            title = favorites.get("title");
+            branch = favorites.get("branch");
+            longitude = favorites.get("longitude");
+            latitude = favorites.get("latitude");
+            up = favorites.get("up");
+            down = favorites.get("down");
+            listViewAdapter.addItem(title, branch, longitude, latitude, up, down);
+        }
+        recommendFavoriteListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                RecommendSearchListData recommendListData = (RecommendSearchListData)listViewAdapter.getItem(position);
+                String longitude = recommendListData.sLongitude;
+                String latitude = recommendListData.sLatitude;
+                ((MainActivity)getActivity()).setRecommendFragment(longitude, latitude);
+            }
+        });
         free_backgroundInitThread = new free_InitAsyncThread();            // 자유게시판 DB로부터 데이터를 새로 받아온다.
         free_backgroundInitThread.execute();
         info_backgroundInitThread = new info_InitAsyncThread();            // 정보게시판 DB로부터 데이터를 새로 받아온다.
@@ -762,5 +792,94 @@ public class HomeFragment extends Fragment {
 
         home_departmentBoard.setText(departTitle);
         Log.d("홈화면 학과게시판 addItem","완료");
+    }
+
+    /**
+     * 리스트 뷰 관련
+     */
+    private class ViewHolder {
+        public TextView sTitle;
+        public TextView sBranch;
+        public TextView sUp;
+        public TextView sDown;
+    }
+
+    private class ListViewAdapter extends BaseAdapter {
+        private Context mContext = null;
+        private ArrayList<RecommendSearchListData> searchListData = new ArrayList<>();
+
+        public ListViewAdapter(Context mContext) {
+            super();
+            this.mContext = mContext;
+        }
+
+        // 총 몇개의 리스트가 있는지 반환
+        @Override
+        public int getCount() {
+            return searchListData.size();
+        }
+
+        // 사용자가 선택한 아이템을 반환
+        @Override
+        public Object getItem(int position) {
+            return searchListData.get(position);
+        }
+
+        // ID(몇 번째 아이템인지) 반환
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            ViewHolder holder;
+            if (convertView == null) {
+                holder = new ViewHolder();
+
+                LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                convertView = inflater.inflate(R.layout.recommend_search_item, null);
+
+                holder.sTitle = (TextView) convertView.findViewById(R.id.search_title);
+                holder.sBranch = (TextView) convertView.findViewById(R.id.search_branch);
+                holder.sUp = (TextView) convertView.findViewById(R.id.search_up);
+                holder.sDown = (TextView) convertView.findViewById(R.id.search_down);
+                convertView.setTag(holder);
+            } else {
+                holder = (ViewHolder) convertView.getTag();
+            }
+
+            RecommendSearchListData searchData = searchListData.get(position); // DListData로부터 해당 아이템의 데이터를 받아온다.
+
+            holder.sTitle.setText(searchData.sTitle);
+            holder.sBranch.setText(searchData.sBranch);
+            holder.sUp.setText(searchData.sUp);
+            holder.sDown.setText(searchData.sDown);
+            return convertView;
+        }
+
+        /*
+            리스트에 아이템을 추가하는 메소드
+        */
+        public void addItem(String title, String branch, String longitude, String latitude, String up, String down) {
+            RecommendSearchListData addInfo = new RecommendSearchListData();
+            addInfo.sTitle = title;
+            addInfo.sBranch = branch;
+            addInfo.sLongitude = longitude;
+            addInfo.sLatitude = latitude;
+            addInfo.sUp = up;
+            addInfo.sDown = down;
+            searchListData.add(addInfo);
+        }
+
+        // 리스트를 새로고침 하는 메소드
+        public void clear() {
+            searchListData.clear();
+        }
+
+        // 데이터가 바뀌었음을 DB에 알려주는 메소드
+        public void dataChange() {
+            listViewAdapter.notifyDataSetChanged();
+        }
     }
 }
