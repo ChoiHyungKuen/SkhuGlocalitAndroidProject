@@ -809,8 +809,8 @@ public class RecommendFragmentActivity extends FragmentActivity {
             HttpURLConnection conn = null;
             String urlStr = "";
 
-//            urlStr = "http://" + getString(R.string.ip_address) + ":8080/SkhuGlocalitWebProject/recommend/AddRecommend";
-            urlStr = "http://192.168.123.175:8080/ServerProject/Recommend/AddRecommend";
+            urlStr = "http://" + getString(R.string.ip_address) + ":8080/SkhuGlocalitWebProject/recommend/AddRecommend";
+//            urlStr = "http://192.168.123.175:8080/ServerProject/Recommend/AddRecommend";
 
             try {
                 url = new URL(urlStr);
