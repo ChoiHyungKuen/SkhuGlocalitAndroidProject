@@ -801,11 +801,10 @@ public class RequestFragment extends Fragment {
                 oos.close();
                 Log.d("test", "remove_write");
                 if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) { // 서버가 받았다면
-                    Log.d("coded", "들어옴");
                     ObjectInputStream ois = new ObjectInputStream(conn.getInputStream());
                     HashMap<String, HashMap<String, String>> dataMap = (HashMap<String, HashMap<String, String>>)ois.readObject();
                     ois.close();
-
+                    Log.d("reomve_coded", "들어옴"+dataMap.size());
                     for(int i=0; i<dataMap.size(); i++) {
                         HashMap<String, String> stringDataMap = dataMap.get(i+"");
                         Message msg = handler.obtainMessage();

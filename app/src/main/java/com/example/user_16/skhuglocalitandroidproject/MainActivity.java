@@ -64,6 +64,41 @@ public class MainActivity extends FragmentActivity {
             } else {
                 succeedAuthStudent();
                 Toast.makeText(getApplicationContext(), "인증되었습니다!", Toast.LENGTH_LONG).show();
+                FirebaseMessaging.getInstance().subscribeToTopic("news");
+                FirebaseInstanceId.getInstance().getToken();
+                tabLayout = (TabLayout) findViewById(R.id.tab_layout);
+                tabLayout.addTab(tabLayout.newTab().setText("홈").setIcon(imageResId[0]));
+                tabLayout.addTab(tabLayout.newTab().setText("게시판").setIcon(imageResId[1]));
+                tabLayout.addTab(tabLayout.newTab().setText("시간표").setIcon(imageResId[2]));
+                tabLayout.addTab(tabLayout.newTab().setText("추천맛집").setIcon(imageResId[3]));
+                tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
+
+                // Initializing ViewPager
+                viewPager = (ViewPager) findViewById(R.id.pager);
+
+                // Creating TabPagerAdapter adapter
+                TabPagerAdapter pagerAdapter = new TabPagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount());
+                viewPager.setAdapter(pagerAdapter);
+                viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+
+                // Set TabSelectedListener
+                tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+
+                    @Override
+                    public void onTabSelected(TabLayout.Tab tab) {
+                        viewPager.setCurrentItem(tab.getPosition());
+                    }
+
+                    @Override
+                    public void onTabUnselected(TabLayout.Tab tab) {
+
+                    }
+
+                    @Override
+                    public void onTabReselected(TabLayout.Tab tab) {
+
+                    }
+                });
             }
 
         }
@@ -81,41 +116,7 @@ public class MainActivity extends FragmentActivity {
             backgroundGetInfoFromForestThread = new GetInfoFromForestAsyncThread();
             backgroundGetInfoFromForestThread.execute(dataMap.get("id"));
         }
-        FirebaseMessaging.getInstance().subscribeToTopic("news");
-        FirebaseInstanceId.getInstance().getToken();
-        tabLayout = (TabLayout) findViewById(R.id.tab_layout);
-        tabLayout.addTab(tabLayout.newTab().setText("홈").setIcon(imageResId[0]));
-        tabLayout.addTab(tabLayout.newTab().setText("게시판").setIcon(imageResId[1]));
-        tabLayout.addTab(tabLayout.newTab().setText("시간표").setIcon(imageResId[2]));
-        tabLayout.addTab(tabLayout.newTab().setText("추천맛집").setIcon(imageResId[3]));
-        tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
-        // Initializing ViewPager
-        viewPager = (ViewPager) findViewById(R.id.pager);
-
-        // Creating TabPagerAdapter adapter
-        TabPagerAdapter pagerAdapter = new TabPagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount());
-        viewPager.setAdapter(pagerAdapter);
-        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-
-        // Set TabSelectedListener
-        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                viewPager.setCurrentItem(tab.getPosition());
-            }
-
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-
-            }
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-
-            }
-        });
 
     }
     public void setRecommendFragment(String longitude, String latitude){
@@ -173,6 +174,7 @@ public class MainActivity extends FragmentActivity {
                 backgroundGetInfoFromForestThread = new GetInfoFromForestAsyncThread();
                 backgroundGetInfoFromForestThread.execute(authId.getText().toString(),
                     authPw.getText().toString());
+
                 myDialog.dismiss();
             }
         });
@@ -243,8 +245,8 @@ public class MainActivity extends FragmentActivity {
                 url = new URL(urlStr);
                 Log.d("test", urlStr);
                 conn = (HttpURLConnection) url.openConnection();
-                conn.setConnectTimeout(10000);
-                conn.setReadTimeout(10000);
+                conn.setConnectTimeout(50000);
+                conn.setReadTimeout(50000);
                 conn.setRequestMethod("POST");
                 conn.setRequestProperty("Cache-Control", "no-cache");
                 conn.setRequestProperty("Accept", "application/json");

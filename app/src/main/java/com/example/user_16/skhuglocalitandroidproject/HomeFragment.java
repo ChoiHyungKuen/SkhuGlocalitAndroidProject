@@ -103,6 +103,7 @@ public class HomeFragment extends Fragment {
                         TextView tx = new TextView(getActivity());
                         tx.setText(s);
                         tx.setTextSize(12f);
+                        tx.setGravity(Gravity.CENTER);
                         tx.setTypeface(Typeface.DEFAULT_BOLD);
                         row.addView(tx);
                     }

@@ -5,6 +5,18 @@
     android:orientation="vertical"
     android:weightSum="100">
 
+    <TextView
+        android:id="@+id/textView6"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="5"
+        android:layout_gravity="center_vertical|center_horizontal"
+        android:layout_marginBottom="12dp"
+        android:foregroundGravity="center_vertical|center"
+        android:gravity="center_vertical|center_horizontal|center"
+        android:text="@string/homefragment_title"
+        android:textSize="25dp" />
+
     <LinearLayout
         android:id="@+id/attendance_layout"
         android:layout_width="match_parent"
@@ -19,7 +31,6 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="25"
-        android:background="#e7e7e7"
         android:paddingLeft="15dp"
         android:paddingRight="15dp"
         android:orientation="vertical"
@@ -49,7 +60,6 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="40"
-        android:background="#e9e8e8"
         android:orientation="vertical">
 
         <TextView
@@ -305,7 +315,7 @@
         android:layout_height="0dp"
         android:orientation="vertical"
         android:gravity="center"
-        android:layout_weight="10">
+        android:layout_weight="5">
 
         <!--<TextView-->
         <!--android:id="@+id/textView3"-->

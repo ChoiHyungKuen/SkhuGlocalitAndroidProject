@@ -23,6 +23,7 @@
     <string name="action_settings">Settings</string>
     <string name="section_format">Hello World from section: %1$d</string>
 
+    <string name="homefragment_title">나의 현황 및 새로운 소식</string>
     <string name="enter_id">학번 입력</string>
     <string name="enter_pw">비밀번호 입력</string>
     <string name="iog_in">LOG IN</string>
