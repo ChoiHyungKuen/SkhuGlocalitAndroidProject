@@ -81,6 +81,7 @@ public class FreeNoticeBoard_Main extends AppCompatActivity {
                     listAdapter.addItem(Integer.parseInt(b.getString("no")), icon, b.getString("title"), b.getString("user"),
                             b.getString("content"), b.getString("date"));
                     Log.d("핸들러", "자유게시판 아이템 추가했니?");
+                    //listAdapter.sort();
                     listAdapter.dataChange();
                 }
             }
@@ -118,13 +119,14 @@ public class FreeNoticeBoard_Main extends AppCompatActivity {
         freeboard_ListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+                final FreeNoticeBoard_ListData freeData = (FreeNoticeBoard_ListData) listAdapter.getItem(position);
 
                 Intent intent = new Intent(getApplicationContext(), FreeNoticeBoard_View.class);
-                int p = position;               // Main에서 View로 인텐트할 때 position값을 넘겨주기 위해
+
+                int p = freeData.fNo;           // Main에서 View로 인텐트할 때 position값을 넘겨주기 위해
                 intent.putExtra("position",p);  // 현재리스트 숫자로 만드는 uniqueNum
                 Log.d("현재 위치 인덱스 값---->>", p+"");
 
-                FreeNoticeBoard_ListData freeData = (FreeNoticeBoard_ListData) listAdapter.getItem(position);
                 intentImage = freeData.fIcon; //drawable형 선택한 해당 위치 이미지
 
                 // 인텐트할 때 이미지 데이터형을 drawable로 못넘겨주기때문에 byte[]으로 바꿔서 보내준다.
@@ -161,7 +163,7 @@ public class FreeNoticeBoard_Main extends AppCompatActivity {
                 final HashMap<String, String> dataMap = dbManager.getMemberInfo();
                 String userName = dataMap.get("name");
 
-                FreeNoticeBoard_ListData fData = (FreeNoticeBoard_ListData) listAdapter.getItem(position);
+                final FreeNoticeBoard_ListData fData = (FreeNoticeBoard_ListData) listAdapter.getItem(position);
                 if (!fData.fUser.equals(userName)) {    // 해당 글 작성자가 아닌 경우 실패 메세지를 띄우고 삭제 취소
                     Log.d("user", fData.fUser);
                     Log.d("userInfo", userName);
@@ -175,11 +177,11 @@ public class FreeNoticeBoard_Main extends AppCompatActivity {
                         .setPositiveButton("확인", new DialogInterface.OnClickListener(){
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                Log.d("d","해당 글 번호 : " + position);
+                                Log.d("d","해당 글 번호 : " + fData.fNo);
                                 listAdapter.clear();
 
                                 backgroundRemoveThread = new RemoveAsyncThread();
-                                backgroundRemoveThread.execute(position+"");        // DB에서 삭제
+                                backgroundRemoveThread.execute(fData.fNo+"");        // DB에서 삭제
 
                                 backgroundInitThread = new InitAsyncThread();       // 삭제 후 새로고침
                                 backgroundInitThread.execute();
@@ -336,6 +338,12 @@ public class FreeNoticeBoard_Main extends AppCompatActivity {
             Log.d("자유게시판 에드아이템","-----------------------------------------");
         }
 
+       /* // 리스트 뷰에 글이 역순으로 추가되도록 하는 메소드
+        public void sort() {
+            Collections.sort(free_ListData, FreeNoticeBoard_ListData.ALPHA_COMPARATOR);
+            Collections.reverse(free_ListData);
+        }*/
+
         // 리스트를 새로고침 하는 메소드
         public void clear() {
             free_ListData.clear();
@@ -346,7 +354,6 @@ public class FreeNoticeBoard_Main extends AppCompatActivity {
             listAdapter.notifyDataSetChanged();
         }
     }
-
 
     /*----------------------------------------------------------------------------------------------
         리스트 뷰 새로고침 스레드
@@ -388,7 +395,7 @@ public class FreeNoticeBoard_Main extends AppCompatActivity {
                     HashMap<String, byte[]> imgByteMap = (HashMap<String, byte[]>)ois.readObject();
                     ois.close();
 
-                    for(int i=0; i<dataMap.size(); i++) {
+                    for(int i=dataMap.size()-1; i>=0; i--) {
                         HashMap<String, String> map = dataMap.get(i+"");
                         Message msg = handler.obtainMessage();
                         Bundle b = new Bundle();
@@ -402,6 +409,21 @@ public class FreeNoticeBoard_Main extends AppCompatActivity {
                         msg.setData(b);
                         handler.sendMessage(msg);
                     }
+
+                    /*for(int i=0; i<dataMap.size(); i++) {
+                        HashMap<String, String> map = dataMap.get(i+"");
+                        Message msg = handler.obtainMessage();
+                        Bundle b = new Bundle();
+                        b.putString("status", "init");//체크
+                        b.putString("no", map.get("no"));
+                        b.putString("title", map.get("title"));
+                        b.putString("user", map.get("user"));
+                        b.putString("content", map.get("content"));
+                        b.putString("date", map.get("date"));
+                        msg.obj = imgByteMap.get(map.get("img_des"));   //이미지
+                        msg.setData(b);
+                        handler.sendMessage(msg);
+                    }*/
                 }
                 conn.disconnect();
             } catch (Exception e) {
@@ -473,7 +495,7 @@ public class FreeNoticeBoard_Main extends AppCompatActivity {
                     HashMap<String, byte[]> imgByteMap = (HashMap<String, byte[]>)ois.readObject();
                     ois.close();
 
-                    for(int i=0; i<dataMap.size(); i++) {
+                    for(int i=dataMap.size()-1; i>=0; i--) {
                         HashMap<String, String> map = dataMap.get(i+"");
                         Message msg = handler.obtainMessage();
                         Bundle b = new Bundle();
@@ -487,6 +509,20 @@ public class FreeNoticeBoard_Main extends AppCompatActivity {
                         msg.setData(b);
                         handler.sendMessage(msg);
                     }
+                    /*for(int i=0; i<dataMap.size(); i++) {
+                        HashMap<String, String> map = dataMap.get(i+"");
+                        Message msg = handler.obtainMessage();
+                        Bundle b = new Bundle();
+
+                        b.putString("no", map.get("no"));
+                        b.putString("title", map.get("title"));
+                        b.putString("user", map.get("user"));
+                        b.putString("content", map.get("content"));
+                        b.putString("date", map.get("date"));
+                        msg.obj = imgByteMap.get(map.get("img_des"));
+                        msg.setData(b);
+                        handler.sendMessage(msg);
+                    }*/
                 }
                 conn.disconnect();
 

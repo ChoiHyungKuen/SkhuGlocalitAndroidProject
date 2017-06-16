@@ -18,7 +18,7 @@
         android:layout_width="385dp"
         android:layout_height="150dp"
         android:layout_weight="10"
-        android:src="@drawable/image01"/>
+        android:src="@drawable/logo3"/>
 
     <LinearLayout
         android:layout_width="match_parent"

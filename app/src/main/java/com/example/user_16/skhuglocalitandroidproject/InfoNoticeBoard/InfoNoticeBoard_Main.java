@@ -80,6 +80,7 @@ public class InfoNoticeBoard_Main extends AppCompatActivity {
                     listAdapter.addItem(Integer.parseInt(b.getString("no")), icon, b.getString("title"), b.getString("user"),
                                         b.getString("content"), b.getString("date"));
                     Log.d("핸들러", "정보게시판 아이템 추가했니?");
+                    //listAdapter.sort();
                     listAdapter.dataChange();
                 }
             }
@@ -117,13 +118,13 @@ public class InfoNoticeBoard_Main extends AppCompatActivity {
         Infoboard_listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+                final InfoNoticeBoard_ListData infoData = (InfoNoticeBoard_ListData) listAdapter.getItem(position);
 
                 Intent intent = new Intent(getApplicationContext(), InfoNoticeBoard_View.class);
-                    int p = position;               // Main에서 View로 인텐트할 때 position값을 넘겨주기 위해
+                    int p = infoData.infoNo;               // Main에서 View로 인텐트할 때 position값을 넘겨주기 위해
                     intent.putExtra("position",p);  // 현재리스트 숫자로 만드는 uniqueNum
                     Log.d("현재 위치 인덱스 값---->>", p+"");
 
-                InfoNoticeBoard_ListData infoData = (InfoNoticeBoard_ListData) listAdapter.getItem(position);
                     intentImage = infoData.infoIcon; //drawable형 선택한 해당 위치 이미지
 
                     // 인텐트할 때 이미지 데이터형을 drawable로 못넘겨주기때문에 byte[]으로 바꿔서 보내준다.
@@ -161,7 +162,7 @@ public class InfoNoticeBoard_Main extends AppCompatActivity {
                 final HashMap<String, String> dataMap = dbManager.getMemberInfo();
                 String userName = dataMap.get("name");
 
-                InfoNoticeBoard_ListData iData = (InfoNoticeBoard_ListData) listAdapter.getItem(position);
+                final InfoNoticeBoard_ListData iData = (InfoNoticeBoard_ListData) listAdapter.getItem(position);
                 if (!iData.infoUser.equals(userName)) {    // 해당 글 작성자가 아닌 경우 실패 메세지를 띄우고 삭제 취소
                     Log.d("user", iData.infoUser);
                     Log.d("userInfo", userName);
@@ -175,11 +176,11 @@ public class InfoNoticeBoard_Main extends AppCompatActivity {
                         .setPositiveButton("확인", new DialogInterface.OnClickListener(){
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                Log.d("d","해당 글 번호 : " + position);
+                                Log.d("d","해당 글 번호 : " + iData.infoNo);
                                 listAdapter.clear();
 
                                 backgroundRemoveThread = new RemoveAsyncThread();
-                                backgroundRemoveThread.execute(position+"");        // DB에서 해당 글 삭제
+                                backgroundRemoveThread.execute(iData.infoNo+"");        // DB에서 해당 글 삭제
 
                                 backgroundInitThread = new InitAsyncThread();       // 삭제 후 새로고침
                                 backgroundInitThread.execute();
@@ -334,6 +335,12 @@ public class InfoNoticeBoard_Main extends AppCompatActivity {
             Log.d("정보게시판 에드아이템","-----------------------------------------");
         }
 
+        /*// 리스트 뷰에 글이 역순으로 추가되도록 하는 메소드
+        public void sort() {
+            Collections.sort(info_ListData, InfoNoticeBoard_ListData.ALPHA_COMPARATOR);
+            Collections.reverse(info_ListData);
+        }*/
+
         // 리스트를 새로고침 하는 메소드
         public void clear() {
             info_ListData.clear();
@@ -386,7 +393,7 @@ public class InfoNoticeBoard_Main extends AppCompatActivity {
                 HashMap<String, byte[]> imgByteMap = (HashMap<String, byte[]>)ois.readObject();
                 ois.close();
 
-                for(int i=0; i<dataMap.size(); i++) {
+                for(int i=dataMap.size()-1; i>=0; i--) {
                     HashMap<String, String> map = dataMap.get(i+"");
                     Message msg = handler.obtainMessage();
                     Bundle b = new Bundle();
@@ -400,6 +407,7 @@ public class InfoNoticeBoard_Main extends AppCompatActivity {
                     msg.setData(b);
                     handler.sendMessage(msg);
                 }
+
             }
             conn.disconnect();
         } catch (Exception e) {
@@ -471,7 +479,7 @@ public class InfoNoticeBoard_Main extends AppCompatActivity {
                     HashMap<String, byte[]> imgByteMap = (HashMap<String, byte[]>)ois.readObject();
                     ois.close();
 
-                    for(int i=0; i<dataMap.size(); i++) {
+                    for(int i=dataMap.size()-1; i>=0; i--) {
                         HashMap<String, String> map = dataMap.get(i+"");
                         Message msg = handler.obtainMessage();
                         Bundle b = new Bundle();
@@ -485,6 +493,7 @@ public class InfoNoticeBoard_Main extends AppCompatActivity {
                         msg.setData(b);
                         handler.sendMessage(msg);
                     }
+
                 }
                 conn.disconnect();
 
