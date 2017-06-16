@@ -429,6 +429,8 @@ public class RecommendFragmentActivity extends FragmentActivity {
                     }
                     break;
                 case R.id.recommend_edit:
+                    recommend_search.setVisibility(View.GONE);
+                    recommend_searchImg.setVisibility(View.GONE);
                     content_layout.setWeightSum(5);
                     recommend_category.setVisibility(View.GONE);
                     recommend_callNumber.setVisibility(View.GONE);
@@ -447,6 +449,8 @@ public class RecommendFragmentActivity extends FragmentActivity {
                     break;
 
                 case R.id.recommend_save:
+                    recommend_search.setVisibility(View.VISIBLE);
+                    recommend_searchImg.setVisibility(View.VISIBLE);
                     category = recommend_category_sp.getSelectedItem().toString();
                     category_position = recommend_category_sp.getSelectedItemPosition();
                     title = recommend_title.getText().toString();
