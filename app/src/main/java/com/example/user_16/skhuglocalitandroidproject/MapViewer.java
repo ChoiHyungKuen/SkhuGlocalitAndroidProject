@@ -157,6 +157,12 @@ public class MapViewer extends NMapActivity {
             super.handleMessage(msg);
             switch (msg.what) {
                 case ADD_POINT:
+                    final DBManager dbManager = new DBManager(getApplicationContext(), "app_data.db", null, 1);
+                    int count = dbManager.getCount();
+                    Boolean[] noArray = new Boolean[count];
+                    for (int i = 0; i < noArray.length; i++){
+                        noArray[i] = false;
+                    }
                     HashMap<Integer, HashMap<String, String>> recommendListMap = (HashMap<Integer, HashMap<String, String>>) msg.obj;
                     String title, longitude, latitude;
                     for (int i = 0; i < recommendListMap.size(); i++) {
@@ -164,7 +170,16 @@ public class MapViewer extends NMapActivity {
                         title = locationData.get("title");
                         longitude = locationData.get("longitude");
                         latitude = locationData.get("latitude");
+                        if (dbManager.isFavorite(title,longitude,latitude)) {
+                            int no = dbManager.getFavoriteNo(title,longitude,latitude);
+                            noArray[no] = true;
+                        }
                         initRecommendPoint(title, Integer.parseInt(longitude), Integer.parseInt(latitude));
+                    }
+                    for (int i = 0; i < noArray.length; i++){
+                        if (!noArray[i]){
+                            dbManager.deleteFavorite(i);
+                        }
                     }
                     map_pref = getSharedPreferences("map_center", MODE_PRIVATE);
                     if (map_pref.getInt("longitude", 0) != 0 && map_pref.getInt("latitude", 0) != 0 && map_pref.getInt("zoomlevel", 0) != 0) {

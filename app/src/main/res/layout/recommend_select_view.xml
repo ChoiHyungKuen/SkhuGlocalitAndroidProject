@@ -96,7 +96,7 @@
                     android:layout_weight="3"
                     android:gravity="end"
                     android:text="학번"
-                    android:textSize="6pt"
+                    android:textSize="5pt"
                     android:textStyle="bold"
                     android:textColor="#232325"/>
 
@@ -110,7 +110,7 @@
                     android:layout_weight="2"
                     android:gravity="center_horizontal"
                     android:text="작성자"
-                    android:textSize="6pt"
+                    android:textSize="5pt"
                     android:textStyle="bold"
                     android:textColor="#232325"/>
             </LinearLayout>
